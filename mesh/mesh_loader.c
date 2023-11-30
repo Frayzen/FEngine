@@ -19,7 +19,7 @@ int parse_tri_ids(char *str, int *v, int *vt)
         if (str[i] >= '0' && str[i] <= '9')
         {
             char *next = NULL;
-            float val = strtof(str + i, &next);
+            int val = strtol(str + i, &next, 10);
             if (*v == -1)
                 *v = val;
             else if (*vt != -1)
@@ -49,12 +49,18 @@ void parse_tri(char *line, struct mesh *m)
         if (cur >= 2)
         {
             int id = m->tris_nb;
-            m->tris[id].vids[0] = v[0];
-            m->tris[id].vids[1] = v[cur - 1];
-            m->tris[id].vids[2] = v[cur];
-            m->tris[id].vtids[0] = vt[0];
-            m->tris[id].vtids[1] = vt[cur - 1];
-            m->tris[id].vtids[2] = vt[cur];
+            if (m->tris_nb < 10)
+            {
+                printf("heijn %d\n", v[0]);
+                printf("%d\n", id);
+            }
+            m->tris[id].v_ids[0] = v[0];
+            m->tris[id].v_ids[1] = v[cur - 1];
+            m->tris[id].v_ids[2] = v[cur];
+            m->tris[id].vt_ids[0] = vt[0];
+            m->tris[id].vt_ids[1] = vt[cur - 1];
+            m->tris[id].vt_ids[2] = vt[cur];
+            m->tris_nb++;
         }
         cur++;
     }
@@ -103,7 +109,7 @@ void parse_vertex(char *line, struct mesh *m)
     m->v_nb++;
 }
 
-void parse_vertex_text(char *line, struct mesh *m)
+void parse_vtext(char *line, struct mesh *m)
 {
     float *vt = m->vt + m->vt_nb * 2;
     if (sscanf(line, "vt %f %f", vt, vt+1) != 2)
@@ -117,6 +123,10 @@ void parse_lines(char *line, size_t len, struct mesh *m)
         return;
     if (CHECK_V(line))
         parse_vertex(line, m);
+    if (CHECK_VT(line))
+        parse_vtext(line, m);
+    if (CHECK_TRI(line))
+        parse_tri(line, m);
 }
 
 struct mesh*create_mesh_from_obj(const char *path)

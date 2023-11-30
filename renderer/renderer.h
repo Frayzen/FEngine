@@ -9,6 +9,7 @@
 
 struct Renderer{
     struct mesh* meshes; 
+    int mesh_nb;
 };
 
 struct Renderer initialize(void);

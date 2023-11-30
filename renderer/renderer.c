@@ -1,4 +1,5 @@
 #include "renderer/renderer.h"
+#include "mesh/mesh.h"
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image/stb_image.h"
 
@@ -154,9 +155,9 @@ unsigned int createBuffer(void)
     return buffer;
 }
 
-GLFWwindow *createWindow(void)
+GLFWwindow *createWindow(const char *name)
 {
-    GLFWwindow* window = glfwCreateWindow(800, 600, "Engine", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(800, 600, name, NULL, NULL);
 
     if (window == NULL)
     {
@@ -189,7 +190,7 @@ struct Renderer*init_renderer(const char *windowsName)
 
     struct Renderer *rd = calloc(1, sizeof(struct Renderer));
 
-    GLFWwindow *window = createWindow();
+    GLFWwindow *window = createWindow(windowsName);
     if (!window)
         return NULL;
     //create buffers
@@ -203,7 +204,7 @@ struct Renderer*init_renderer(const char *windowsName)
     unsigned int vertexShader = loadShader(GL_VERTEX_SHADER, vertexShaderSource);
     unsigned int fragmentShader = loadShader(GL_FRAGMENT_SHADER, fragmentShaderSource);
     unsigned int shaderProgram = glCreateProgram();
-    unsigned int texture = createTexture("./assets/block.png");
+    // unsigned int texture = createTexture("./assets/block.png");
 
     //compile and attach
     glAttachShader(shaderProgram, vertexShader);
@@ -232,15 +233,15 @@ struct Renderer*init_renderer(const char *windowsName)
 
     glUseProgram(shaderProgram);
     glUniform1i(glGetUniformLocation(shaderProgram, "text"), 0);
-    return 
+    return rd;
 }
 
-void destroy(struct Renderer *r)
+void destroyRenderer(struct Renderer *r)
 {
     if (!r)
         return;
-
-
+    for (int i = 0; i < r->mesh_nb; i++)
+        destroy_mesh(r->meshes + i);
     free(r);
 }
 
