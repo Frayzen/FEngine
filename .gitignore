@@ -2,6 +2,8 @@
 !*.c
 !*.h
 !*.obj
+!*.glsl
+!assets/**
 !.gitignore
 !*/
 !**/Makefile

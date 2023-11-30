@@ -1,7 +1,4 @@
 #include "shader.h"
-#include <GL/gl.h>
-#include <GLFW/glfw3.h>
-#include <bits/types/FILE.h>
 #include <err.h>
 #include <stdio.h>
 #include <stdlib.h>

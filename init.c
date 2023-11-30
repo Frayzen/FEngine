@@ -1,5 +1,6 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
+#include "renderer/shader.h"
 #include <stdio.h>
 #include <stdlib.h>
 #define STB_IMAGE_IMPLEMENTATION
@@ -9,30 +10,6 @@
 #define VERSION "beta 0.0"
 
 #define UNUSED(X) ((void)X)
-
-const char *vertexShaderSource = "\n"
-    "#version 330 core\n"
-    "layout (location = 1) in vec2 texCoord;\n"
-    "layout (location = 0) in vec3 aPos;\n"
-    "out vec2 exTexCoord;\n"
-    "\n"
-    "void main()\n"
-    "{\n"
-    "gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-    "exTexCoord=texCoord;\n"
-    "}\n";
-
-const char *fragmentShaderSource = "\n"
-    "#version 330 core\n"
-    "out vec4 FragColor;\n"
-    "in vec2 exTexCoord;\n"
-    "uniform sampler2D text;\n"
-    "\n"
-    "void main()\n"
-    "{\n"
-    " FragColor=texture(text, exTexCoord);\n"
-    "}\n";
-
 
 float vertices[] = {
     0.5f,  0.5f, 0.0f,  // top right
@@ -71,11 +48,7 @@ void setWindowFPS (GLFWwindow* win)
 
     if ( currentTime - lastTime >= 1.0 ){ // If last cout was more than 1 sec ago
         char title [256];
-        title [255] = '\0';
-
-        snprintf ( title, 255,
-                  "%s %s - [FPS: %3.2f]",
-                  TITLE, VERSION, (float)nbFrames );
+        sprintf(title, "%s %s - [FPS: %3.2f]", TITLE, VERSION, (float)nbFrames );
 
         glfwSetWindowTitle (win, title);
 
@@ -141,15 +114,6 @@ void debugCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsiz
     }
 }
 
-unsigned int loadShader(GLenum shaderType, const char *source)
-{
-    unsigned int vertexShader;
-    vertexShader = glCreateShader(shaderType);
-    glShaderSource(vertexShader, 1, &source, NULL);
-    glCompileShader(vertexShader);
-    return vertexShader;
-}
-
 unsigned int createBuffer(void)
 {
     unsigned int buffer;
@@ -205,8 +169,8 @@ int main()
     unsigned int ElementBuffer = createBuffer();
 
     //create shaders
-    unsigned int vertexShader = loadShader(GL_VERTEX_SHADER, vertexShaderSource);
-    unsigned int fragmentShader = loadShader(GL_FRAGMENT_SHADER, fragmentShaderSource);
+    unsigned int vertexShader = createShader(GL_VERTEX_SHADER, "./assets/vertexShader.glsl");
+    unsigned int fragmentShader = createShader(GL_FRAGMENT_SHADER, "./assets/fragmentShadder.glsl");
     unsigned int shaderProgram = glCreateProgram();
     unsigned int texture = createTexture("./assets/block.png");
     //compile and attach
