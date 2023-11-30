@@ -35,7 +35,7 @@ int parse_tri_ids(char *str, int *v, int *vt)
 }
 
 #define MAX_VERT_PER_FACE 32
-void parse_tri(char *line, struct mesh *m)
+void parse_tri(char *line, mesh *m)
 {
     line++;
     while(isspace(*line))
@@ -66,7 +66,7 @@ void parse_tri(char *line, struct mesh *m)
     }
 }
 
-void count_lines(char *line, size_t len, struct mesh *m)
+void count_lines(char *line, size_t len, mesh *m)
 {
     if (len < 3)
         return;
@@ -89,7 +89,7 @@ void count_lines(char *line, size_t len, struct mesh *m)
     }
 }
 
-void parse(FILE *f, lineParser parser, struct mesh *m)
+void parse(FILE *f, lineParser parser, mesh *m)
 {
     char *line = NULL;
     size_t len = 0;
@@ -101,7 +101,7 @@ void parse(FILE *f, lineParser parser, struct mesh *m)
     }
 }
 
-void parse_vertex(char *line, struct mesh *m)
+void parse_vertex(char *line, mesh *m)
 {
     float *v = m->v + m->v_nb * 3;
     if (sscanf(line, "v %f %f %f", v, v+1, v+2) != 3)
@@ -109,7 +109,7 @@ void parse_vertex(char *line, struct mesh *m)
     m->v_nb++;
 }
 
-void parse_vtext(char *line, struct mesh *m)
+void parse_vtext(char *line, mesh *m)
 {
     float *vt = m->vt + m->vt_nb * 2;
     if (sscanf(line, "vt %f %f", vt, vt+1) != 2)
@@ -117,7 +117,7 @@ void parse_vtext(char *line, struct mesh *m)
     m->vt_nb++;
 }
 
-void parse_lines(char *line, size_t len, struct mesh *m)
+void parse_lines(char *line, size_t len, mesh *m)
 {
     if (len < 3)
         return;
@@ -129,16 +129,16 @@ void parse_lines(char *line, size_t len, struct mesh *m)
         parse_tri(line, m);
 }
 
-struct mesh*create_mesh_from_obj(const char *path)
+mesh*create_mesh_from_obj(const char *path)
 {
     FILE *f = fopen(path, "r");
     if (f == NULL)
         errx(1, "Could not read %s", path);
-    struct mesh *m = calloc(1, sizeof(struct mesh));
+    mesh *m = calloc(1, sizeof(mesh));
     parse(f, count_lines, m);
     m->v = malloc(sizeof(float) * 3 * m->v_nb);
     m->vt = malloc(sizeof(float) * 2 * m->vt_nb);
-    m->tris = malloc(sizeof(struct tri) * m->tris_nb);
+    m->tris = malloc(sizeof(tri) * m->tris_nb);
     m->v_nb = 0;
     m->vt_nb = 0;
     m->tris_nb = 0;

@@ -1,7 +1,7 @@
 #include "mesh.h"
 #include <stdlib.h>
 
-void destroy_mesh(struct mesh *mesh)
+void destroy_mesh(mesh *mesh)
 {
     if (!mesh)
         return;
@@ -11,7 +11,7 @@ void destroy_mesh(struct mesh *mesh)
     free(mesh);
 }
 
-void print_mesh(struct mesh* m)
+void print_mesh(mesh* m)
 {
     printf("NBV %d\n", m->v_nb);
     printf("NBVT %d\n", m->vt_nb);
