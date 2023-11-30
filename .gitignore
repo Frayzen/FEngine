@@ -2,8 +2,8 @@
 !*.c
 !*.h
 !.gitignore
+!*/
 !assets/**
-!*/*/
 !**/Makefile
 !README
 .git
