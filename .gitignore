@@ -1,10 +1,9 @@
 *
 !*.c
 !*.h
+!*.obj
 !.gitignore
 !*/
-!assets/**
 !**/Makefile
 !README
 .git
-*.o
