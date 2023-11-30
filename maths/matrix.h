@@ -3,29 +3,30 @@
 
 #include "vector.h"
 
-struct mat4{
+typedef struct mat4{
     float m[4][4];
-};
+} mat4;
 
-struct mat3{
+typedef struct mat3{
     float m[3][3];
-};
+} mat3;
 
-struct mat4 mat4_identity(void);
-struct mat4 mat4_mul(struct mat4 a, struct mat4 b);
-struct mat4 mat4_translate(struct mat4 a, struct vec3 b);
-struct mat4 mat4_scale(struct mat4 a, struct vec3 b);
-struct mat4 mat4_rotate_x(struct mat4 a, float b);
-struct mat4 mat4_rotate_y(struct mat4 a, float b);
-struct mat4 mat4_rotate_z(struct mat4 a, float b);
-struct mat4 mat4_ortho(float left, float right, float bottom, float top, float near, float far);
-struct mat4 mat4_perspective(float fov, float aspect, float near, float far);
-struct mat4 mat4_look_at(struct vec3 eye, struct vec3 center, struct vec3 up);
+mat4 mat4_identity(void);
+mat4 mat4_mul(mat4 a, mat4 b);
+mat4 mat4_translate(mat4 a, vec3 b);
+mat4 mat4_scale(mat4 a, vec3 b);
+mat4 mat4_rotate_x(mat4 a, float b);
+mat4 mat4_rotate_y(mat4 a, float b);
+mat4 mat4_rotate_z(mat4 a, float b);
+mat4 mat4_ortho(float left, float right, float bottom, float top, float near, float far);
+mat4 mat4_perspective(float fov, float aspect, float near, float far);
+mat4 mat4_look_at(vec3 eye, vec3 center, vec3 up);
+mat4 mat4_transform(vec3 pos, vec3 scale, vec3 rot);
 
-struct mat3 mat3_identity(void);
-struct mat3 mat3_mul(struct mat3 a, struct mat3 b);
-struct mat3 mat3_translate(struct mat3 a, struct vec2 b);
-struct mat3 mat3_scale(struct mat3 a, struct vec2 b);
-struct mat3 mat3_rotate(float b);
+mat3 mat3_identity(void);
+mat3 mat3_mul(mat3 a, mat3 b);
+mat3 mat3_translate(mat3 a, vec2 b);
+mat3 mat3_scale(mat3 a, vec2 b);
+mat3 mat3_rotate(float b);
 
 #endif /* !MATRIX_H */
