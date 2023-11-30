@@ -1,9 +1,5 @@
-<<<<<<< HEAD
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
-#include "renderer/shader.h"
-#include <stdio.h>
-#include <stdlib.h>
+#include "renderer/renderer.h"
+#include "mesh/mesh.h"
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image/stb_image.h"
 
@@ -11,6 +7,30 @@
 #define VERSION "beta 0.0"
 
 #define UNUSED(X) ((void)X)
+
+const char *vertexShaderSource = "\n"
+    "#version 330 core\n"
+    "layout (location = 1) in vec2 texCoord;\n"
+    "layout (location = 0) in vec3 aPos;\n"
+    "out vec2 exTexCoord;\n"
+    "\n"
+    "void main()\n"
+    "{\n"
+    "gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
+    "exTexCoord=texCoord;\n"
+    "}\n";
+
+const char *fragmentShaderSource = "\n"
+    "#version 330 core\n"
+    "out vec4 FragColor;\n"
+    "in vec2 exTexCoord;\n"
+    "uniform sampler2D text;\n"
+    "\n"
+    "void main()\n"
+    "{\n"
+    " FragColor=texture(text, exTexCoord);\n"
+    "}\n";
+
 
 float vertices[] = {
     0.5f,  0.5f, 0.0f,  // top right
@@ -49,7 +69,11 @@ void setWindowFPS (GLFWwindow* win)
 
     if ( currentTime - lastTime >= 1.0 ){ // If last cout was more than 1 sec ago
         char title [256];
-        sprintf(title, "%s %s - [FPS: %3.2f]", TITLE, VERSION, (float)nbFrames );
+        title [255] = '\0';
+
+        snprintf ( title, 255,
+                  "%s %s - [FPS: %3.2f]",
+                  TITLE, VERSION, (float)nbFrames );
 
         glfwSetWindowTitle (win, title);
 
@@ -115,6 +139,15 @@ void debugCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsiz
     }
 }
 
+unsigned int loadShader(GLenum shaderType, const char *source)
+{
+    unsigned int vertexShader;
+    vertexShader = glCreateShader(shaderType);
+    glShaderSource(vertexShader, 1, &source, NULL);
+    glCompileShader(vertexShader);
+    return vertexShader;
+}
+
 unsigned int createBuffer(void)
 {
     unsigned int buffer;
@@ -122,18 +155,9 @@ unsigned int createBuffer(void)
     return buffer;
 }
 
-void init(void)
+GLFWwindow *createWindow(const char *name)
 {
-    glfwInit();
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
-    glfwWindowHint(GLFW_OPENGL_CORE_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-}
-
-GLFWwindow *createWindow(void)
-{
-    GLFWwindow* window = glfwCreateWindow(800, 600, "Engine", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(800, 600, name, NULL, NULL);
 
     if (window == NULL)
     {
@@ -156,12 +180,19 @@ GLFWwindow *createWindow(void)
     return window;
 }
 
-int main()
+struct Renderer*init_renderer(const char *windowsName)
 {
-    init();
-    GLFWwindow *window = createWindow();
+    glfwInit();
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
+    glfwWindowHint(GLFW_OPENGL_CORE_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
+    struct Renderer *rd = calloc(1, sizeof(struct Renderer));
+
+    GLFWwindow *window = createWindow(windowsName);
     if (!window)
-        return -1;
+        return NULL;
     //create buffers
     glDebugMessageCallback(debugCallback, NULL);
 
@@ -170,10 +201,11 @@ int main()
     unsigned int ElementBuffer = createBuffer();
 
     //create shaders
-    unsigned int vertexShader = createShader(GL_VERTEX_SHADER, "./assets/vertexShader.glsl");
-    unsigned int fragmentShader = createShader(GL_FRAGMENT_SHADER, "./assets/fragmentShadder.glsl");
+    unsigned int vertexShader = loadShader(GL_VERTEX_SHADER, vertexShaderSource);
+    unsigned int fragmentShader = loadShader(GL_FRAGMENT_SHADER, fragmentShaderSource);
     unsigned int shaderProgram = glCreateProgram();
-    unsigned int texture = createTexture("./assets/block.png");
+    // unsigned int texture = createTexture("./assets/block.png");
+
     //compile and attach
     glAttachShader(shaderProgram, vertexShader);
     glAttachShader(shaderProgram, fragmentShader);
@@ -201,32 +233,15 @@ int main()
 
     glUseProgram(shaderProgram);
     glUniform1i(glGetUniformLocation(shaderProgram, "text"), 0);
-
-    // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-    // glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-    while(!glfwWindowShouldClose(window))
-    {
-        glClear(GL_COLOR_BUFFER_BIT);
-        setWindowFPS(window);
-        //render
-        glUseProgram(shaderProgram);
-        glBindTexture(GL_TEXTURE_2D, texture);
-        glBindVertexArray(VAO);
-        glDrawElements(GL_TRIANGLES, NB_TRI * 3, GL_UNSIGNED_INT, 0);
-
-        glfwSwapBuffers(window);
-        glfwPollEvents();    
-    }
-    //clear
-    glDeleteBuffers(1, &VertexBuffer);
-    glDeleteBuffers(1, &TextureBuffer);
-    glDeleteBuffers(1, &ElementBuffer);
-    glDetachShader(shaderProgram, vertexShader);
-    glDetachShader(shaderProgram, fragmentShader);
-    glDeleteShader(vertexShader);
-    glDeleteShader(fragmentShader);
-    glDeleteProgram(shaderProgram);
-    glfwDestroyWindow(window);
-    glfwTerminate();
-    return 0;
+    return rd;
 }
+
+void destroyRenderer(struct Renderer *r)
+{
+    if (!r)
+        return;
+    for (int i = 0; i < r->mesh_nb; i++)
+        destroy_mesh(r->meshes + i);
+    free(r);
+}
+
