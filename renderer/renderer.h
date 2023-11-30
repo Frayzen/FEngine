@@ -1,18 +1,26 @@
 #ifndef RENDERER_H
 #define RENDERER_H
 
+#include "mesh/mesh.h"
 #include <GL/glew.h>
-#include <GL/gl.h>
 #include <GLFW/glfw3.h>
+#include <GL/gl.h>
 #include <stdio.h>
 #include <stdlib.h>
 
-struct Renderer{
-    struct mesh* meshes; 
+typedef struct Renderer{
+    GLFWwindow *window;
+    GLint vertexShader;
+    GLint fragmentShader;
+    GLint shaderProgram;
+    mesh* meshes; 
     int mesh_nb;
-};
+} renderer;
 
-struct Renderer initialize(void);
-void destroyRenderer(struct Renderer *rd);
+renderer *initRenderer(const char *windowsName);
+void defineVertexShader(renderer *rd, const char *path);
+void defineFragmentShader(renderer *rd, const char *path);
+int startRendering(renderer *rd);
+void destroyRenderer(renderer *rd);
 
 #endif /* !RENDERER_H */

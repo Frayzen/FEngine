@@ -1,5 +1,8 @@
 #include "renderer/renderer.h"
 #include "mesh/mesh.h"
+#include "renderer/shader.h"
+#include <GL/glext.h>
+#include <GLFW/glfw3.h>
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image/stb_image.h"
 
@@ -7,29 +10,6 @@
 #define VERSION "beta 0.0"
 
 #define UNUSED(X) ((void)X)
-
-const char *vertexShaderSource = "\n"
-    "#version 330 core\n"
-    "layout (location = 1) in vec2 texCoord;\n"
-    "layout (location = 0) in vec3 aPos;\n"
-    "out vec2 exTexCoord;\n"
-    "\n"
-    "void main()\n"
-    "{\n"
-    "gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-    "exTexCoord=texCoord;\n"
-    "}\n";
-
-const char *fragmentShaderSource = "\n"
-    "#version 330 core\n"
-    "out vec4 FragColor;\n"
-    "in vec2 exTexCoord;\n"
-    "uniform sampler2D text;\n"
-    "\n"
-    "void main()\n"
-    "{\n"
-    " FragColor=texture(text, exTexCoord);\n"
-    "}\n";
 
 
 float vertices[] = {
@@ -115,37 +95,16 @@ void debugCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsiz
     UNUSED(userParam);
     switch (severity) {
         case GL_DEBUG_SEVERITY_MEDIUM:
-            fprintf(
-                stderr,
-                "WARNING: %s \n",
-                message
-            );
+            fprintf(stdout, "WARNING: %s \n", message);
             break;
         case GL_DEBUG_SEVERITY_HIGH:
-            fprintf(
-                stderr,
-                "ERROR: %s \n",
-                message
-            );
+            fprintf(stdout, "ERROR: %s \n", message);
             exit(-1);
             break;
         default:
-            // fprintf(
-            //     stdout,
-            //     "INFO: %s \n",
-            //     message
-            // );
+            // fprintf(stdout, "INFO: %s \n", message);
             return;
     }
-}
-
-unsigned int loadShader(GLenum shaderType, const char *source)
-{
-    unsigned int vertexShader;
-    vertexShader = glCreateShader(shaderType);
-    glShaderSource(vertexShader, 1, &source, NULL);
-    glCompileShader(vertexShader);
-    return vertexShader;
 }
 
 unsigned int createBuffer(void)
@@ -180,68 +139,83 @@ GLFWwindow *createWindow(const char *name)
     return window;
 }
 
-struct Renderer*init_renderer(const char *windowsName)
+void defineVertexShader(renderer *rd, const char *path)
+{
+    if (rd->vertexShader)
+    {
+        glDetachShader(rd->shaderProgram, rd->vertexShader);
+        glDeleteShader(rd->vertexShader);
+    }
+    rd->vertexShader = createShader(GL_VERTEX_SHADER, path);
+    glAttachShader(rd->shaderProgram, rd->vertexShader);
+}
+
+void defineFragmentShader(renderer *rd, const char *path)
+{
+    if (rd->fragmentShader)
+    {
+        glDetachShader(rd->shaderProgram, rd->fragmentShader);
+        glDeleteShader(rd->fragmentShader);
+    }
+    rd->fragmentShader = createShader(GL_FRAGMENT_SHADER, path);
+    glAttachShader(rd->shaderProgram, rd->fragmentShader);
+}
+
+renderer *initRenderer(const char *windowsName)
 {
     glfwInit();
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 4);
     glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
     glfwWindowHint(GLFW_OPENGL_CORE_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    struct Renderer *rd = calloc(1, sizeof(struct Renderer));
-
-    GLFWwindow *window = createWindow(windowsName);
-    if (!window)
+    renderer *rd = calloc(1, sizeof(renderer));
+    rd->window = createWindow(windowsName);
+    if (!rd->window)
         return NULL;
-    //create buffers
     glDebugMessageCallback(debugCallback, NULL);
-
-    unsigned int VertexBuffer = createBuffer();
-    unsigned int TextureBuffer = createBuffer();
-    unsigned int ElementBuffer = createBuffer();
-
-    //create shaders
-    unsigned int vertexShader = loadShader(GL_VERTEX_SHADER, vertexShaderSource);
-    unsigned int fragmentShader = loadShader(GL_FRAGMENT_SHADER, fragmentShaderSource);
-    unsigned int shaderProgram = glCreateProgram();
-    // unsigned int texture = createTexture("./assets/block.png");
-
-    //compile and attach
-    glAttachShader(shaderProgram, vertexShader);
-    glAttachShader(shaderProgram, fragmentShader);
-    glLinkProgram(shaderProgram);
-
-    //create VAO
-    unsigned int VAO;
-    glGenVertexArrays(1, &VAO);
-    glBindVertexArray(VAO);
-
-    //begin VAO
-    glBindBuffer(GL_ARRAY_BUFFER, VertexBuffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*) 0);
-    glEnableVertexAttribArray(0);
-
-    glBindBuffer(GL_ARRAY_BUFFER, TextureBuffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(texCoords), texCoords, GL_STATIC_DRAW);
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (void*) 0);
-    glEnableVertexAttribArray(1);
-
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ElementBuffer);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-    //end VAO
-
-    glUseProgram(shaderProgram);
-    glUniform1i(glGetUniformLocation(shaderProgram, "text"), 0);
+    rd->shaderProgram = glCreateProgram();
     return rd;
 }
 
-void destroyRenderer(struct Renderer *r)
+int startRendering(renderer *rd)
 {
-    if (!r)
+    glLinkProgram(rd->shaderProgram);
+    glUseProgram(rd->shaderProgram);
+
+    // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    // glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    while(!glfwWindowShouldClose(rd->window))
+    {
+        glClear(GL_COLOR_BUFFER_BIT);
+        setWindowFPS(rd->window);
+        //render
+        glUseProgram(rd->shaderProgram);
+        // glBindTexture(GL_TEXTURE_2D, texture);
+        // glBindVertexArray(VAO);
+        // glDrawElements(GL_TRIANGLES, NB_TRI * 3, GL_UNSIGNED_INT, 0);
+        glfwSwapBuffers(rd->window);
+        glfwPollEvents();    
+    }
+    return 0;
+}
+
+void destroyRenderer(renderer *rd)
+{
+    if (!rd)
         return;
-    for (int i = 0; i < r->mesh_nb; i++)
-        destroy_mesh(r->meshes + i);
-    free(r);
+    for (int i = 0; i < rd->mesh_nb; i++)
+        destroy_mesh(rd->meshes + i);
+    // glDeleteBuffers(1, &VertexBuffer);
+    // glDeleteBuffers(1, &TextureBuffer);
+    // glDeleteBuffers(1, &ElementBuffer);
+    glDetachShader(rd->shaderProgram, rd->vertexShader);
+    glDetachShader(rd->shaderProgram, rd->fragmentShader);
+    glDeleteShader(rd->vertexShader);
+    glDeleteShader(rd->fragmentShader);
+    glDeleteProgram(rd->shaderProgram);
+    glfwDestroyWindow(rd->window);
+    glfwTerminate();
+    free(rd);
 }
 
