@@ -1,18 +1,19 @@
 CC=gcc
 CFLAGS= -std=c99 -pedantic -Werror -Wall -Wextra -Wvla
-LDFLAGS= -lglfw -lGL -lGLEW
+CPPFLAGS= -I.
+LDFLAGS= -lglfw -lGL -lGLEW -lm
 SRCS = $(shell find $(SRC_DIR) -name '*.c' -a ! -path '*/tests/*')
 OBJS = $(SRCS:.c=.o)
 
 engine: CFLAGS += 
 engine: LDFLAGS += 
 engine: all 
-	$(CC) -o $@ $(LDFLAGS) $(OBJS) 
+	$(CC) -o $@  $(OBJS) $(LDFLAGS)
 
-debug: CFLAGS += -g -fsanitize=address
-debug: LDFLAGS += -g -fsanitize=address
+debug: CFLAGS += -g
+debug: LDFLAGS += -g
 debug: all 
-	$(CC) -o $@ $(LDFLAGS) $(OBJS) 
+	$(CC) -o $@  $(OBJS) $(LDFLAGS)
 
 
 all: $(OBJS)
