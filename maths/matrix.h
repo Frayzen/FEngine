@@ -26,6 +26,8 @@ mat4 mat4Transform(transform t);
 mat4 mat4View(vec3 pos, vec3 rot);
 mat4 mat4Inverse(mat4 m);
 
+vec3 mat4MulVec3(mat4 m, vec3 v);
+
 mat3 mat3Identity(void);
 mat3 mat3Mul(mat3 a, mat3 b);
 mat3 mat3Translate(mat3 a, vec2 b);

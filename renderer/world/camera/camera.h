@@ -7,8 +7,6 @@ typedef struct camera {
     transform transform;
     mat4 projection;
     mat4 view;
-    mat4 vp;
-    mat4 inv_vp;
     float fov;
     float aspect;
     float near;

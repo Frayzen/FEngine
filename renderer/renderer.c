@@ -119,6 +119,7 @@ int startRendering(renderer *rd, world *w)
 {
     // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     // glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    glfwSetWindowUserPointer(rd->window, w);
     registerEvents();
     GLint transformLocation = glGetUniformLocation(rd->shaderProgram, "transform");
     GLint projectionLocation = glGetUniformLocation(rd->shaderProgram, "projection");
@@ -126,9 +127,9 @@ int startRendering(renderer *rd, world *w)
     float lastTime = 0;
     while(!glfwWindowShouldClose(rd->window))
     {
+        updateFrame(w, glfwGetTime() - lastTime);
         glClear(GL_COLOR_BUFFER_BIT);
         setWindowFPS(rd->window);
-        updateWorld(w);
         mat4 view = mat4Transform(CURRENT_CAMERA(w)->transform);
         mat4 projection = CURRENT_CAMERA(w)->projection;
         //render
@@ -145,7 +146,6 @@ int startRendering(renderer *rd, world *w)
             glDrawElements(GL_TRIANGLES, m->tris_count * 3, GL_UNSIGNED_INT, 0);
         }
         glfwSwapBuffers(rd->window);
-        updateFrame(w, glfwGetTime() - lastTime);
         lastTime = glfwGetTime();
         glfwPollEvents();
     }

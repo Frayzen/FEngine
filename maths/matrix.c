@@ -130,21 +130,22 @@ mat4 mat4Look_at(vec3 eye, vec3 center, vec3 up){
 mat4 mat4Transform(transform t)
 {
     mat4 result = mat4Identity();
-    result = mat4RotateX(result, t.rot.x);
-    result = mat4RotateY(result, t.rot.y);
-    result = mat4RotateZ(result, t.rot.z);
-    result = mat4Scale(result, t.scale);
     result = mat4Translate(result, t.pos);
+    result = mat4Scale(result, t.scale);
+    mat4 rot = mat4RotateY(mat4Identity(), t.rot.y);
+    // rot = mat4Mul(rot, mat4RotateZ(mat4Identity(), t.rot.z));
+    // rot = mat4Mul(rot, mat4RotateX(mat4Identity(), t.rot.x));
+    result = mat4Mul(result, rot);
     return result;
 }
 
 mat4 mat4View(vec3 pos, vec3 rot)
 {
     mat4 result = mat4Identity();
-    result = mat4RotateX(result, rot.x);
-    result = mat4RotateY(result, rot.y);
-    result = mat4RotateZ(result, rot.z);
     result = mat4Translate(result, vec3Scale(pos, -1.0f));
+    result = mat4RotateX(result, rot.x);
+    result = mat4RotateZ(result, rot.z);
+    result = mat4RotateY(result, rot.y);
     return result;
 }
 
@@ -167,6 +168,15 @@ mat4 mat4Inverse(mat4 m)
                 (m.m[(j + 1) % 4][(i + 2) % 4] * m.m[(j + 2) % 4][(i + 1) % 4] * m.m[(j + 3) % 4][(i + 3) % 4]) -
                 (m.m[(j + 1) % 4][(i + 1) % 4] * m.m[(j + 2) % 4][(i + 3) % 4] * m.m[(j + 3) % 4][(i + 2) % 4])) * det;
         }
+    return result;
+}
+
+vec3 mat4MulVec3(mat4 m, vec3 v)
+{
+    vec3 result;
+    result.x = m.m[0][0] * v.x + m.m[0][1] * v.y + m.m[0][2] * v.z + m.m[0][3];
+    result.y = m.m[1][0] * v.x + m.m[1][1] * v.y + m.m[1][2] * v.z + m.m[1][3];
+    result.z = m.m[2][0] * v.x + m.m[2][1] * v.y + m.m[2][2] * v.z + m.m[2][3];
     return result;
 }
 

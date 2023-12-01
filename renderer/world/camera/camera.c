@@ -7,8 +7,6 @@ camera *createCamera(float fov, float aspect, float near, float far)
     cam->transform = transformIdentity();
     cam->projection = mat4Identity();
     cam->view = mat4Identity();
-    cam->vp = mat4Identity();
-    cam->inv_vp = mat4Identity();
     cam->fov = fov;
     cam->aspect = aspect;
     cam->near = near;
@@ -25,6 +23,4 @@ void updateCamera(camera *cam)
 {
     cam->projection = mat4Perspective(cam->fov, cam->aspect, cam->near, cam->far);
     cam->view = mat4Transform(cam->transform);
-    cam->vp = mat4Mul(cam->projection, cam->view);
-    cam->inv_vp = mat4Inverse(cam->vp);
 }
