@@ -1,6 +1,8 @@
 #ifndef MESH_H
 #define MESH_H
 
+#include "maths/matrix.h"
+#include "maths/utils.h"
 #define _POSIX_C_SOURCE 200809L
 #include <GL/glew.h>
 #include <GL/gl.h>
@@ -13,6 +15,7 @@ typedef struct mesh_graphic{
 } mesh_graphic;
 
 typedef struct mesh{
+    transform transform;
     //vector data
     float*v;
     unsigned int v_nb;

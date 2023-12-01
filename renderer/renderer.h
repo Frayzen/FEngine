@@ -8,7 +8,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-typedef struct Renderer{
+typedef struct renderer{
     GLFWwindow *window;
     GLint vertexShader;
     GLint fragmentShader;
