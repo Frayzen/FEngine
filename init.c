@@ -81,7 +81,7 @@ void myUpdateHandler(world *w, float deltaTime)
     cam->transform.pos = vec3Add(cam->transform.pos, vec3Scale(up, camVelocity.y * deltaTime * movSpeed));
 
     rotVelocity = VEC3(0, 0, 0);
-    w->meshes[0]->transform.rot.y += deltaTime;
+    w->meshes[0]->transform.rot.y += deltaTime * 300;
 }
 
 int main(void)
@@ -92,9 +92,9 @@ int main(void)
     world *w = createWorld();
     camera *cam = createCamera(90, 16.0 / 9.0, 0.1, 100);
     addCamera(w, cam);
+    cam->transform.pos = VEC3(0, 0, -1);
     mesh *m = createMeshFromObj("./assets/teddy.obj");
-    m->transform.scale = VEC3(0.05, 0.05, 0.05);
-    m->transform.pos = VEC3(-.5, -.5, 0);
+    m->transform.scale = VEC3(0.02, 0.02, 0.02);
     m->transform.rot = VEC3(M_PI / 6, 0, 0);
     addMesh(w, m);
 

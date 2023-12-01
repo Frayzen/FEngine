@@ -1,6 +1,17 @@
 #ifndef VECTORS_H
 #define VECTORS_H
 
+typedef struct vec3i{
+    int x;
+    int y;
+    int z;
+} vec3i;
+
+typedef struct vec2i{
+    int x;
+    int y;
+} vec2i;
+
 typedef struct vec4{
     float x;
     float y;

@@ -50,13 +50,13 @@ void printMesh(mesh* m)
     printf("NBTRI %d\n", m->tris_count);
     printf("====\n");
     for (size_t i = 0; i < m->v_count; i++) {
-        printf("%f %f %f\n", m->v[3 * i], m->v[3 * i + 1], m->v[3 * i + 2]);
+        printf("%f %f %f\n", m->v[i].x, m->v[i].y, m->v[i].z);
     }
     printf("====\n");
     for (size_t i = 0; i < m->tris_count; i++) {
-        printf("%d\n", m->v_ids[i*3+0]);
-        printf("%d\n", m->v_ids[i*3+1]);
-        printf("%d\n", m->v_ids[i*3+2]);
+        printf("%d\n", m->v_ids[i].x);
+        printf("%d\n", m->v_ids[i].y);
+        printf("%d\n", m->v_ids[i].z);
         printf("====\n");
     }
 }

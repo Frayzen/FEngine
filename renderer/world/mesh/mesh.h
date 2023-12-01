@@ -17,13 +17,13 @@ typedef struct mesh_graphic{
 typedef struct mesh{
     transform transform;
     //vector data
-    float*v;
+    vec3*v;
     unsigned int v_count;
-    float *vt;
+    vec2 *vt;
     unsigned int vt_count;
     //triangles
-    unsigned int *v_ids;
-    unsigned int *vt_ids;
+    vec3i *v_ids;
+    vec2i *vt_ids;
     unsigned int tris_count;
     //graphic
     mesh_graphic graphic;

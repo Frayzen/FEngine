@@ -49,8 +49,8 @@ void parse_tri(char *line, mesh *m)
         if (cur >= 2)
         {
             int id = m->tris_count;
-            memcpy(m->v_ids + id * 3, v, 3 * sizeof(unsigned int));
-            memcpy(m->vt_ids + id * 3, vt, 3 * sizeof(unsigned int));
+            memcpy(m->v_ids + id, v, 3 * sizeof(unsigned int));
+            memcpy(m->vt_ids + id, vt, 3 * sizeof(unsigned int));
             m->tris_count++;
         }
         cur++;
@@ -94,16 +94,16 @@ void parse(FILE *f, lineParser parser, mesh *m)
 
 void parse_vertex(char *line, mesh *m)
 {
-    float *v = m->v + m->v_count * 3;
-    if (sscanf(line, "v %f %f %f", v, v+1, v+2) != 3)
+    vec3 *v = m->v + m->v_count;
+    if (sscanf(line, "v %f %f %f", &v->x, &v->y, &v->z) != 3)
         return;
     m->v_count++;
 }
 
 void parse_vtext(char *line, mesh *m)
 {
-    float *vt = m->vt + m->vt_count * 2;
-    if (sscanf(line, "vt %f %f", vt, vt+1) != 2)
+    vec2 *vt = m->vt + m->vt_count;
+    if (sscanf(line, "vt %f %f", &vt->x, &vt->y) != 2)
         return;
     m->vt_count++;
 }
@@ -128,10 +128,14 @@ mesh *createMeshFromObj(const char *path)
     mesh *m = calloc(1, sizeof(mesh));
     m->transform.scale = VEC3(1, 1, 1);
     parse(f, count_lines, m);
-    m->v = malloc(sizeof(float) * 3 * m->v_count);
-    m->vt = malloc(sizeof(float) * 2 * m->vt_count);
-    m->v_ids = malloc(sizeof(unsigned int) * m->tris_count);
-    m->vt_ids = malloc(sizeof(unsigned int) * m->tris_count);
+
+    // allocate
+    m->v = malloc(sizeof(vec3) * m->v_count);
+    m->vt = malloc(sizeof(vec3) * m->vt_count);
+    m->v_ids = malloc(sizeof(vec3i) * m->tris_count);
+    m->vt_ids = malloc(sizeof(vec2i) * m->tris_count);
+
+    // reset
     m->v_count = 0;
     m->vt_count = 0;
     m->tris_count = 0;
