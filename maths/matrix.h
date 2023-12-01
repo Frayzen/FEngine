@@ -23,7 +23,8 @@ mat4 mat4Ortho(float left, float right, float bottom, float top, float near, flo
 mat4 mat4Perspective(float fov, float aspect, float near, float far);
 mat4 mat4Look_at(vec3 eye, vec3 center, vec3 up);
 mat4 mat4Transform(transform t);
-mat4 viewMatrix(vec3 pos, vec3 rot);
+mat4 mat4View(vec3 pos, vec3 rot);
+mat4 mat4Inverse(mat4 m);
 
 mat3 mat3Identity(void);
 mat3 mat3Mul(mat3 a, mat3 b);

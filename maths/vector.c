@@ -185,3 +185,21 @@ vec2 vec2Normalize(vec2 a){
     result.y = a.y / length;
     return result;
 }
+
+// transform operations
+
+transform transformIdentity(void){
+    transform result;
+    result.pos = VEC3(0.0f, 0.0f, 0.0f);
+    result.scale = VEC3(1.0f, 1.0f, 1.0f);
+    result.rot = VEC3(0.0f, 0.0f, 0.0f);
+    return result;
+}
+
+transform transformCreate(vec3 pos, vec3 scale, vec3 rot){
+    transform result;
+    result.pos = pos;
+    result.scale = scale;
+    result.rot = rot;
+    return result;
+}

@@ -48,10 +48,10 @@ void parse_tri(char *line, mesh *m)
         line += parse_tri_ids(line, v + cur, vt + cur);
         if (cur >= 2)
         {
-            int id = m->tris_nb;
+            int id = m->tris_count;
             memcpy(m->v_ids + id * 3, v, 3 * sizeof(unsigned int));
             memcpy(m->vt_ids + id * 3, vt, 3 * sizeof(unsigned int));
-            m->tris_nb++;
+            m->tris_count++;
         }
         cur++;
     }
@@ -62,9 +62,9 @@ void count_lines(char *line, size_t len, mesh *m)
     if (len < 3)
         return;
     if (CHECK_V(line))
-        m->v_nb++;
+        m->v_count++;
     if (CHECK_VT(line))
-        m->vt_nb++;
+        m->vt_count++;
     if (CHECK_TRI(line))
     {
         int i = 0;
@@ -74,9 +74,9 @@ void count_lines(char *line, size_t len, mesh *m)
                 i++;
             while(line[i] && isspace(line[i])) 
                 i++;
-            m->tris_nb++;
+            m->tris_count++;
         }
-        m->tris_nb--;
+        m->tris_count--;
     }
 }
 
@@ -94,18 +94,18 @@ void parse(FILE *f, lineParser parser, mesh *m)
 
 void parse_vertex(char *line, mesh *m)
 {
-    float *v = m->v + m->v_nb * 3;
+    float *v = m->v + m->v_count * 3;
     if (sscanf(line, "v %f %f %f", v, v+1, v+2) != 3)
         return;
-    m->v_nb++;
+    m->v_count++;
 }
 
 void parse_vtext(char *line, mesh *m)
 {
-    float *vt = m->vt + m->vt_nb * 2;
+    float *vt = m->vt + m->vt_count * 2;
     if (sscanf(line, "vt %f %f", vt, vt+1) != 2)
         return;
-    m->vt_nb++;
+    m->vt_count++;
 }
 
 void parse_lines(char *line, size_t len, mesh *m)
@@ -126,14 +126,15 @@ mesh *createMeshFromObj(const char *path)
     if (f == NULL)
         errx(1, "Could not read %s", path);
     mesh *m = calloc(1, sizeof(mesh));
+    m->transform.scale = VEC3(1, 1, 1);
     parse(f, count_lines, m);
-    m->v = malloc(sizeof(float) * 3 * m->v_nb);
-    m->vt = malloc(sizeof(float) * 2 * m->vt_nb);
-    m->v_ids = malloc(sizeof(unsigned int) * m->tris_nb);
-    m->vt_ids = malloc(sizeof(unsigned int) * m->tris_nb);
-    m->v_nb = 0;
-    m->vt_nb = 0;
-    m->tris_nb = 0;
+    m->v = malloc(sizeof(float) * 3 * m->v_count);
+    m->vt = malloc(sizeof(float) * 2 * m->vt_count);
+    m->v_ids = malloc(sizeof(unsigned int) * m->tris_count);
+    m->vt_ids = malloc(sizeof(unsigned int) * m->tris_count);
+    m->v_count = 0;
+    m->vt_count = 0;
+    m->tris_count = 0;
     fseek(f, 0, SEEK_SET);
     parse(f, parse_lines, m);
     return m;

@@ -1,7 +1,8 @@
 #ifndef RENDERER_H
 #define RENDERER_H
 
-#include "renderer/mesh/mesh.h"
+#include "renderer/world/mesh/mesh.h"
+#include "renderer/world/world.h"
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <GL/gl.h>
@@ -13,15 +14,12 @@ typedef struct renderer{
     GLint vertexShader;
     GLint fragmentShader;
     GLint shaderProgram;
-    mesh** meshes; 
-    unsigned int mesh_nb;
 } renderer;
 
 renderer *initRenderer(void);
 void defineVertexShader(renderer *rd, const char *path);
 void defineFragmentShader(renderer *rd, const char *path);
-int startRendering(renderer *rd);
+int startRendering(renderer *rd, world *w);
 void destroyRenderer(renderer *rd);
-void addMesh(renderer *rd, mesh *m);
 
 #endif /* !RENDERER_H */

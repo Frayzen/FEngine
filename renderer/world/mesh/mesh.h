@@ -18,13 +18,13 @@ typedef struct mesh{
     transform transform;
     //vector data
     float*v;
-    unsigned int v_nb;
+    unsigned int v_count;
     float *vt;
-    unsigned int vt_nb;
+    unsigned int vt_count;
     //triangles
     unsigned int *v_ids;
     unsigned int *vt_ids;
-    unsigned int tris_nb;
+    unsigned int tris_count;
     //graphic
     mesh_graphic graphic;
 } mesh;
@@ -32,7 +32,7 @@ typedef struct mesh{
 typedef void (*lineParser)(char *line, size_t size, mesh *m);
 
 mesh *createMeshFromObj(const char *path);
-void createVAO(mesh *m);
+void createMeshGraphic(mesh *m);
 void destroyMesh(mesh *mesh);
 void printMesh(mesh* m);
 

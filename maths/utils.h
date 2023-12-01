@@ -1,13 +1,7 @@
 #ifndef UTILS_H
 #define UTILS_H
-
-#include "maths/vector.h"
 #define M_PI 3.14159265358979323846
-
-typedef struct transform{
-    vec3 pos;
-    vec3 scale;
-    vec3 rot;
-} transform;
-
+#define RADIAN(X) ((X) * M_PI / 180.0)
+#define DEGREE(X) ((X) * 180.0 / M_PI)
+#define UNUSED(X) ((void)X)
 #endif /* !UTILS_H */

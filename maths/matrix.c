@@ -129,23 +129,45 @@ mat4 mat4Look_at(vec3 eye, vec3 center, vec3 up){
 
 mat4 mat4Transform(transform t)
 {
-    mat4 m = mat4Identity();
-    m = mat4RotateX(m, t.rot.x);
-    m = mat4RotateY(m, t.rot.y);
-    m = mat4RotateZ(m, t.rot.z);
-    m = mat4Translate(m, t.pos);
-    m = mat4Scale(m, t.scale);
-    return m;
+    mat4 result = mat4Identity();
+    result = mat4RotateX(result, t.rot.x);
+    result = mat4RotateY(result, t.rot.y);
+    result = mat4RotateZ(result, t.rot.z);
+    result = mat4Scale(result, t.scale);
+    result = mat4Translate(result, t.pos);
+    return result;
 }
 
-mat4 viewMatrix(vec3 pos, vec3 rot)
+mat4 mat4View(vec3 pos, vec3 rot)
 {
-    mat4 m = mat4Identity();
-    m = mat4RotateX(m, rot.x);
-    m = mat4RotateY(m, rot.y);
-    m = mat4RotateZ(m, rot.z);
-    m = mat4Translate(m, vec3Scale(pos, -1.0f));
-    return m;
+    mat4 result = mat4Identity();
+    result = mat4RotateX(result, rot.x);
+    result = mat4RotateY(result, rot.y);
+    result = mat4RotateZ(result, rot.z);
+    result = mat4Translate(result, vec3Scale(pos, -1.0f));
+    return result;
+}
+
+mat4 mat4Inverse(mat4 m)
+{
+    float det = 0.0f;
+    for (int i = 0; i < 4; i++)
+        det += (m.m[0][i] * (m.m[1][(i + 1) % 4] * m.m[2][(i + 2) % 4] * m.m[3][(i + 3) % 4] -
+            m.m[1][(i + 3) % 4] * m.m[2][(i + 2) % 4] * m.m[3][(i + 1) % 4]));
+    if (det == 0.0f)
+        return mat4Identity();
+    det = 1.0f / det;
+    mat4 result;
+    for (int i = 0; i < 4; i++)
+        for (int j = 0; j < 4; j++){
+            result.m[i][j] = ((m.m[(j + 1) % 4][(i + 1) % 4] * m.m[(j + 2) % 4][(i + 2) % 4] * m.m[(j + 3) % 4][(i + 3) % 4]) +
+                (m.m[(j + 1) % 4][(i + 2) % 4] * m.m[(j + 2) % 4][(i + 3) % 4] * m.m[(j + 3) % 4][(i + 1) % 4]) +
+                (m.m[(j + 1) % 4][(i + 3) % 4] * m.m[(j + 2) % 4][(i + 1) % 4] * m.m[(j + 3) % 4][(i + 2) % 4]) -
+                (m.m[(j + 1) % 4][(i + 3) % 4] * m.m[(j + 2) % 4][(i + 2) % 4] * m.m[(j + 3) % 4][(i + 1) % 4]) -
+                (m.m[(j + 1) % 4][(i + 2) % 4] * m.m[(j + 2) % 4][(i + 1) % 4] * m.m[(j + 3) % 4][(i + 3) % 4]) -
+                (m.m[(j + 1) % 4][(i + 1) % 4] * m.m[(j + 2) % 4][(i + 3) % 4] * m.m[(j + 3) % 4][(i + 2) % 4])) * det;
+        }
+    return result;
 }
 
 //mat4

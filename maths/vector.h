@@ -19,6 +19,12 @@ typedef struct vec2{
     float y;
 } vec2;
 
+typedef struct transform{
+    vec3 pos;
+    vec3 scale;
+    vec3 rot;
+} transform;
+
 #define VEC4(X, Y, Z, W) ((vec4) {X,Y,Z,W})
 vec4 vec4Add(vec4 a, vec4 b);
 vec4 vec4Sub(vec4 a, vec4 b);
@@ -53,5 +59,8 @@ vec2 vec2Scale(vec2 a, float b);
 float vec2Dot(vec2 a, vec2 b);
 float vec2Length(vec2 a);
 vec2 vec2Normalize(vec2 a);
+
+transform transformIdentity(void);
+transform transformCreate(vec3 pos, vec3 scale, vec3 rot);
 
 #endif /* !VECTORS_H */

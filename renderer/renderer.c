@@ -1,18 +1,12 @@
+#include "maths/matrix.h"
 #include "renderer/renderer.h"
-#include "renderer/mesh/mesh.h"
 #include "renderer/shader/shader.h"
+#include "renderer/world/world.h"
+#include "timer/timer.h"
 #include <GL/glext.h>
 #include <GLFW/glfw3.h>
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image/stb_image.h"
-
-#define UNUSED(X) ((void)X)
-
-void frame_buffersize_callback(GLFWwindow* window, int width, int height)
-{
-    UNUSED(window);
-    glViewport(0, 0, width, height);
-}
 
 void setWindowFPS (GLFWwindow* win)
 {
@@ -55,27 +49,6 @@ unsigned int createTexture(const char *path)
     return texture;
 }
 
-void debugCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar *message, const void *userParam)
-{
-    UNUSED(source);
-    UNUSED(type);
-    UNUSED(id);
-    UNUSED(length);
-    UNUSED(userParam);
-    switch (severity) {
-        case GL_DEBUG_SEVERITY_MEDIUM:
-            fprintf(stdout, "WARNING: %s \n", message);
-            break;
-        case GL_DEBUG_SEVERITY_HIGH:
-            fprintf(stdout, "ERROR: %s \n", message);
-            exit(-1);
-            break;
-        default:
-            // fprintf(stdout, "INFO: %s \n", message);
-            return;
-    }
-}
-
 GLFWwindow *createWindow(void)
 {
     GLFWwindow* window = glfwCreateWindow(800, 600, "", NULL, NULL);
@@ -94,9 +67,8 @@ GLFWwindow *createWindow(void)
         return NULL;
 
     }
-    glViewport(0, 0, 800, 600);
+    glViewport(0, 0, 1280, 720);
     glClearColor(.5f, .5f, .5f, 1.f);
-    glfwSetFramebufferSizeCallback(window, frame_buffersize_callback);
     // glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
     return window;
 }
@@ -125,13 +97,6 @@ void defineFragmentShader(renderer *rd, const char *path)
     glUseProgram(rd->shaderProgram);
 }
 
-void addMesh(renderer *rd, mesh *m)
-{
-    createVAO(m); 
-    rd->meshes = realloc(rd->meshes, ++rd->mesh_nb*sizeof(mesh *));
-    rd->meshes[rd->mesh_nb - 1] = m;
-}
-
 renderer *initRenderer(void)
 {
     glfwInit();
@@ -139,36 +104,50 @@ renderer *initRenderer(void)
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 4);
     glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
     glfwWindowHint(GLFW_OPENGL_CORE_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    // glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
     renderer *rd = calloc(1, sizeof(renderer));
     rd->window = createWindow();
     if (!rd->window)
         return NULL;
-    glDebugMessageCallback(debugCallback, NULL);
     rd->shaderProgram = glCreateProgram();
     return rd;
 }
 
 
-int startRendering(renderer *rd)
+int startRendering(renderer *rd, world *w)
 {
     // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     // glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    registerEvents();
+    GLint transformLocation = glGetUniformLocation(rd->shaderProgram, "transform");
+    GLint projectionLocation = glGetUniformLocation(rd->shaderProgram, "projection");
+    GLint viewLocation = glGetUniformLocation(rd->shaderProgram, "view");
+    float lastTime = 0;
     while(!glfwWindowShouldClose(rd->window))
     {
         glClear(GL_COLOR_BUFFER_BIT);
         setWindowFPS(rd->window);
+        updateWorld(w);
+        mat4 view = mat4Transform(CURRENT_CAMERA(w)->transform);
+        mat4 projection = CURRENT_CAMERA(w)->projection;
         //render
-        for (unsigned int i = 0; i < rd->mesh_nb; i++) {
-            mesh *m = rd->meshes[i];
+        for (unsigned int i = 0; i < w->mesh_count; i++) {
+            mesh *m = w->meshes[i];
             glUseProgram(rd->shaderProgram);
             // glBindTexture(GL_TEXTURE_2D, texture);
+            mat4 transform = mat4Transform(m->transform);
+            glUniformMatrix4fv(transformLocation, 1, GL_FALSE, (float *) &transform);
+            glUniformMatrix4fv(viewLocation, 1, GL_FALSE, (float *) &view);
+            glUniformMatrix4fv(projectionLocation, 1, GL_FALSE, (float *) &projection);
             glBindVertexArray(m->graphic.VAO);
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m->graphic.EBO);
-            glDrawElements(GL_TRIANGLES, m->tris_nb * 3, GL_UNSIGNED_INT, 0);
+            glDrawElements(GL_TRIANGLES, m->tris_count * 3, GL_UNSIGNED_INT, 0);
         }
         glfwSwapBuffers(rd->window);
-        glfwPollEvents();    
+        updateFrame(w, glfwGetTime() - lastTime);
+        lastTime = glfwGetTime();
+        glfwPollEvents();
     }
     return 0;
 }
@@ -177,8 +156,6 @@ void destroyRenderer(renderer *rd)
 {
     if (!rd)
         return;
-    for (unsigned int i = 0; i < rd->mesh_nb; i++)
-        destroyMesh(rd->meshes[i]);
     // glDeleteBuffers(1, &VertexBuffer);
     // glDeleteBuffers(1, &TextureBuffer);
     // glDeleteBuffers(1, &ElementBuffer);
