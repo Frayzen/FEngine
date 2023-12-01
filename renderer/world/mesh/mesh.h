@@ -9,8 +9,9 @@
 #include <stdio.h>
 
 typedef struct mesh_graphic{
-    GLuint VAO;
     GLuint VBO;
+    GLuint VNBO;
+    GLuint VAO;
     GLuint EBO;
 } mesh_graphic;
 
@@ -21,9 +22,12 @@ typedef struct mesh{
     unsigned int v_count;
     vec2 *vt;
     unsigned int vt_count;
+    vec3 *vn;
+    unsigned int vn_count;
     //triangles
     vec3i *v_ids;
     vec2i *vt_ids;
+    vec3i *vn_ids;
     unsigned int tris_count;
     //graphic
     mesh_graphic graphic;
