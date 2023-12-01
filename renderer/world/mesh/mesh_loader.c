@@ -1,3 +1,4 @@
+#include "maths/vector.h"
 #include "mesh.h"
 #include <stdio.h>
 #include <err.h>
@@ -7,9 +8,10 @@
 
 #define CHECK_V(Line) ((Line)[0] == 'v' && (Line)[1] == ' ')
 #define CHECK_VT(Line) ((Line)[0] == 'v' && (Line)[1] == 't' && (line)[2] == ' ')
+#define CHECK_VN(Line) ((Line)[0] == 'v' && (Line)[1] == 'n' && (line)[2] == ' ')
 #define CHECK_TRI(Line) ((Line)[0] == 'f' && (Line)[1] == ' ')
 
-int parse_tri_ids(char *str, int *v, int *vt)
+int parse_tri_ids(char *str, int *v, int *vt, int *vn)
 {
     *v = -1;
     *vt = -1;
@@ -24,6 +26,8 @@ int parse_tri_ids(char *str, int *v, int *vt)
                 *v = val;
             else if (*vt != -1)
                 *vt = val;
+            else
+                *vn = val;
             i = next - str;
         }
         else
@@ -42,15 +46,17 @@ void parse_tri(char *line, mesh *m)
         line++;
     int v[MAX_VERT_PER_FACE];
     int vt[MAX_VERT_PER_FACE];
+    int vn[MAX_VERT_PER_FACE];
     int cur = 0;
     while (*line)
     {
-        line += parse_tri_ids(line, v + cur, vt + cur);
+        line += parse_tri_ids(line, v + cur, vt + cur, vn + cur);
         if (cur >= 2)
         {
             int id = m->tris_count;
             memcpy(m->v_ids + id, v, 3 * sizeof(unsigned int));
             memcpy(m->vt_ids + id, vt, 3 * sizeof(unsigned int));
+            memcpy(m->vn_ids + id, vn, 3 * sizeof(unsigned int));
             m->tris_count++;
         }
         cur++;
@@ -65,6 +71,8 @@ void count_lines(char *line, size_t len, mesh *m)
         m->v_count++;
     if (CHECK_VT(line))
         m->vt_count++;
+    if (CHECK_VN(line))
+        m->vn_count++;
     if (CHECK_TRI(line))
     {
         int i = 0;
@@ -108,6 +116,14 @@ void parse_vtext(char *line, mesh *m)
     m->vt_count++;
 }
 
+void parse_vnorm(char *line, mesh *m)
+{
+    vec3 *vn = m->vn + m->vn_count;
+    if (sscanf(line, "vn %f %f %f", &vn->x, &vn->y, &vn->z) != 3)
+        return;
+    m->vn_count++;
+}
+
 void parse_lines(char *line, size_t len, mesh *m)
 {
     if (len < 3)
@@ -116,8 +132,35 @@ void parse_lines(char *line, size_t len, mesh *m)
         parse_vertex(line, m);
     if (CHECK_VT(line))
         parse_vtext(line, m);
+    if (CHECK_VN(line))
+        parse_vnorm(line, m);
     if (CHECK_TRI(line))
         parse_tri(line, m);
+}
+
+void createNormals(mesh *m)
+{
+    m->vn_count = m->v_count;
+    m->vn = calloc(sizeof(vec3), m->vn_count);
+    for (size_t i = 0; i < m->tris_count; i++)
+    {
+        vec3i *tri = m->v_ids + i;
+        vec3 *v0 = m->v + tri->x;
+        vec3 *v1 = m->v + tri->y;
+        vec3 *v2 = m->v + tri->z;
+        vec3 *n1 = m->vn + tri->x;
+        *n1 = vec3Add(*n1, vec3Cross(vec3Sub(*v1, *v0), vec3Sub(*v2, *v0)));
+        vec3 *n2 = m->vn + tri->y;
+        *n2 = vec3Add(*n2, vec3Cross(vec3Sub(*v1, *v0), vec3Sub(*v2, *v0)));
+        vec3 *n3 = m->vn + tri->z;
+        *n3 = vec3Add(*n3, vec3Cross(vec3Sub(*v1, *v0), vec3Sub(*v2, *v0)));       
+    }
+    for (size_t i = 0; i < m->vn_count; i++)
+    {
+        vec3 *n = m->vn + i;
+        *n = vec3Normalize(*n);
+    }
+    memcpy(m->vn_ids, m->v_ids, sizeof(vec3i) * m->tris_count);
 }
 
 mesh *createMeshFromObj(const char *path)
@@ -132,8 +175,10 @@ mesh *createMeshFromObj(const char *path)
     // allocate
     m->v = malloc(sizeof(vec3) * m->v_count);
     m->vt = malloc(sizeof(vec3) * m->vt_count);
+    m->vn = malloc(sizeof(vec3) * m->vn_count);
     m->v_ids = malloc(sizeof(vec3i) * m->tris_count);
     m->vt_ids = malloc(sizeof(vec2i) * m->tris_count);
+    m->vn_ids = malloc(sizeof(vec3i) * m->tris_count);
 
     // reset
     m->v_count = 0;
@@ -141,5 +186,9 @@ mesh *createMeshFromObj(const char *path)
     m->tris_count = 0;
     fseek(f, 0, SEEK_SET);
     parse(f, parse_lines, m);
+
+    // if (m->vn_count == 0)
+    //     createNormals(m);
+
     return m;
 }
