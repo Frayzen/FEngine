@@ -187,8 +187,8 @@ mesh *createMeshFromObj(const char *path)
     fseek(f, 0, SEEK_SET);
     parse(f, parse_lines, m);
 
-    // if (m->vn_count == 0)
-    //     createNormals(m);
+    if (m->vn_count == 0)
+        createNormals(m);
 
     return m;
 }

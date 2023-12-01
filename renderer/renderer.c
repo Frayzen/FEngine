@@ -125,10 +125,11 @@ int startRendering(renderer *rd, world *w)
     GLint projectionLocation = glGetUniformLocation(rd->shaderProgram, "projection");
     GLint viewLocation = glGetUniformLocation(rd->shaderProgram, "view");
     float lastTime = 0;
+    glEnable(GL_DEPTH_TEST);
     while(!glfwWindowShouldClose(rd->window))
     {
         updateFrame(w, glfwGetTime() - lastTime);
-        glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         setWindowFPS(rd->window);
         mat4 view = mat4Transform(CURRENT_CAMERA(w)->transform);
         mat4 projection = CURRENT_CAMERA(w)->projection;
