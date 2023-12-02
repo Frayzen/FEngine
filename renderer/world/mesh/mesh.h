@@ -8,15 +8,8 @@
 #include <GL/gl.h>
 #include <stdio.h>
 
-typedef struct mesh_graphic{
-    GLuint VBO;
-    GLuint VNBO;
-    GLuint VAO;
-    GLuint EBO;
-} mesh_graphic;
-
 typedef struct mesh{
-    transform transform;
+    ssize_t meshID;
     //vector data
     vec3*v;
     unsigned int v_count;
@@ -29,14 +22,12 @@ typedef struct mesh{
     vec2i *vt_ids;
     vec3i *vn_ids;
     unsigned int tris_count;
-    //graphic
-    mesh_graphic graphic;
 } mesh;
 
 typedef void (*lineParser)(char *line, size_t size, mesh *m);
 
+mesh *createMesh(void);
 mesh *createMeshFromObj(const char *path);
-void createMeshGraphic(mesh *m);
 void destroyMesh(mesh *mesh);
 void printMesh(mesh* m);
 

@@ -168,8 +168,7 @@ mesh *createMeshFromObj(const char *path)
     FILE *f = fopen(path, "r");
     if (f == NULL)
         errx(1, "Could not read %s", path);
-    mesh *m = calloc(1, sizeof(mesh));
-    m->transform.scale = VEC3(1, 1, 1);
+    mesh *m = createMesh();
     parse(f, count_lines, m);
 
     // allocate
