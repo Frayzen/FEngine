@@ -129,6 +129,49 @@ unsigned int addGraphic(graphic *gc)
     return rd->graphicsCount - 1;
 }
 
+void createShadowMap(world *w, vec3 pos)
+{
+    // consts
+    const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
+    glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
+    // create framebuffer
+    unsigned int depthMapFBO;
+    glGenFramebuffers(1, &depthMapFBO);
+    //create depthMap
+    unsigned int depthMap;
+    glGenTextures(1, &depthMap);
+    glBindTexture(GL_TEXTURE_2D, depthMap);
+    glTexImage2D(GL_TEXTURE_2D, 0,GL_DEPTH_COMPONENT, SHADOW_WIDTH, SHADOW_HEIGHT, 0,GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+    // attach depthMap to framebuffer
+    glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,GL_TEXTURE_2D, depthMap, 0);
+    // set framebuffer options
+    glDrawBuffer(GL_NONE);
+    glReadBuffer(GL_NONE);
+    // create renderbuffer 
+    unsigned int rbo;
+    glGenRenderbuffers(1, &rbo);
+    glBindRenderbuffer(GL_RENDERBUFFER, rbo);
+    //create shader shaderProgram
+    unsigned int shaderProgram;
+    shaderProgram = glCreateProgram();
+    unsigned int vertexShader = createShader(GL_VERTEX_SHADER, "./assets/shaders/vertexShader.glsl");
+    unsigned int fragmentShader = createShader(GL_FRAGMENT_SHADER, "./assets/shaders/emptyFragShader.glsl");
+    glAttachShader(shaderProgram, vertexShader);
+    glAttachShader(shaderProgram, fragmentShader);
+    glLinkProgram(shaderProgram);
+    glUseProgram(shaderProgram);
+    // set renderbuffer options
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, SHADOW_WIDTH, SHADOW_HEIGHT);
+    // attach renderbuffer to glFramebuffer
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
+    // check framebuffer
+    if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+        fprintf(stderr, "Framebuffer not complete!\n");
+    // unbind framebuffer
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
 int startRendering(world *w)
 {
     renderer *rd = GET_RENDERER;

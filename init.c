@@ -89,8 +89,8 @@ void myUpdateHandler(world *w, float deltaTime)
 int main(void)
 {
     initRenderer();
-    defineVertexShader("./assets/vertexShader.glsl");
-    defineFragmentShader("./assets/fragmentShadder.glsl");
+    defineVertexShader("./assets/shaders/vertexShader.glsl");
+    defineFragmentShader("./assets/shaders/fragmentShader.glsl");
     world *w = createWorld();
     camera *cam = createCamera(90, 16.0 / 9.0, 0.01, 1000);
     addCamera(w, cam);
