@@ -103,7 +103,7 @@ mat4 mat4Perspective(float fov, float aspect, float near, float far){
     return result;
 }
 
-mat4 mat4Look_at(vec3 eye, vec3 center, vec3 up){
+mat4 mat4LookAt(vec3 eye, vec3 center, vec3 up){
     mat4 result;
     vec3 f = vec3Normalize(vec3Sub(center, eye));
     vec3 s = vec3Normalize(vec3Cross(f, up));
@@ -130,11 +130,11 @@ mat4 mat4Look_at(vec3 eye, vec3 center, vec3 up){
 mat4 mat4Transform(transform t)
 {
     mat4 result = mat4Identity();
-    result = mat4Translate(result, t.pos);
-    result = mat4Scale(result, t.scale);
     mat4 rot = mat4RotateY(mat4Identity(), t.rot.y);
     // rot = mat4Mul(rot, mat4RotateZ(mat4Identity(), t.rot.z));
     // rot = mat4Mul(rot, mat4RotateX(mat4Identity(), t.rot.x));
+    result = mat4Translate(result, t.pos);
+    result = mat4Scale(result, t.scale);
     result = mat4Mul(result, rot);
     return result;
 }
@@ -143,8 +143,8 @@ mat4 mat4View(vec3 pos, vec3 rot)
 {
     mat4 result = mat4Identity();
     result = mat4Translate(result, vec3Scale(pos, -1.0f));
-    result = mat4RotateX(result, rot.x);
-    result = mat4RotateZ(result, rot.z);
+    // result = mat4RotateX(result, rot.x);
+    // result = mat4RotateZ(result, rot.z);
     result = mat4RotateY(result, rot.y);
     return result;
 }

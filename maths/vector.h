@@ -36,13 +36,6 @@ typedef struct transform{
     vec3 rot;
 } transform;
 
-#define VECTOR_FORWARD VEC3(0, 0, 1)
-#define VECTOR_BACKWARD VEC3(0, 0, -1)
-#define VECTOR_LEFT VEC3(-1, 0, 0)
-#define VECTOR_RIGHT VEC3(1, 0, 0)
-#define VECTOR_UP VEC3(0, 1, 0)
-#define VECTOR_DOWN VEC3(0, -1, 0)
-
 #define VEC4(X, Y, Z, W) ((vec4) {X,Y,Z,W})
 vec4 vec4Add(vec4 a, vec4 b);
 vec4 vec4Sub(vec4 a, vec4 b);
@@ -55,6 +48,16 @@ float vec4Length(vec4 a);
 vec4 vec4Normalize(vec4 a);
 
 #define VEC3(X, Y, Z) ((vec3) {X,Y,Z})
+#define VEC3FULL(X) VEC3(X, X, X)
+#define VECTOR_FORWARD VEC3(0, 0, 1)
+#define VECTOR_BACKWARD VEC3(0, 0, -1)
+#define VECTOR_LEFT VEC3(-1, 0, 0)
+#define VECTOR_RIGHT VEC3(1, 0, 0)
+#define VECTOR_UP VEC3(0, 1, 0)
+#define VECTOR_DOWN VEC3(0, -1, 0)
+#define VEC3ZERO VEC3(0, 0, 0)
+#define VEC3ONE VEC3(1, 1, 1)
+
 vec3 vec3Create(float x, float y, float z);
 vec3 vec3Add(vec3 a, vec3 b);
 vec3 vec3Sub(vec3 a, vec3 b);

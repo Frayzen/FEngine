@@ -20,23 +20,23 @@ void myKeyHandler(int key, int action, int mods, world *w)
     switch (key) {
         case GLFW_KEY_W:
             if (action == GLFW_PRESS)
-                camVelocity.x = 1;
+                camVelocity.x = -1;
             else if (action == GLFW_RELEASE)
                 camVelocity.x = 0;
             break;
         case GLFW_KEY_S:
             if (action == GLFW_PRESS)
-                camVelocity.x = -1;
+                camVelocity.x = 1;
             else if (action == GLFW_RELEASE)
                 camVelocity.x = 0;
             break;
-        case GLFW_KEY_A:
+        case GLFW_KEY_D:
             if (action == GLFW_PRESS)
                 camVelocity.z = 1;
             else if (action == GLFW_RELEASE)
                 camVelocity.z = 0;
             break;
-        case GLFW_KEY_D:
+        case GLFW_KEY_A:
             if (action == GLFW_PRESS)
                 camVelocity.z = -1;
             else if (action == GLFW_RELEASE)
@@ -44,13 +44,13 @@ void myKeyHandler(int key, int action, int mods, world *w)
             break;
         case GLFW_KEY_SPACE:
             if (action == GLFW_PRESS)
-                camVelocity.y = -1;
+                camVelocity.y = 1;
             else if (action == GLFW_RELEASE)
                 camVelocity.y = 0;
             break;
         case GLFW_KEY_LEFT_SHIFT:
             if (action == GLFW_PRESS)
-                camVelocity.y = 1;
+                camVelocity.y = -1;
             else if (action == GLFW_RELEASE)
                 camVelocity.y = 0;
             break;
@@ -81,32 +81,39 @@ void myUpdateHandler(world *w, float deltaTime)
     cam->transform.pos = vec3Add(cam->transform.pos, vec3Scale(up, camVelocity.y * deltaTime * movSpeed));
 
     rotVelocity = VEC3(0, 0, 0);
-    w->meshes[0]->transform.rot.y += deltaTime * 300;
+    // for (size_t i = 0; i < w->objectsCount; i++) {
+    //     w->objects[i]->transform.rot.y += deltaTime * 300;
+    // }
 }
 
 int main(void)
 {
-    renderer *rd = initRenderer();
-    defineVertexShader(rd, "./assets/vertexShader.glsl");
-    defineFragmentShader(rd, "./assets/fragmentShadder.glsl");
+    initRenderer();
+    defineVertexShader("./assets/vertexShader.glsl");
+    defineFragmentShader("./assets/fragmentShadder.glsl");
     world *w = createWorld();
-    camera *cam = createCamera(90, 16.0 / 9.0, 0.1, 100);
+    camera *cam = createCamera(90, 16.0 / 9.0, 0.01, 1000);
     addCamera(w, cam);
     cam->transform.pos = VEC3(0, 0, -1);
-    mesh *m = createMeshFromObj("./assets/teddy.obj");
-    m->transform.scale = VEC3(0.02, 0.02, 0.02);
-    m->transform.rot = VEC3(M_PI / 6, 0, 0);
+    mesh *m = createMeshFromObj("./assets/billiard/source/model.obj");
+
+    // for (size_t k = 0; k < 10; k++) {
+    //     for (size_t j = 0; j < 10; j++) {
+    //         for (size_t i = 0; i < 10; i++) {
     addMesh(w, m);
+    //         }
+    //     }
+    // }
 
     registerKeyHandler(myKeyHandler);
     registerUpdateHandler(myUpdateHandler);
     registerMouseHandler(myMouseHandler, true);
 
     // printMesh(m);
-    
-    startRendering(rd, w);
 
-    destroyRenderer(rd);
+    startRendering(w);
+
     destroyWorld(w);
+    destroyRenderer();
     return 0;
 }
