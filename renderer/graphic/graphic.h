@@ -6,12 +6,15 @@
 #include <GL/gl.h>
 
 typedef struct graphic{
+    GLuint *textArray;
     GLuint VBO;
+    GLuint VTBO;
     GLuint VNBO;
     GLuint VAO;
     GLuint EBO;
 } graphic;
 
 graphic *createMeshGraphic(mesh *m);
+void destroyGraphic(graphic *g);
 
 #endif /* !GRAPHIC_H */

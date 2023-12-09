@@ -1,9 +1,11 @@
 #include "world.h"
+
+#include <stdlib.h>
+
 #include "maths/vector.h"
 #include "renderer/graphic/graphic.h"
 #include "renderer/renderer.h"
 #include "renderer/world/object/object.h"
-#include <stdlib.h>
 
 world *createWorld(void)
 {
@@ -16,11 +18,14 @@ void destroyWorld(world *w)
     {
         for (unsigned int i = 0; i < w->objectsCount; i++)
         {
-            switch (w->objects[i]->type) {
-                case MESH:
-                    destroyMesh(w->objects[i]->data.mesh);
-                default:
-                    return;
+            object *o = w->objects[i];
+            switch (o->type)
+            {
+            case MESH:
+                destroyGraphic(o->graphic);
+                destroyMesh(o->data.mesh);
+            default:
+                return;
             }
         }
         free(w->objects);
@@ -54,7 +59,8 @@ object *addMesh(world *w, mesh *m)
     if (m->meshID == -1)
         m->meshID = addGraphic(createMeshGraphic(m));
     renderer *rd = GET_RENDERER;
-    object *o = createObject(transformIdentity(), MESH, m, rd->graphics[m->meshID]);
+    object *o =
+        createObject(transformIdentity(), MESH, m, rd->graphics[m->meshID]);
     addObject(w, o);
     return o;
 }
