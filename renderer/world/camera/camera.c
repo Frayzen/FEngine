@@ -1,4 +1,5 @@
 #include "camera.h"
+
 #include <stdlib.h>
 
 camera *createCamera(float fov, float aspect, float near, float far)
@@ -21,6 +22,7 @@ void destroyCamera(camera *cam)
 
 void updateCamera(camera *cam)
 {
-    cam->projection = mat4Perspective(cam->fov, cam->aspect, cam->near, cam->far);
+    cam->projection =
+        mat4Perspective(cam->fov, cam->aspect, cam->near, cam->far);
     cam->view = mat4Transform(cam->transform);
 }
