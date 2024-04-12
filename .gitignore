@@ -1,9 +1,13 @@
 *
+!*.cc
 !*.c
 !*.h
+!*.hh
+!*.hxx
 !*.obj
 !.gitignore
 !*/
 !**/Makefile
 !README
+!.clang-format
 .git
