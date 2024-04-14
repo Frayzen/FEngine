@@ -37,7 +37,7 @@ int main() {
     FAIL_ON(win == nullptr, "An error occured while creating the window");
     glfwMakeContextCurrent(win);
 
-    glewInit();
+    FAIL_ON(glewInit() != GLEW_OK, "Glew could not be initialized");
     glViewport(0, 0, WIDTH, HEIGHT);
 
     /* glEnable(GL_DEBUG_OUTPUT); */
@@ -67,8 +67,6 @@ int main() {
     /* glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3,
      * nullptr); */
     /* glEnableVertexAttribArray(0); */
-    Camera camera;
-
     // Main loop
     while (!glfwWindowShouldClose(win)) {
         // Take care of events
@@ -79,7 +77,8 @@ int main() {
 
         shader.activate();
         /* glDrawArrays(GL_TRIANGLES, 0, 3); */
-        o.render(shader);
+        Camera::mainCamera().inputs(win);
+        o.render(shader, Camera::mainCamera());
 
         glfwSwapBuffers(win);
     }
