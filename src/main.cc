@@ -1,6 +1,7 @@
 #include <iostream>
 #include <GL/glew.h>
 #include "mesh/mesh.hh"
+#include "object/camera.hh"
 #include "object/object.hh"
 #include "shader.hh"
 #include "tools.hh"
@@ -58,12 +59,15 @@ int main() {
     /* // Buffer */
     /* glGenBuffers(1, &VBO); */
     /* glBindBuffer(GL_ARRAY_BUFFER, VBO); */
-    /* glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW); */
+    /* glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices,
+     * GL_STATIC_DRAW); */
     /* // Vertex Array */
     /* glGenVertexArrays(1, &VAO); */
     /* glBindVertexArray(VAO); */
-    /* glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, nullptr); */
+    /* glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3,
+     * nullptr); */
     /* glEnableVertexAttribArray(0); */
+    Camera camera;
 
     // Main loop
     while (!glfwWindowShouldClose(win)) {
@@ -75,7 +79,7 @@ int main() {
 
         shader.activate();
         /* glDrawArrays(GL_TRIANGLES, 0, 3); */
-        o.render(shader.getProgram());
+        o.render(shader);
 
         glfwSwapBuffers(win);
     }

@@ -13,4 +13,6 @@ class Transform {
     mat4 getMatrix();
 
     static Transform identity();
+  private:
+    Transform();
 };
