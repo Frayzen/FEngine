@@ -27,8 +27,8 @@ int main() {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     // Specify that the project uses modern functions
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    //Debug
-    glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
+    // Debug
+    /* glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE); */
 
     // Creation of the window
     GLFWwindow *win =
@@ -39,19 +39,16 @@ int main() {
     glewInit();
     glViewport(0, 0, WIDTH, HEIGHT);
 
-    glEnable(GL_DEBUG_OUTPUT);
-    glDebugMessageCallback(DebugCallback, 0);
+    /* glEnable(GL_DEBUG_OUTPUT); */
+    /* glDebugMessageCallback(DebugCallback, 0); */
 
     Shader shader =
         Shader("assets/shaders/default.vert", "assets/shaders/default.frag");
 
     float vertices[] = {
-        1.0f,1.0f,1.0f,
-        1.0f,1.0f,0.0f,
-        1.0f,0.0f,0.0f,
-        0.0f,1.0f,1.0f,
-        0.0f,1.0f,0.0f,
-        0.0f,0.0f,1.0f
+        1.0f,  1.0f,  0.0f, // Vertex 1
+        -1.0f, 1.0f,  0.0f, // Vertex 2
+        0.0f,  -1.0f, 0.0f  // Vertex 3
     };
     GLuint VAO, VBO;
     // Buffer
@@ -62,13 +59,7 @@ int main() {
     glGenVertexArrays(1, &VAO);
     glBindVertexArray(VAO);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, nullptr);
-    /* glEnableVertexAttribArray(0); */
-    // Unbinding
-    /* glBindVertexArray(0);             // Safety */
-    /* glBindBuffer(GL_ARRAY_BUFFER, 0); // Safety */
-
-    /* Mesh m = Mesh::createFrom("./assets/cube.obj"); */
-    /* Object o = Object(m); */
+    glEnableVertexAttribArray(0);
 
     // Main loop
     while (!glfwWindowShouldClose(win)) {
@@ -79,7 +70,7 @@ int main() {
         glClear(GL_COLOR_BUFFER_BIT);
 
         shader.activate();
-        glDrawArrays(GL_TRIANGLES, 0, 8);
+        glDrawArrays(GL_TRIANGLES, 0, 3);
         /* o.render(shader.getProgram()); */
 
         glfwSwapBuffers(win);
