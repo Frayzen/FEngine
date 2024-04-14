@@ -14,20 +14,17 @@ Mesh Mesh::createFrom(std::string path) {
     std::cout << "Importing " << path << "..." << '\n';
     static Assimp::Importer importer;
     const aiScene *scene = importer.ReadFile(
-        path.c_str(), aiProcess_CalcTangentSpace | aiProcess_Triangulate |
-                          aiProcess_JoinIdenticalVertices |
-                          aiProcess_SortByPType /* | aiProcess_MakeLeftHanded*/
-    );
+        path.c_str(), aiProcess_Triangulate | aiProcess_JoinIdenticalVertices);
     FAIL_ON(scene == nullptr, "The mesh " << path
                                           << "could not be loaded.\nReason:"
                                           << importer.GetErrorString());
     Mesh m = Mesh();
     for (unsigned int i = 0; i < scene->mNumMeshes; i++) {
         aiMesh *mesh = scene->mMeshes[i];
+        std::cout << mesh->mName.C_Str() << '\n';
         for (unsigned int j = 0; j < mesh->mNumFaces; j++) {
-            aiFace& face = mesh->mFaces[j];
-            m.appendIndices(reinterpret_cast<uvec3 *>(face.mIndices),
-                            face.mNumIndices / 3);
+            aiFace &face = mesh->mFaces[j];
+            m.appendIndices(reinterpret_cast<uvec3 *>(face.mIndices), 1);
         }
         m.appendVertices(reinterpret_cast<const vec3 *>(mesh->mVertices),
                          mesh->mNumVertices / 3);
@@ -53,20 +50,20 @@ void Mesh::updateBuffers() {
 
     enable();
 
-    glBufferData(GL_ARRAY_BUFFER, vertices_.size() * sizeof(vec3), vertices_.data(),
-                 GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, vertices_.size() * sizeof(vec3),
+                 vertices_.data(), GL_STATIC_DRAW);
     FAIL_ON(indices_.size() % 3 != 0,
-            "Invalid number of indicices (got " << indices_.size() << ")")
+            "Invalid number of indices (got " << indices_.size() << ")")
 
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices_.size() * sizeof(uvec3), indices_.data(),
-                 GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices_.size() * sizeof(uvec3),
+                 indices_.data(), GL_STATIC_DRAW);
 
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(vec3), nullptr);
     glEnableVertexAttribArray(0);
 
-    /* glBindVertexArray(0); */
-    /* glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0); */
-    /* glBindBuffer(GL_ARRAY_BUFFER, 0); */
+    glBindVertexArray(0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 Mesh::~Mesh() {

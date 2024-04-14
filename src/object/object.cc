@@ -7,7 +7,6 @@ void Object::render(GLuint program) {
     attachedMesh_.updateBuffers();
     glUseProgram(program);
     attachedMesh_.enable();
-
-    glDrawElements(GL_TRIANGLES, attachedMesh_.triangleNumber(),
+    glDrawElements(GL_TRIANGLES, attachedMesh_.triangleNumber() * 3,
                    GL_UNSIGNED_INT, nullptr);
 }
