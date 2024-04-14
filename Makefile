@@ -1,9 +1,10 @@
 CC=g++
-CFLAGS= -Wall -Wextra -Werror -pedantic -std=c++20 -Wold-style-cast
-CPPFLAGS= -I.
-LDFLAGS= -lglfw -lGL -lGLEW -lm
+CXXFLAGS= -Wall -Wextra -Werror -pedantic -std=c++20 -Wold-style-cast -g -fsanitize=address
+LDFLAGS= -lglfw -lGL -lGLEW -lm -lglm -lassimp -fsanitize=address
+SRC_DIR=./src
+CPPFLAGS= -I$(SRC_DIR)
 SRCS = $(shell find $(SRC_DIR) \( -name '*.cc' -o -name '*.c' \) -a ! -path '*/tests/*')
-OBJS = $(SRCS:.c=.o)
+OBJS = $(SRCS:.cc=.o)
 
 engine: CFLAGS += 
 engine: LDFLAGS += 
@@ -13,12 +14,13 @@ engine: all
 debug: CFLAGS += -g
 debug: LDFLAGS += -g
 debug: all 
-	$(CC) -o $@  $(OBJS) $(LDFLAGS)
+	$(CC) -o $@ $(OBJS) $(LDFLAGS)
 
-glad.o:
-	$(CC) -c glad.c -o glad.o
+src/include/glad/glad.o: src/include/glad/glad.c
+	$(CC) -c $< -o $@
 
 all: $(OBJS)
+	$(CC) -c $< -o $@ $(CFLAGS) -I.$(SRC_DIR)
 
 clean:
 	$(RM) $(OUT) $(shell find . -name '*.o') engine debug
