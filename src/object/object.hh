@@ -8,7 +8,7 @@ class Object : public Renderable{
   public:
     Object(Mesh &mesh);
     Transform transform = Transform::identity();
-    void render(GLuint program) override;
+    void render(Shader& shader) override;
 
   private:
     Mesh &attachedMesh_;
