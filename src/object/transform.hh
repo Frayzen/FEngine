@@ -11,8 +11,10 @@ class Transform {
     // in radian
     vec3 rotation;
     mat4 getMatrix();
+    mat4 getRotationMatrix();
 
     static Transform identity();
+
   private:
     Transform();
 };
