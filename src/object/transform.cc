@@ -8,7 +8,7 @@
 mat4 Transform::getMatrix() {
     glm::mat4 m = glm::translate(glm::mat4(1.0f), position);
     glm::mat4 rot = getRotationMatrix();
-    m = rot * m;
+    m = glm::scale(rot * m, scale);
 
     /* for (int i = 0; i < 4; i++) */
     /* { */
