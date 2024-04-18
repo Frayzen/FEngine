@@ -28,6 +28,7 @@ int main() {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     // Specify that the project uses modern functions
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
     // Debug
     /* glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE); */
 
@@ -46,7 +47,7 @@ int main() {
     Shader shader =
         Shader("assets/shaders/default.vert", "assets/shaders/default.frag");
 
-    Mesh m = Mesh::createFrom("assets/cube.obj");
+    Mesh m = Mesh::createFrom("assets/teddy.obj");
     Object o = Object(m);
 
     /* float vertices[] = { */
