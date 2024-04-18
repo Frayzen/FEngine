@@ -25,10 +25,14 @@ Mesh Mesh::createFrom(std::string path) {
 
     // Retrieve vertices
     for (unsigned int i = 0; i < mesh->mNumVertices; ++i) {
-        auto b = mesh->mVertices[i];
-        vec3 v = {b.x, b.y, b.z};
-        v = v * 0.1f;
-        m.vertices_.push_back(v);
+        auto v = mesh->mVertices[i];
+        vec3 vert = {v.x, v.y, v.z};
+
+        auto norm = mesh->mVertices[i];
+        vec3 vn = {norm.x, norm.y, norm.z};
+        (void)vn;
+
+        m.vertices_.push_back(vert);
     }
 
     // Retrieve indices (assuming triangles)
