@@ -49,6 +49,7 @@ int main() {
 
     Mesh m = Mesh::createFrom("assets/teddy.obj");
     Object o = Object(m);
+    o.transform.position = vec3(0.0f, 0.0f, -5.0f);
 
     /* float vertices[] = { */
     /*     1.0f,  1.0f,  0.0f, // Vertex 1 */

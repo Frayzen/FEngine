@@ -15,6 +15,6 @@ class Camera {
 
   private:
     float fov_, near_, far_;
-    float sensitivity = 1.0f;
-    float speed = 0.01f;
+    float sensitivity = 100.0f;
+    float speed = 1.0f;
 };
