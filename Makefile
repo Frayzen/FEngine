@@ -1,5 +1,5 @@
 CC=g++
-CXXFLAGS= -Wall -Wextra -Werror -pedantic -std=c++20 -Wold-style-cast -g -fsanitize=address
+CXXFLAGS= -Wall -Wextra -Werror -pedantic -std=c++20 -Wold-style-cast -g -fsanitize=address -Wno-error=old-style-cast
 LDFLAGS= -lglfw -lGL -lGLEW -lm -lglm -lassimp -fsanitize=address
 SRC_DIR=./src
 CPPFLAGS= -I$(SRC_DIR)

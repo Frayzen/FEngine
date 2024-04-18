@@ -49,34 +49,17 @@ int main() {
 
     Mesh m = Mesh::createFrom("assets/teddy.obj");
     Object o = Object(m);
-    o.transform.position = vec3(0.0f, 0.0f, -5.0f);
-    o.transform.scale = vec3(0.1f);
+    o.transform.position = vec3(0.0f, 0.0f, -8.0f);
+    o.transform.scale = vec3(0.3f);
 
-    /* float vertices[] = { */
-    /*     1.0f,  1.0f,  0.0f, // Vertex 1 */
-    /*     -1.0f, 1.0f,  0.0f, // Vertex 2 */
-    /*     0.0f,  -1.0f, 0.0f  // Vertex 3 */
-    /* }; */
-
-    /* GLuint VAO, VBO; */
-    /* // Buffer */
-    /* glGenBuffers(1, &VBO); */
-    /* glBindBuffer(GL_ARRAY_BUFFER, VBO); */
-    /* glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices,
-     * GL_STATIC_DRAW); */
-    /* // Vertex Array */
-    /* glGenVertexArrays(1, &VAO); */
-    /* glBindVertexArray(VAO); */
-    /* glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3,
-     * nullptr); */
-    /* glEnableVertexAttribArray(0); */
+    glEnable(GL_DEPTH_TEST);
     // Main loop
     while (!glfwWindowShouldClose(win)) {
         // Take care of events
         glfwPollEvents();
         // Background color
         glClearColor(0.6f, 0.6f, 0.6f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         shader.activate();
         /* glDrawArrays(GL_TRIANGLES, 0, 3); */
