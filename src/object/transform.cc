@@ -7,15 +7,15 @@
 
 mat4 Transform::getMatrix() {
     glm::mat4 m = glm::translate(glm::mat4(1.0f), position);
-    for (int i = 0; i < 4; i++)
-    {
-        for (int j = 0; j < 4; j++)
-        {
-            std::cout << m[i][j] << " ";
-        }
-        std::cout << "" << '\n';
+    /* for (int i = 0; i < 4; i++) */
+    /* { */
+    /*     for (int j = 0; j < 4; j++) */
+    /*     { */
+    /*         std::cout << m[i][j] << " "; */
+    /*     } */
+    /*     std::cout << "" << '\n'; */
             
-    }
+    /* } */
     return m;
 }
 
