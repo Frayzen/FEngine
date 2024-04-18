@@ -37,4 +37,18 @@ Transform Transform::identity() {
     tf.rotation = vec3(0.0f, 0.0f, 0.0f);
     return tf;
 }
+
+vec3 Transform::front() {
+    return glm::normalize(
+        vec3(glm::inverse(getRotationMatrix()) * vec4(0.0f, 0.0f, 1.0f, 1.0f)));
+}
+vec3 Transform::left() {
+    return glm::normalize(
+        vec3(glm::inverse(getRotationMatrix()) * vec4(1.0f, 0.0f, 0.0f, 1.0f)));
+}
+vec3 Transform::up() {
+    return glm::normalize(
+        vec3(glm::inverse(getRotationMatrix()) * vec4(0.0f, 1.0f, 0.0f, 1.0f)));
+}
+
 Transform::Transform() {}

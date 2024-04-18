@@ -39,12 +39,6 @@ Mesh Mesh::createFrom(std::string path) {
                 uvec3(face.mIndices[0], face.mIndices[1], face.mIndices[2]));
     }
 
-    for (auto i : m.indices_)
-        std::cout << i.x << " " << i.y << " " << i.z << '\n';
-    std::cout << "==" << '\n';
-    for (auto i : m.vertices_)
-        std::cout << i.x << " " << i.y << " " << i.z << '\n';
-
     return m;
 }
 
