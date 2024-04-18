@@ -16,6 +16,10 @@ class Transform {
 
     static Transform identity();
 
+    vec3 front();
+    vec3 left();
+    vec3 up();
+
   private:
     Transform();
 };
