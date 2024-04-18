@@ -6,6 +6,8 @@
 !*.hxx
 !*.obj
 !.gitignore
+!*.vert
+!*.frag
 !*/
 !**/Makefile
 !README
