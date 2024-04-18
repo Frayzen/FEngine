@@ -14,7 +14,8 @@ Mesh Mesh::createFrom(std::string path) {
     std::cout << "Importing " << path << "..." << '\n';
     static Assimp::Importer importer;
     const aiScene *scene = importer.ReadFile(
-        path.c_str(), aiProcess_Triangulate | aiProcess_JoinIdenticalVertices);
+        path.c_str(), aiProcess_Triangulate | aiProcess_JoinIdenticalVertices |
+                          aiProcess_GenNormals);
     FAIL_ON(scene == nullptr, "The mesh " << path
                                           << "could not be loaded.\nReason:"
                                           << importer.GetErrorString());
@@ -23,16 +24,20 @@ Mesh Mesh::createFrom(std::string path) {
     aiMesh *mesh =
         scene->mMeshes[0]; // Assuming there's only one mesh in the scene
 
+    if (!mesh->mNormals)
+        std::cout << "NO NORMALS FOUND" << '\n';
     // Retrieve vertices
     for (unsigned int i = 0; i < mesh->mNumVertices; ++i) {
         auto v = mesh->mVertices[i];
         vec3 vert = {v.x, v.y, v.z};
 
-        auto norm = mesh->mVertices[i];
-        vec3 vn = {norm.x, norm.y, norm.z};
-        (void)vn;
-
+        vec3 vn = vec3(0.0f);
+        if (mesh->mNormals) {
+            auto norm = mesh->mNormals[i];
+            vn = {norm.x, norm.y, norm.z};
+        }
         m.vertices_.push_back(vert);
+        m.vertices_.push_back(vn);
     }
 
     // Retrieve indices (assuming triangles)
@@ -72,8 +77,11 @@ void Mesh::updateBuffers() {
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices_.size() * sizeof(uvec3),
                  indices_.data(), GL_STATIC_DRAW);
 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(vec3), nullptr);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(vec3) * 2, nullptr);
     glEnableVertexAttribArray(0);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(vec3) * 2,
+                          (void *)sizeof(vec3));
+    glEnableVertexAttribArray(1);
 
     glBindVertexArray(0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);

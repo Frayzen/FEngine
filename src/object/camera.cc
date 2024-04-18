@@ -8,7 +8,7 @@
 
 mat4 Camera::getMatrix() {
     mat4 m = transform.getMatrix();
-    mat4 pers = glm::perspective(glm::radians(70.0f), 1.0f, 0.001f, 10.0f);
+    mat4 pers = glm::perspective(glm::radians(fov_), HEIGHT / (1.0f * WIDTH), near_, far_);
     m = pers * m;
     return m;
 }

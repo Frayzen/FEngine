@@ -8,13 +8,14 @@ class Camera {
     Transform transform = Transform::identity();
     mat4 getMatrix();
 
-    Camera(float fov = glm::radians(45.0f), float near = 0.1f,
-           float far = 100.0f);
+    Camera(float fov = 90.0f, float near = 0.1f,
+           float far = 10000.0f);
     void inputs(GLFWwindow *win);
     static Camera& mainCamera();
 
   private:
+    // fov in degrees
     float fov_, near_, far_;
-    float sensitivity = 100.0f;
-    float speed = 1.0f;
+    float sensitivity = 3.0f;
+    float speed = 0.3f;
 };
