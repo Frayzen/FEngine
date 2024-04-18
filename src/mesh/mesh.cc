@@ -14,8 +14,9 @@ Mesh Mesh::createFrom(std::string path) {
     std::cout << "Importing " << path << "..." << '\n';
     static Assimp::Importer importer;
     const aiScene *scene = importer.ReadFile(
-        path.c_str(), aiProcess_Triangulate | aiProcess_JoinIdenticalVertices |
-                          aiProcess_GenNormals);
+        path.c_str(),
+        aiProcess_Triangulate | aiProcess_JoinIdenticalVertices |
+            aiProcess_GenSmoothNormals /* or aiProcess_GenNormals */);
     FAIL_ON(scene == nullptr, "The mesh " << path
                                           << "could not be loaded.\nReason:"
                                           << importer.GetErrorString());
