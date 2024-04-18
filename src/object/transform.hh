@@ -10,6 +10,7 @@ class Transform {
     vec3 scale;
     // in radian
     vec3 rotation;
+
     mat4 getMatrix();
     mat4 getRotationMatrix();
 

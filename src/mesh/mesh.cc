@@ -19,17 +19,31 @@ Mesh Mesh::createFrom(std::string path) {
                                           << "could not be loaded.\nReason:"
                                           << importer.GetErrorString());
     Mesh m = Mesh();
-    for (unsigned int i = 0; i < scene->mNumMeshes; i++) {
-        aiMesh *mesh = scene->mMeshes[i];
-        std::cout << mesh->mName.C_Str() << '\n';
-        for (unsigned int j = 0; j < mesh->mNumFaces; j++) {
-            aiFace &face = mesh->mFaces[j];
-            m.appendIndices(reinterpret_cast<uvec3 *>(face.mIndices), 1);
-        }
-        m.appendVertices(reinterpret_cast<const vec3 *>(mesh->mVertices),
-                         mesh->mNumVertices / 3);
+
+    aiMesh *mesh =
+        scene->mMeshes[0]; // Assuming there's only one mesh in the scene
+
+    // Retrieve vertices
+    for (unsigned int i = 0; i < mesh->mNumVertices; ++i) {
+        auto b = mesh->mVertices[i];
+        vec3 v = {b.x, b.y, b.z};
+        m.vertices_.push_back(v);
     }
-    std::cout << path << " succesfully imported" << '\n';
+
+    // Retrieve indices (assuming triangles)
+    for (unsigned int i = 0; i < mesh->mNumFaces; ++i) {
+        aiFace face = mesh->mFaces[i];
+        if (face.mNumIndices == 3) // Assuming triangles
+            m.indices_.push_back(
+                uvec3(face.mIndices[0], face.mIndices[1], face.mIndices[2]));
+    }
+
+    for (auto i : m.indices_)
+        std::cout << i.x << " " << i.y << " " << i.z << '\n';
+    std::cout << "==" << '\n';
+    for (auto i : m.vertices_)
+        std::cout << i.x << " " << i.y << " " << i.z << '\n';
+
     return m;
 }
 
@@ -44,6 +58,7 @@ void Mesh::appendIndices(const uvec3 *indices, size_t size) {
 void Mesh::updateBuffers() {
     if (VAO + VBO + EBO != 0)
         return;
+
     glGenBuffers(1, &VBO);
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &EBO);
