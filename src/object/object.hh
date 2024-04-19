@@ -5,6 +5,10 @@
 
 class Object {
   public:
-    Object();
-    Transform transform;
+    Object(mat4& t);
+    mat4& mat;
+
+  public: 
+    Transform getTransform();
+    void setTransform(Transform& t);
 };

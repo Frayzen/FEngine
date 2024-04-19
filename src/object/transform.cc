@@ -1,9 +1,13 @@
 #include "transform.hh"
 #include <glm/ext/matrix_transform.hpp>
+#include <glm/ext/quaternion_float.hpp>
 #include <glm/fwd.hpp>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <iostream>
+
+Transform::Transform(vec3 pos, quat rot, vec3 scale)
+    : position(pos), rotation(rot), scale(scale) {}
 
 mat4 Transform::getMatrix() {
     glm::mat4 m = glm::translate(glm::mat4(1.0f), position);
@@ -13,18 +17,15 @@ mat4 Transform::getMatrix() {
 }
 
 mat4 Transform::getRotationMatrix() {
-    mat4 m = mat4(1.0f);
-    m = rotate(m, rotation[0], vec3(1.0f, 0.0f, 0.0f));
-    m = rotate(m, rotation[1], vec3(0.0f, 1.0f, 0.0f));
-    m = rotate(m, rotation[2], vec3(0.0f, 0.0f, 1.0f));
-    return m;
+    return glm::mat4_cast(rotation);
 }
 
 Transform Transform::identity() {
     Transform tf = Transform();
     tf.scale = vec3(1.0f, 1.0f, 1.0f);
     tf.position = vec3(0.0f, 0.0f, 0.0f);
-    tf.rotation = vec3(0.0f, 0.0f, 0.0f);
+    tf.rotation = glm::quat(1.0f, 0.0f, 0.0f, 0.0f);
+;
     return tf;
 }
 

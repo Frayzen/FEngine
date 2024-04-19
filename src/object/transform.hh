@@ -1,15 +1,16 @@
 #pragma once
 
 #include <glm/glm.hpp>
+#include <glm/gtc/quaternion.hpp>
 
 using namespace glm;
 
 class Transform {
   public:
+    Transform(vec3 pos, quat rot, vec3 scale);
     vec3 position;
+    quat rotation;
     vec3 scale;
-    // in radian
-    vec3 rotation;
 
     mat4 getMatrix();
     mat4 getRotationMatrix();

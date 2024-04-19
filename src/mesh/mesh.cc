@@ -108,15 +108,12 @@ void Mesh::enable() { glBindVertexArray(VAO); }
 unsigned int Mesh::triangleNumber() { return indices_.size(); }
 
 Object &Mesh::createObject() {
-    objects_.push_back(Object());
-    objTransforms_.push_back(mat4(1.0f));
+    objTransforms_.push_back(Transform::identity().getMatrix());
+    objects_.push_back(Object(objTransforms_.back()));
     return objects_.back();
 }
 
 void Mesh::updateTransforms() {
-    for (unsigned i = 0; i < objects_.size(); i++)
-        objTransforms_[i] = objects_[i].transform.getMatrix();
-
     glBindVertexArray(VAO);
     if (!IBT) {
 

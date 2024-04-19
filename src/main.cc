@@ -47,13 +47,14 @@ int main() {
     Shader shader =
         Shader("assets/shaders/default.vert", "assets/shaders/default.frag");
 
-    Mesh m = Mesh::createFrom("assets/teddy.obj");
-    for (int i = 0; i < 10; i++) {
+    Mesh m = Mesh::createFrom("assets/sphere.obj");
+    for (int i = 0; i < 50; i++) {
         for (int j = 0; j < 10; j++) {
-            for (int k = 0; k < 10; k++) {
+            for (int k = 0; k < 50; k++) {
                 Object &o = m.createObject();
-                o.transform.position = vec3(i * 50.0f, j * 50.0f, -50.0f * k);
-                o.transform.scale = vec3(0.3f);
+                Transform t = o.getTransform();
+                t.position = vec3(i * 2.0f, j * 2.0f, -2.0f * k);
+                o.setTransform(t);
             }
         }
     }
