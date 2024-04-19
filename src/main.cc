@@ -30,7 +30,7 @@ int main() {
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
     // Debug
-    /* glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE); */
+    glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
 
     // Creation of the window
     GLFWwindow *win =
@@ -41,16 +41,26 @@ int main() {
     FAIL_ON(glewInit() != GLEW_OK, "Glew could not be initialized");
     glViewport(0, 0, WIDTH, HEIGHT);
 
-    /* glEnable(GL_DEBUG_OUTPUT); */
-    /* glDebugMessageCallback(DebugCallback, 0); */
+    glEnable(GL_DEBUG_OUTPUT);
+    glDebugMessageCallback(DebugCallback, 0);
 
     Shader shader =
         Shader("assets/shaders/default.vert", "assets/shaders/default.frag");
 
     Mesh m = Mesh::createFrom("assets/teddy.obj");
-    Object o = Object(m);
-    o.transform.position = vec3(0.0f, 0.0f, -8.0f);
-    o.transform.scale = vec3(0.3f);
+    for (int i = 0; i < 10; i++) {
+        for (int j = 0; j < 10; j++) {
+            for (int k = 0; k < 10; k++) {
+                Object &o = m.createObject();
+                o.transform.position = vec3(i * 50.0f, j * 50.0f, -50.0f * k);
+                o.transform.scale = vec3(0.3f);
+            }
+        }
+    }
+
+    glfwSetTime(0);
+    double last = glfwGetTime();
+    int fps = 0;
 
     glEnable(GL_DEPTH_TEST);
     // Main loop
@@ -61,10 +71,17 @@ int main() {
         glClearColor(0.6f, 0.6f, 0.6f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        if (glfwGetTime() - last >= 1.0) {
+            last += 1.0;
+            std::cout << "FPS: " << fps << '\n';
+            fps = 0;
+        }
+        fps++;
+
         shader.activate();
         /* glDrawArrays(GL_TRIANGLES, 0, 3); */
         Camera::mainCamera().inputs(win);
-        o.render(shader, Camera::mainCamera());
+        m.render(shader, Camera::mainCamera());
 
         glfwSwapBuffers(win);
     }
