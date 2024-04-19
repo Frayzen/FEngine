@@ -18,4 +18,6 @@ class Camera {
     float fov_, near_, far_;
     float sensitivity = 3.0f;
     float speed = 0.3f;
+
+    vec3 lookAt = vec3(1.0f, 0.0f, 0.0f);
 };
