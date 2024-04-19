@@ -1,15 +1,10 @@
 #pragma once
 
 #include "object/renderable.hh"
-#include "mesh/mesh.hh"
 #include "object/transform.hh"
 
-class Object : public Renderable{
+class Object {
   public:
-    Object(Mesh &mesh);
-    Transform transform = Transform::identity();
-    void render(Shader& shader, Camera &camera) override;
-
-  private:
-    Mesh &attachedMesh_;
+    Object();
+    Transform transform;
 };

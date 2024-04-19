@@ -8,6 +8,10 @@
 #include <cstdlib>
 #include <cstring>
 
+#define LOC_VERTEX 0
+#define LOC_NORMAL 1
+#define LOC_TRANSFORM 2
+
 Mesh::Mesh() {}
 
 Mesh Mesh::createFrom(std::string path) {
@@ -68,7 +72,9 @@ void Mesh::updateBuffers() {
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &EBO);
 
-    enable();
+    glBindVertexArray(VAO);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 
     glBufferData(GL_ARRAY_BUFFER, vertices_.size() * sizeof(vec3),
                  vertices_.data(), GL_STATIC_DRAW);
@@ -78,11 +84,12 @@ void Mesh::updateBuffers() {
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices_.size() * sizeof(uvec3),
                  indices_.data(), GL_STATIC_DRAW);
 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(vec3) * 2, nullptr);
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(vec3) * 2,
+    glVertexAttribPointer(LOC_VERTEX, 3, GL_FLOAT, GL_FALSE, sizeof(vec3) * 2,
+                          nullptr);
+    glEnableVertexAttribArray(LOC_VERTEX);
+    glVertexAttribPointer(LOC_NORMAL, 3, GL_FLOAT, GL_FALSE, sizeof(vec3) * 2,
                           (void *)sizeof(vec3));
-    glEnableVertexAttribArray(1);
+    glEnableVertexAttribArray(LOC_NORMAL);
 
     glBindVertexArray(0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
@@ -92,13 +99,61 @@ void Mesh::updateBuffers() {
 Mesh::~Mesh() {
     glDeleteBuffers(1, &EBO);
     glDeleteBuffers(1, &VBO);
+    glDeleteBuffers(1, &IBT);
     glDeleteVertexArrays(1, &VAO);
 }
 
-void Mesh::enable() {
-    glBindVertexArray(VAO);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-}
+void Mesh::enable() { glBindVertexArray(VAO); }
 
 unsigned int Mesh::triangleNumber() { return indices_.size(); }
+
+Object &Mesh::createObject() {
+    objects_.push_back(Object());
+    objTransforms_.push_back(mat4(1.0f));
+    return objects_.back();
+}
+
+void Mesh::updateTransforms() {
+    for (unsigned i = 0; i < objects_.size(); i++)
+        objTransforms_[i] = objects_[i].transform.getMatrix();
+
+    glBindVertexArray(VAO);
+    if (!IBT) {
+
+        glGenBuffers(1, &IBT);
+        glBindBuffer(GL_ARRAY_BUFFER, IBT);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(mat4) * objTransforms_.size(),
+                     objTransforms_.data(), GL_STATIC_DRAW);
+        //Since vertexAttribPointer size maximum is 4
+        for (int i = 0; i < 4; i++) {
+            glVertexAttribPointer(LOC_TRANSFORM + i, 4, GL_FLOAT, GL_FALSE,
+                                  sizeof(mat4), (void *)(sizeof(vec4) * i));
+            glEnableVertexAttribArray(LOC_TRANSFORM + i);
+            glVertexAttribDivisor(LOC_TRANSFORM + i, 1);
+        }
+    } else {
+        glBindBuffer(GL_ARRAY_BUFFER, IBT);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(mat4) * objTransforms_.size(),
+                     objTransforms_.data(), GL_STATIC_DRAW);
+    }
+    glBindVertexArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
+void Mesh::render(Shader &shader, Camera &camera) {
+    shader.activate();
+
+    GLuint camMatUniID = glGetUniformLocation(shader.getProgram(), "camMat");
+    glUniformMatrix4fv(camMatUniID, 1, GL_FALSE, &camera.getMatrix()[0][0]);
+
+    GLuint posLightUniID =
+        glGetUniformLocation(shader.getProgram(), "lightPos");
+    vec3 lightPos = vec3(0.0f, 1000.f, 0.0f);
+    glUniform3fv(posLightUniID, 1, &lightPos[0]);
+
+    updateBuffers();
+    updateTransforms();
+    enable();
+    glDrawElementsInstanced(GL_TRIANGLES, triangleNumber() * 3, GL_UNSIGNED_INT,
+                            nullptr, objects_.size());
+}
