@@ -1,11 +1,17 @@
 *
+!*.cc
 !*.c
 !*.h
+!*.hh
+!*.hxx
 !*.obj
 !*.glsl
 !assets/**
 !.gitignore
+!*.vert
+!*.frag
 !*/
 !**/Makefile
 !README
+!.clang-format
 .git

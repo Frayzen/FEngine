@@ -1,3 +1,5 @@
 The dependecies of the project:
 - GLEW
+- GLFW
 - OpenGL
+- GLM
