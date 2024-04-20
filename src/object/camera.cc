@@ -43,7 +43,7 @@ void Camera::inputs(GLFWwindow *win) {
         rotX_ += deg;
     if (glfwGetKey(win, GLFW_KEY_K) == GLFW_PRESS)
         rotX_ -= deg;
-    rotX_ = max(min(rotX_, glm::half_pi<float>()), -glm::half_pi<float>());
+    rotX_ = max(min(rotX_, lockAxisX_), -lockAxisX_);
     transform.setRotation(vec3(rotX_, rotY_, 0));
 }
 Camera &Camera::mainCamera() {

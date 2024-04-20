@@ -3,6 +3,7 @@
 #include "object/transform.hh"
 #include <GLFW/glfw3.h>
 #include <glm/fwd.hpp>
+#include <glm/gtc/constants.hpp>
 class Camera {
   public:
     Transform transform = Transform::identity();
@@ -18,6 +19,7 @@ class Camera {
     float fov_, near_, far_;
     float sensitivity = 3.0f;
     float speed = 0.3f;
+    float lockAxisX_ = glm::quarter_pi<float>();
 
     float rotX_ = 0;
     float rotY_ = 0;
