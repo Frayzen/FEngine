@@ -1,5 +1,10 @@
+FEngine_t
+
+Initially made by 2 developers full of curiosity and (a bit of) time.
+
 The dependecies of the project:
 - GLEW
 - GLFW
 - OpenGL
 - GLM
+- Assimp
