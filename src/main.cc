@@ -4,7 +4,8 @@
 #include "mesh/mesh.hh"
 #include "object/camera.hh"
 #include "object/object.hh"
-#include "shader.hh"
+#include "shader/compute.hh"
+#include "shader/render.hh"
 #include "tools.hh"
 #include <GLFW/glfw3.h>
 #include <string.h>
@@ -20,6 +21,24 @@ void GLAPIENTRY DebugCallback(GLenum source, GLenum type, GLuint id,
     (void)userParam;
     std::cout << msg << '\n';
     std::flush(std::cout);
+}
+
+void sum() {
+    Compute cmp = Compute("assets/shaders/summer.comp");
+    const int nb = 10;
+    float a[nb];
+    float b[nb];
+    for (int i = 0; i < nb; i++) {
+        a[i] = 1.0f * i * i;
+        b[i] = 1.0f * i;
+    }
+    cmp.setupData(a, nb, sizeof(float), 1, GL_DYNAMIC_COPY);
+    cmp.setupData(b, nb, sizeof(float), 2, GL_DYNAMIC_COPY);
+    cmp.dispatch(nb);
+    auto res = reinterpret_cast<const float *>(cmp.retrieveData(2));
+    for (int i = 0; i < nb; i++)
+        std::cout << res[i] << ' ';
+    std::cout << std::endl;
 }
 
 int main() {
@@ -45,16 +64,18 @@ int main() {
     glEnable(GL_DEBUG_OUTPUT);
     glDebugMessageCallback(DebugCallback, 0);
 
-    Shader shader =
-        Shader("assets/shaders/default.vert", "assets/shaders/default.frag");
+    sum();
 
-    Mesh m = Mesh::createFrom("assets/sphere.obj");
-    for (int i = 0; i < 5; i++) {
-        for (int j = 0; j < 5; j++) {
-            for (int k = 0; k < 5; k++) {
+    Render render =
+        Render("assets/shaders/default.vert", "assets/shaders/default.frag");
+
+    Mesh m = Mesh::createFrom("assets/cube.obj");
+    for (int i = 0; i < 10; i++) {
+        for (int j = 0; j < 10; j++) {
+            for (int k = 0; k < 10; k++) {
                 Object &o = m.createObject();
                 Transform t = o.getTransform();
-                t.position = vec3(i * 2.0f, j * 2.0f, -2.0f * k);
+                t.position = vec3(i * 3.0f, j * 3.0f, -3.0f * k);
                 o.setTransform(t);
             }
         }
@@ -80,16 +101,16 @@ int main() {
         }
         fps++;
 
-        shader.activate();
+        render.activate();
         Camera::mainCamera().inputs(win);
-        m.render(shader, Camera::mainCamera());
+        m.render(render, Camera::mainCamera());
 
-        /* for (Object &o : m.getObjects()) { */
-        /*     Transform t = o.getTransform(); */
-        /*     t.position.y -= 0.1; */
-        /*     /1* t.position.y = std::max(-10.0f, t.position.y); *1/ */
-        /*     o.setTransform(t); */
-        /* } */
+        for (Object &o : m.getObjects()) {
+            Transform t = o.getTransform();
+            t.position.y -= 0.1;
+            /* t.position.y = std::max(-10.0f, t.position.y); */
+            o.setTransform(t);
+        }
 
         glfwSwapBuffers(win);
     }
