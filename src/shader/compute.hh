@@ -15,6 +15,8 @@ class Compute : public Shader {
                    GLenum usage);
     void dispatch(GLuint amount);
     const void *retrieveData(unsigned int bindingPosition);
+
+    GLuint getUniformLoc(std::string name);
     ~Compute();
 
   private:

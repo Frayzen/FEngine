@@ -8,6 +8,7 @@ Compute::Compute(std::string computeFilePath) {
     program_ = glCreateProgram();
     glAttachShader(program_, cmpShader);
     glLinkProgram(program_);
+    checkGLError("Error while linking compute shader");
 }
 
 void Compute::setupData(void *data, unsigned int element_count,
@@ -24,6 +25,12 @@ void Compute::setupData(void *data, unsigned int element_count,
                  usage);
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, bindingPosition, buf);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+}
+
+GLuint Compute::getUniformLoc(std::string name)
+{
+    glUseProgram(program_);
+    return glGetUniformLocation(program_, name.c_str());
 }
 
 void Compute::dispatch(GLuint amount) {

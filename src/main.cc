@@ -80,10 +80,10 @@ int main() {
     Render render =
         Render("assets/shaders/default.vert", "assets/shaders/default.frag");
 
-    Mesh m = Mesh::createFrom("assets/cube.obj");
-    for (int i = 0; i < 10; i++) {
-        for (int j = 0; j < 1; j++) {
-            for (int k = 0; k < 1; k++) {
+    Mesh m = Mesh::createFrom("assets/isohedron.obj");
+    for (int i = 0; i < 5; i++) {
+        for (int j = 0; j < 5; j++) {
+            for (int k = 0; k < 5; k++) {
                 Object &o = m.createObject();
                 Transform t = o.getTransform();
                 t.position = vec3(i * 3.0f, j * 3.0f, -3.0f * k);
@@ -92,8 +92,14 @@ int main() {
         }
     }
 
+    const int objNb = m.getObjects().size();
+
     Compute grav("assets/shaders/gravity.comp");
-    grav.setupData(m.getTransforms(), 10, sizeof(mat4), 0, GL_DYNAMIC_COPY);
+    vec3 ubound = {20.0f, 20.0f, 20.0f};
+    vec3 lbound = {-20.0f, -20.0f, -20.0f};
+    glUniform3fv(grav.getUniformLoc("ubound"), 1, (GLfloat *)&ubound);
+    glUniform3fv(grav.getUniformLoc("lbound"), 1, (GLfloat *)&lbound);
+    grav.setupData(m.getTransforms(), objNb, sizeof(mat4), 0, GL_DYNAMIC_COPY);
 
     /* exit(1); */
 
@@ -102,6 +108,7 @@ int main() {
     int fps = 0;
 
     glEnable(GL_DEPTH_TEST);
+    Camera::mainCamera().transform.position.z = -30;
     // Main loop
     while (!glfwWindowShouldClose(win)) {
         // Take care of events
@@ -121,9 +128,9 @@ int main() {
         Camera::mainCamera().inputs(win);
         m.render(render, Camera::mainCamera());
         
-        grav.dispatch(10);
+        grav.dispatch(objNb);
         const mat4 *newpos = (const mat4*)grav.retrieveData(0);
-        memcpy(m.getTransforms(), newpos, 10 * sizeof(mat4));
+        memcpy(m.getTransforms(), newpos, objNb * sizeof(mat4));
 
         /* for (Object &o : m.getObjects()) { */
         /*     Transform t = o.getTransform(); */
