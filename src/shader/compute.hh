@@ -23,4 +23,6 @@ class Compute : public Shader {
   private:
     GLuint buffers_[MAX_INPUTS];
     void *retrieved_ = nullptr;
+
+    bool isMapped(unsigned int bindingPosition);
 };
