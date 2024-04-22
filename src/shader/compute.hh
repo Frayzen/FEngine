@@ -13,6 +13,7 @@ class Compute : public Shader {
     void setupData(void *data, unsigned int element_count,
                    unsigned int element_size, unsigned int bindingPosition,
                    GLenum usage);
+    void updateData(void *data, unsigned int bindingPosition);
     void dispatch(GLuint amount);
     const void *retrieveData(unsigned int bindingPosition);
 

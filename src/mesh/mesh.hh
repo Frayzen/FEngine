@@ -19,9 +19,7 @@ class Mesh : public Renderable{
 
     Object& createObject();
     std::vector<Object>& getObjects();
-    mat4& getTransform(unsigned int id);
-
-     mat4* getTransforms();
+     const unsigned int id;
 
   private:
     Mesh();
@@ -34,7 +32,6 @@ class Mesh : public Renderable{
     std::vector<uvec3> indices_;
     //object related
     std::vector<Object> objects_;
-    std::vector<mat4> objTransforms_;
     // IBT = Instance Buffer Transform
     GLuint VAO, VBO, EBO, IBT = 0;
 };

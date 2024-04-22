@@ -12,7 +12,9 @@
 #define LOC_NORMAL 1
 #define LOC_TRANSFORM 2
 
-Mesh::Mesh() {}
+static int curId = 0;
+
+Mesh::Mesh() : id(curId++) {}
 
 Mesh Mesh::createFrom(std::string path) {
     std::cout << "Importing " << path << "..." << '\n';
@@ -107,11 +109,7 @@ void Mesh::enable() { glBindVertexArray(VAO); }
 
 unsigned int Mesh::triangleNumber() { return indices_.size(); }
 
-Object &Mesh::createObject() {
-    mat4 mat = Transform::identity().getMatrix();
-    objTransforms_.emplace_back(mat);
-    return objects_.emplace_back(Object(*this, objects_.size()));
-}
+Object &Mesh::createObject() { return objects_.emplace_back(Object(*this)); }
 
 void Mesh::updateTransforms() {
     glBindVertexArray(VAO);
@@ -119,8 +117,8 @@ void Mesh::updateTransforms() {
 
         glGenBuffers(1, &IBT);
         glBindBuffer(GL_ARRAY_BUFFER, IBT);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(mat4) * objTransforms_.size(),
-                     objTransforms_.data(), GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(mat4) * objects_.size(),
+                     Object::getTransforms(*this), GL_STATIC_DRAW);
         // Since vertexAttribPointer size maximum is 4
         for (int i = 0; i < 4; i++) {
             glVertexAttribPointer(LOC_TRANSFORM + i, 4, GL_FLOAT, GL_FALSE,
@@ -130,8 +128,9 @@ void Mesh::updateTransforms() {
         }
     } else {
         glBindBuffer(GL_ARRAY_BUFFER, IBT);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(mat4) * objTransforms_.size(),
-                     objTransforms_.data(), GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(mat4) * objects_.size(),
+                     Object::getTransforms(*this), GL_STATIC_DRAW);
+
     }
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -156,12 +155,3 @@ void Mesh::render(Shader &shader, Camera &camera) {
 }
 
 std::vector<Object> &Mesh::getObjects() { return objects_; }
-
-mat4& Mesh::getTransform(unsigned int id)
-{
-   return objTransforms_.data()[id];
-}
-
-mat4* Mesh::getTransforms(){
-    return objTransforms_.data(); 
-}

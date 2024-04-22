@@ -27,6 +27,13 @@ void Compute::setupData(void *data, unsigned int element_count,
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 }
 
+void Compute::updateData(void *data, unsigned int bindingPosition)
+{
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, buffers_[bindingPosition]);
+    GLuint size = 0;
+    glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0,)
+}
+
 GLuint Compute::getUniformLoc(std::string name)
 {
     glUseProgram(program_);

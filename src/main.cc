@@ -75,15 +75,15 @@ int main() {
     glEnable(GL_DEBUG_OUTPUT);
     glDebugMessageCallback(DebugCallback, 0);
 
-    sum();
+    /* sum(); */
 
     Render render =
         Render("assets/shaders/default.vert", "assets/shaders/default.frag");
 
-    Mesh m = Mesh::createFrom("assets/isohedron.obj");
-    for (int i = 0; i < 5; i++) {
-        for (int j = 0; j < 5; j++) {
-            for (int k = 0; k < 5; k++) {
+    Mesh m = Mesh::createFrom("assets/sphere.obj");
+    for (int i = 0; i < 1; i++) {
+        for (int j = 0; j < 1; j++) {
+            for (int k = 0; k < 1; k++) {
                 Object &o = m.createObject();
                 Transform t = o.getTransform();
                 t.position = vec3(i * 3.0f, j * 3.0f, -3.0f * k);
@@ -99,7 +99,8 @@ int main() {
     vec3 lbound = {-20.0f, -20.0f, -20.0f};
     glUniform3fv(grav.getUniformLoc("ubound"), 1, (GLfloat *)&ubound);
     glUniform3fv(grav.getUniformLoc("lbound"), 1, (GLfloat *)&lbound);
-    grav.setupData(m.getTransforms(), objNb, sizeof(mat4), 0, GL_DYNAMIC_COPY);
+    grav.setupData(Object::getTransforms(m), objNb, sizeof(mat4), 0, GL_DYNAMIC_COPY);
+        std::cout << Object::getTransforms(m)[0][3][1] << '\n';
 
     /* exit(1); */
 
@@ -128,16 +129,11 @@ int main() {
         Camera::mainCamera().inputs(win);
         m.render(render, Camera::mainCamera());
         
+        grav.updateData(Object::getTransforms(m), 0);
         grav.dispatch(objNb);
-        const mat4 *newpos = (const mat4*)grav.retrieveData(0);
-        memcpy(m.getTransforms(), newpos, objNb * sizeof(mat4));
-
-        /* for (Object &o : m.getObjects()) { */
-        /*     Transform t = o.getTransform(); */
-        /*     t.position.y -= 0.1; */
-        /*     /1* t.position.y = std::max(-10.0f, t.position.y); *1/ */
-        /*     o.setTransform(t); */
-        /* } */
+        const mat4 * newpos = (const mat4*)grav.retrieveData(0);
+        memcpy(Object::getTransforms(m), newpos, objNb * sizeof(mat4));
+        std::cout << Object::getTransforms(m)[0][3][1] << '\n';
 
         glfwSwapBuffers(win);
     }
