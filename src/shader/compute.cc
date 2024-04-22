@@ -29,20 +29,19 @@ void Compute::setupData(void *data, unsigned int element_count,
 void Compute::dispatch(GLuint amount) {
     glUseProgram(program_);
     glDispatchCompute(amount, 1, 1);
+    glMemoryBarrier( GL_ALL_BARRIER_BITS);
 }
 
-const void *&Compute::retrieveData(unsigned int bindingPosition) {
+const void *Compute::retrieveData(unsigned int bindingPosition) {
     glUseProgram(program_);
     GLuint buf = buffers_[bindingPosition];
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, buf);
-    if (retrieved_)
-        glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
-    retrieved_ = glMapBuffer(GL_SHADER_STORAGE_BUFFER, GL_READ_ONLY);
+    if (!retrieved_)
+        glMapBuffer(GL_SHADER_STORAGE_BUFFER, GL_READ_ONLY);
+    glGetBufferPointerv(GL_SHADER_STORAGE_BUFFER, GL_BUFFER_MAP_POINTER, &retrieved_);
     return retrieved_;
 }
 
 Compute::~Compute() {
-    if (retrieved_)
-        glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
     Shader::~Shader();
 }

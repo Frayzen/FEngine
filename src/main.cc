@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <glm/fwd.hpp>
 #include <iostream>
 #include <GL/glew.h>
 #include "mesh/mesh.hh"
@@ -10,6 +11,16 @@
 #include <GLFW/glfw3.h>
 #include <string.h>
 
+void prettyPrintMat4(const glm::mat4 &matrix) {
+
+    for (int i = 0; i < 4; ++i) {
+        for (int j = 0; j < 4; ++j) {
+            std::cout << matrix[i][j] << " ";
+        }
+
+        std::cout << std::endl;
+    }
+}
 void GLAPIENTRY DebugCallback(GLenum source, GLenum type, GLuint id,
                               GLenum severity, GLsizei length,
                               const GLchar *msg, const void *userParam) {
@@ -71,8 +82,8 @@ int main() {
 
     Mesh m = Mesh::createFrom("assets/cube.obj");
     for (int i = 0; i < 10; i++) {
-        for (int j = 0; j < 10; j++) {
-            for (int k = 0; k < 10; k++) {
+        for (int j = 0; j < 1; j++) {
+            for (int k = 0; k < 1; k++) {
                 Object &o = m.createObject();
                 Transform t = o.getTransform();
                 t.position = vec3(i * 3.0f, j * 3.0f, -3.0f * k);
@@ -80,6 +91,11 @@ int main() {
             }
         }
     }
+
+    Compute grav("assets/shaders/gravity.comp");
+    grav.setupData(m.getTransforms(), 10, sizeof(mat4), 0, GL_DYNAMIC_COPY);
+
+    /* exit(1); */
 
     glfwSetTime(0);
     double last = glfwGetTime();
@@ -104,13 +120,17 @@ int main() {
         render.activate();
         Camera::mainCamera().inputs(win);
         m.render(render, Camera::mainCamera());
+        
+        grav.dispatch(10);
+        const mat4 *newpos = (const mat4*)grav.retrieveData(0);
+        memcpy(m.getTransforms(), newpos, 10 * sizeof(mat4));
 
-        for (Object &o : m.getObjects()) {
-            Transform t = o.getTransform();
-            t.position.y -= 0.1;
-            /* t.position.y = std::max(-10.0f, t.position.y); */
-            o.setTransform(t);
-        }
+        /* for (Object &o : m.getObjects()) { */
+        /*     Transform t = o.getTransform(); */
+        /*     t.position.y -= 0.1; */
+        /*     /1* t.position.y = std::max(-10.0f, t.position.y); *1/ */
+        /*     o.setTransform(t); */
+        /* } */
 
         glfwSwapBuffers(win);
     }

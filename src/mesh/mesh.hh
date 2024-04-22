@@ -21,6 +21,8 @@ class Mesh : public Renderable{
     std::vector<Object>& getObjects();
     mat4& getTransform(unsigned int id);
 
+     mat4* getTransforms();
+
   private:
     Mesh();
     void updateBuffers();

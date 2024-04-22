@@ -161,3 +161,7 @@ mat4& Mesh::getTransform(unsigned int id)
 {
    return objTransforms_.data()[id];
 }
+
+mat4* Mesh::getTransforms(){
+    return objTransforms_.data(); 
+}
