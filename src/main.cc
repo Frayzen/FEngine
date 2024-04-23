@@ -108,6 +108,7 @@ int main() {
 
     glfwSetTime(0);
     double last = glfwGetTime();
+    double lastSec = glfwGetTime();
     int fps = 0;
 
     glEnable(GL_DEPTH_TEST);
@@ -119,10 +120,12 @@ int main() {
         // Background color
         glClearColor(0.6f, 0.6f, 0.6f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        double dt = glfwGetTime() - last;
+        double cur = glfwGetTime();
+        double dt = cur - last;
+        last = cur;
         glUniform1f(grav.getUniformLoc("deltaTime"), static_cast<float>(dt));
-        if (dt >= 1.0) {
-            last += 1.0;
+        if (cur - lastSec >= 1.0) {
+            lastSec += 1.0;
             std::cout << "FPS: " << fps << '\n';
             fps = 0;
         }
