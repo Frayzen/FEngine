@@ -27,18 +27,14 @@ void Compute::setupData(void *data, unsigned int element_count,
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 }
 
-void Compute::updateData(void *data, unsigned int bindingPosition)
-{
+void Compute::updateData(void *data, unsigned int bindingPosition) {
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, buffers_[bindingPosition]);
-    if (isMapped(bindingPosition))
-        glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
     GLint size = 0;
     glGetBufferParameteriv(GL_SHADER_STORAGE_BUFFER, GL_BUFFER_SIZE, &size);
     glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, size, data);
 }
 
-GLuint Compute::getUniformLoc(std::string name)
-{
+GLuint Compute::getUniformLoc(std::string name) {
     glUseProgram(program_);
     return glGetUniformLocation(program_, name.c_str());
 }
@@ -46,11 +42,10 @@ GLuint Compute::getUniformLoc(std::string name)
 void Compute::dispatch(GLuint amount) {
     glUseProgram(program_);
     glDispatchCompute(amount, 1, 1);
-    glMemoryBarrier( GL_ALL_BARRIER_BITS);
+    glMemoryBarrier(GL_ALL_BARRIER_BITS);
 }
 
-bool Compute::isMapped(unsigned int bindingPosition)
-{
+bool Compute::isMapped(unsigned int bindingPosition) {
     GLint mapped;
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, buffers_[bindingPosition]);
     glGetBufferParameteriv(GL_SHADER_STORAGE_BUFFER, GL_BUFFER_MAPPED, &mapped);
@@ -61,12 +56,8 @@ const void *Compute::retrieveData(unsigned int bindingPosition) {
     glUseProgram(program_);
     GLuint buf = buffers_[bindingPosition];
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, buf);
-    if (!isMapped(bindingPosition))
-        glMapBuffer(GL_SHADER_STORAGE_BUFFER, GL_READ_ONLY);
-    glGetBufferPointerv(GL_SHADER_STORAGE_BUFFER, GL_BUFFER_MAP_POINTER, &retrieved_);
-    return retrieved_;
+    glFinish();
+    return glMapBuffer(GL_SHADER_STORAGE_BUFFER, GL_READ_ONLY);
 }
 
-Compute::~Compute() {
-    Shader::~Shader();
-}
+Compute::~Compute() { Shader::~Shader(); }

@@ -99,8 +99,10 @@ int main() {
     vec3 lbound = {-20.0f, -20.0f, -20.0f};
     glUniform3fv(grav.getUniformLoc("ubound"), 1, (GLfloat *)&ubound);
     glUniform3fv(grav.getUniformLoc("lbound"), 1, (GLfloat *)&lbound);
-    grav.setupData(Object::getTransforms(m), objNb, sizeof(mat4), 0, GL_DYNAMIC_COPY);
-        std::cout << Object::getTransforms(m)[0][3][1] << '\n';
+    grav.setupData(Object::getTransforms(m), objNb, sizeof(mat4), 0,
+                   GL_DYNAMIC_DRAW);
+    grav.setupData(Object::getVelocities(m), objNb, sizeof(vec3), 1,
+                   GL_DYNAMIC_DRAW);
 
     /* exit(1); */
 
@@ -117,8 +119,9 @@ int main() {
         // Background color
         glClearColor(0.6f, 0.6f, 0.6f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        if (glfwGetTime() - last >= 1.0) {
+        double dt = glfwGetTime() - last;
+        glUniform1f(grav.getUniformLoc("deltaTime"), static_cast<float>(dt));
+        if (dt >= 1.0) {
             last += 1.0;
             std::cout << "FPS: " << fps << '\n';
             fps = 0;
@@ -128,11 +131,18 @@ int main() {
         render.activate();
         Camera::mainCamera().inputs(win);
         m.render(render, Camera::mainCamera());
-        
+
         grav.updateData(Object::getTransforms(m), 0);
+        grav.updateData(Object::getVelocities(m), 1);
         grav.dispatch(objNb);
-        const mat4 * newpos = (const mat4*)grav.retrieveData(0);
+        const mat4 *newpos = (const mat4 *)grav.retrieveData(0);
         memcpy(Object::getTransforms(m), newpos, objNb * sizeof(mat4));
+
+        glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
+        const vec3 *newvel = (const vec3 *)grav.retrieveData(1);
+        memcpy(Object::getVelocities(m), newvel, objNb * sizeof(vec3));
+        
+        glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
 
         glfwSwapBuffers(win);
     }
