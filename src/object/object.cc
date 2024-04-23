@@ -10,13 +10,13 @@
 // Define static member variables
 std::map<unsigned int, unsigned int> Object::objIds_;
 std::map<unsigned int, std::vector<mat4>> Object::objTransforms_;
-std::map<unsigned int, std::vector<vec3>> Object::objVelocity_;
+std::map<unsigned int, std::vector<vec4>> Object::objVelocity_;
 
 unsigned int Object::getId(Mesh &m) {
     objIds_.try_emplace(m.id, 0);
     if (objIds_[m.id] == 0)
     {
-        objVelocity_[m.id] = std::vector<vec3>();
+        objVelocity_[m.id] = std::vector<vec4>();
         objTransforms_[m.id] = std::vector<mat4>();
     }
     return objIds_[m.id]++;
@@ -25,7 +25,7 @@ unsigned int Object::getId(Mesh &m) {
 Object::Object(Mesh &m) : id(getId(m)), m_(m) {
     static const mat4 mat = Transform::identity().getMatrix();
     objTransforms_[m.id].push_back(mat);
-    objVelocity_[m.id].push_back(vec3(0.0f));
+    objVelocity_[m.id].push_back(vec4(0.0f, 0.0f, 0.0f, 1.0f));
 }
 
 Transform Object::getTransform() {
@@ -46,7 +46,7 @@ mat4 *Object::getTransforms(Mesh &m) {
     return objTransforms_[m.id].data();
 }
 
-vec3 *Object::getVelocities(Mesh &m) {
+vec4 *Object::getVelocities(Mesh &m) {
     if (objVelocity_.size() <= m.id)
         return nullptr;
     return objVelocity_[m.id].data();

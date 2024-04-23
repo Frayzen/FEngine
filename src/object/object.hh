@@ -16,7 +16,7 @@ class Object {
     vec3& getVelocity();
 
     static mat4* getTransforms(Mesh& m);
-    static vec3* getVelocities(Mesh& m);
+    static vec4* getVelocities(Mesh& m);
 
     unsigned int id;
 
@@ -25,7 +25,7 @@ class Object {
     static unsigned int getId(Mesh &m);
     static std::map<unsigned int, unsigned int> objIds_;
     static std::map<unsigned int, std::vector<mat4>> objTransforms_;
-    static std::map<unsigned int, std::vector<vec3>> objVelocity_;
+    static std::map<unsigned int, std::vector<vec4>> objVelocity_;
 
 };
 
