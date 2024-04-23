@@ -10,6 +10,8 @@
 class Compute : public Shader {
   public:
     Compute(std::string computeFilePath);
+    GLuint getBuffer(unsigned int bindingPosition);
+    void setupData(unsigned int bindingPosition, GLuint buffer);
     void setupData(void *data, unsigned int element_count,
                    unsigned int element_size, unsigned int bindingPosition,
                    GLenum usage);

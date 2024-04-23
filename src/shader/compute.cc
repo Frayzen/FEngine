@@ -1,6 +1,7 @@
 #include "compute.hh"
 #include "tools.hh"
 #include "shader.hh"
+#include <cassert>
 
 Compute::Compute(std::string computeFilePath) {
     std::string text = get_file_content(computeFilePath.c_str());
@@ -11,6 +12,17 @@ Compute::Compute(std::string computeFilePath) {
     checkGLError("Error while linking compute shader");
 }
 
+GLuint Compute::getBuffer(unsigned int bindingPosition) {
+    assert(buffers_[bindingPosition] != 0);
+    return buffers_[bindingPosition];
+}
+void Compute::setupData(unsigned int bindingPosition, GLuint buffer) {
+    glUseProgram(program_);
+    buffers_[bindingPosition] = buffer;
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, buffer);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, bindingPosition, buffer);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+}
 void Compute::setupData(void *data, unsigned int element_count,
                         unsigned int element_size, unsigned int bindingPosition,
                         GLenum usage) {
