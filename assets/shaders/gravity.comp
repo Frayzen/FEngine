@@ -9,6 +9,9 @@ layout(binding = 0) buffer transforms{
 layout(binding = 1) buffer velocities{
     vec4 vels[];
 };
+layout(binding = 2) buffer colors{
+    vec4 cols[];
+};
 
 
 uniform vec3 ubound;
@@ -59,6 +62,24 @@ float calculateSharedPressure(float a, float b)
 }
 
 
+vec4 mapVelocityToColor(float velocityMagnitude) {
+    // Define thresholds and corresponding colors
+    const float minVelocity = 0.0;
+    const float maxVelocity = 10.0;
+    const vec4 coldColor = vec4(0.0, 0.0, 1.0, 1.0);  // Blue
+    const vec4 hotColor = vec4(1.0, 0.0, 0.0, 1.0);   // Red
+
+    // Map velocity to color
+    if (velocityMagnitude <= minVelocity) {
+        return coldColor;  // Minimum velocity results in cold color
+    } else if (velocityMagnitude >= maxVelocity) {
+        return hotColor;   // Maximum velocity results in hot color
+    } else {
+        // Interpolate between cold and hot colors based on velocity magnitude
+        float t = (velocityMagnitude - minVelocity) / (maxVelocity - minVelocity);
+        return mix(coldColor, hotColor, t);
+    }
+}
 
 void main()
 {
@@ -88,10 +109,13 @@ void main()
 
 
     vec4 vel = vels[id];
-    //vel += vec4(0.0f, -1.0f, 0.0f, 1.0f) * g * deltaTime;
+    vel += vec4(0.0f, -1.0f, 0.0f, 1.0f) * g * deltaTime;
     vel += vec4(pressure.xyz, 1.0f) * deltaTime / particuleDensity;
     t += vel * deltaTime;
 
+
+    float velocityMagnitude = length(vel.xyz);
+    vec4 color = mapVelocityToColor(velocityMagnitude);
     if( t.x < lbound.x)
     {
        t.x = lbound.x;
@@ -117,5 +141,6 @@ void main()
 
     vels[id] = vel * 0.99;
     trs[id][3] = t;
+    cols[id] = color;
 }
 
