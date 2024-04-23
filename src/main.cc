@@ -47,8 +47,8 @@ int main(int argc, char *argv[]) {
     glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
 
     // Creation of the window
-    GLFWwindow *win =
-        glfwCreateWindow(screenSize.x, screenSize.y, "FEngine", nullptr, nullptr);
+    GLFWwindow *win = glfwCreateWindow(screenSize.x, screenSize.y, "FEngine",
+                                       nullptr, nullptr);
     FAIL_ON(win == nullptr, "An error occured while creating the window");
     glfwMakeContextCurrent(win);
 
@@ -87,20 +87,25 @@ int main(int argc, char *argv[]) {
     bbox.setTransform(bbox_t);
     *bbox.getColor() = vec4(1.0f, 0.1f, 0.1f, 1.0f);
 
+    Compute dens("assets/shaders/density.comp");
+    glUniform1f(dens.getUniformLoc("radius"), radius);
+    dens.setupData(Object::getTransforms(m), objNb, sizeof(mat4), 0,
+                   GL_DYNAMIC_DRAW);
+    dens.setupData(Object::getVelocities(m), objNb, sizeof(vec4), 1,
+                   GL_DYNAMIC_DRAW);
+
     Compute grav("assets/shaders/gravity.comp");
     vec3 ubound = bounds;
     vec3 lbound = -bounds;
+    grav.setupData(0, dens.getBuffer(0));
+    grav.setupData(1, dens.getBuffer(1));
+    grav.setupData(Object::getColors(m), objNb, sizeof(vec4), 2,
+                   GL_DYNAMIC_DRAW);
     glUniform3fv(grav.getUniformLoc("ubound"), 1, (GLfloat *)&ubound);
     glUniform3fv(grav.getUniformLoc("lbound"), 1, (GLfloat *)&lbound);
     glUniform3fv(grav.getUniformLoc("interaction"), 1,
                  (float *)&Camera::mainCamera().interactionPoint);
     glUniform1f(grav.getUniformLoc("radius"), radius);
-    grav.setupData(Object::getTransforms(m), objNb, sizeof(mat4), 0,
-                   GL_DYNAMIC_DRAW);
-    grav.setupData(Object::getVelocities(m), objNb, sizeof(vec4), 1,
-                   GL_DYNAMIC_DRAW);
-    grav.setupData(Object::getColors(m), objNb, sizeof(vec4), 2,
-                   GL_DYNAMIC_DRAW);
 
     /* exit(1); */
 
@@ -134,13 +139,12 @@ int main(int argc, char *argv[]) {
         m.render(render, Camera::mainCamera());
         bbox_m.render(render, Camera::mainCamera());
 
+        dens.dispatch(objNb);
+
         glUniform3fv(grav.getUniformLoc("interaction"), 1,
                      (float *)&Camera::mainCamera().interactionPoint);
         glUniform1i(grav.getUniformLoc("inputState"),
                     Camera::mainCamera().clickState);
-        grav.updateData(Object::getTransforms(m), 0);
-        grav.updateData(Object::getVelocities(m), 1);
-        grav.updateData(Object::getColors(m), 2);
         grav.dispatch(objNb);
 
         const mat4 *newpos = (const mat4 *)grav.retrieveData(0);
