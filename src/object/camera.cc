@@ -46,6 +46,7 @@ void Camera::inputs(GLFWwindow *win) {
     rotX_ = max(min(rotX_, lockAxisX_), -lockAxisX_);
     transform.setRotation(vec3(rotX_, rotY_, 0));
 }
+
 Camera &Camera::mainCamera() {
     static Camera camera;
     return camera;
