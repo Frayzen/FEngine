@@ -64,7 +64,7 @@ int main(int argc, char *argv[]) {
         Render("assets/shaders/default.vert", "assets/shaders/default.frag");
 
     Mesh m = Mesh::createFrom("assets/sphere.obj");
-    const float radius = argc == 1 ? 3.0f : atoi(argv[1]);
+    const float radius = argc == 1 ? 1.0f : std::stof(argv[1]);
     for (int i = 0; i < size.x; i++) {
         for (int j = 0; j < size.y; j++) {
             Object &o = m.createObject();
@@ -73,7 +73,7 @@ int main(int argc, char *argv[]) {
             t.position = vec3(i * offset.x, j * offset.y, 0.0f);
             t.position -=
                 vec3(offset.x * size.x / 2, offset.y * size.y / 2, 0.0f);
-            t.scale = vec3(radius / 3, radius / 3, 0.0f);
+            t.scale = vec3(radius / 10, radius / 10, 0.0f);
             o.setTransform(t);
         }
     }
@@ -89,6 +89,7 @@ int main(int argc, char *argv[]) {
 
     Compute dens("assets/shaders/density.comp");
     glUniform1f(dens.getUniformLoc("radius"), radius);
+    glUniform1f(dens.getUniformLoc("mass"), mass);
     dens.setupData(Object::getTransforms(m), objNb, sizeof(mat4), 0,
                    GL_DYNAMIC_DRAW);
     dens.setupData(Object::getVelocities(m), objNb, sizeof(vec4), 1,
@@ -106,6 +107,7 @@ int main(int argc, char *argv[]) {
     glUniform3fv(grav.getUniformLoc("interaction"), 1,
                  (float *)&Camera::mainCamera().interactionPoint);
     glUniform1f(grav.getUniformLoc("radius"), radius);
+    glUniform1f(grav.getUniformLoc("mass"), mass);
 
     /* exit(1); */
 
@@ -115,7 +117,7 @@ int main(int argc, char *argv[]) {
     int fps = 0;
 
     glEnable(GL_DEPTH_TEST);
-    Camera::mainCamera().transform.position.z = -13.5;
+    Camera::mainCamera().transform.position.z = -12;
     // Main loop
     while (!glfwWindowShouldClose(win)) {
         // Take care of events
@@ -127,6 +129,7 @@ int main(int argc, char *argv[]) {
         double dt = cur - last;
         last = cur;
         glUniform1f(grav.getUniformLoc("deltaTime"), static_cast<float>(dt));
+        glUniform1f(dens.getUniformLoc("deltaTime"), static_cast<float>(dt));
         if (cur - lastSec >= 1.0) {
             lastSec += 1.0;
             std::cout << "FPS: " << fps << '\n';
