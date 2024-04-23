@@ -64,7 +64,7 @@ float calculateSharedPressure(float a, float b)
 
 vec4 mapVelocityToColor(float velocityMagnitude) {
     const float minVelocity = 0.0;
-    const float maxVelocity = 10.0;
+    const float maxVelocity = 30.0;
     const vec4 coldColor = vec4(0.0, 0.0, 1.0, 1.0); 
     const vec4 hotColor = vec4(1.0, 0.0, 0.0, 1.0);   
     if (velocityMagnitude <= minVelocity) {
