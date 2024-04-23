@@ -33,25 +33,6 @@ void GLAPIENTRY DebugCallback(GLenum source, GLenum type, GLuint id,
     std::cout << msg << '\n';
     std::flush(std::cout);
 }
-
-void sum() {
-    Compute cmp = Compute("assets/shaders/summer.comp");
-    const int nb = 10;
-    float a[nb];
-    float b[nb];
-    for (int i = 0; i < nb; i++) {
-        a[i] = 1.0f * i * i;
-        b[i] = 1.0f * i;
-    }
-    cmp.setupData(a, nb, sizeof(float), 1, GL_DYNAMIC_COPY);
-    cmp.setupData(b, nb, sizeof(float), 2, GL_DYNAMIC_COPY);
-    cmp.dispatch(nb);
-    auto res = reinterpret_cast<const float *>(cmp.retrieveData(2));
-    for (int i = 0; i < nb; i++)
-        std::cout << res[i] << ' ';
-    std::cout << std::endl;
-}
-
 int main() {
     glfwInit();
     // Define required version of OpenGL
@@ -81,26 +62,36 @@ int main() {
         Render("assets/shaders/default.vert", "assets/shaders/default.frag");
 
     Mesh m = Mesh::createFrom("assets/sphere.obj");
-    for (int i = 0; i < 5; i++) {
-        for (int j = 0; j < 5; j++) {
-            for (int k = 0; k < 5; k++) {
+    for (int i = 0; i < 10; i++) {
+        for (int j = 0; j < 10; j++) {
+            for (int k = 0; k < 1; k++) {
                 Object &o = m.createObject();
+                *o.getColor() = vec4(1.0f);
                 Transform t = o.getTransform();
                 t.position = vec3(i * 3.0f, j * 3.0f, -3.0f * k);
                 o.setTransform(t);
             }
         }
     }
-
     const int objNb = m.getObjects().size();
+    const int particuleRadius = 1;
+
+    const vec3 bounds = vec3(20.0f, 20.0f, 1.0f);
+    Mesh bbox_m = Mesh::createFrom("assets/square.obj");
+    Object bbox = bbox_m.createObject();
+    auto bbox_t = bbox.getTransform();
+    bbox_t.scale = bounds + vec3(particuleRadius);
+    bbox_t.position.z = -1.0f;
+    bbox.setTransform(bbox_t);
+    *bbox.getColor() = vec4(0.0f, 0.0f, 0.0f, 1.0f);
 
     Compute grav("assets/shaders/gravity.comp");
-    vec3 ubound = {20.0f, 20.0f, 20.0f};
-    vec3 lbound = {-20.0f, -20.0f, -20.0f};
+    vec3 ubound = bounds;
+    vec3 lbound = -bounds;
     glUniform3fv(grav.getUniformLoc("ubound"), 1, (GLfloat *)&ubound);
     glUniform3fv(grav.getUniformLoc("lbound"), 1, (GLfloat *)&lbound);
-    grav.setupData(Object::getTransforms(m), objNb, sizeof(mat4), 0, GL_DYNAMIC_COPY);
-        std::cout << Object::getTransforms(m)[0][3][1] << '\n';
+    grav.setupData(Object::getTransforms(m), objNb, sizeof(mat4), 0,
+                   GL_DYNAMIC_COPY);
 
     /* exit(1); */
 
@@ -125,13 +116,14 @@ int main() {
         }
         fps++;
 
-        render.activate();
         Camera::mainCamera().inputs(win);
+
         m.render(render, Camera::mainCamera());
-        
+        bbox_m.render(render, Camera::mainCamera());
+
         grav.updateData(Object::getTransforms(m), 0);
         grav.dispatch(objNb);
-        const mat4 * newpos = (const mat4*)grav.retrieveData(0);
+        const mat4 *newpos = (const mat4 *)grav.retrieveData(0);
         memcpy(Object::getTransforms(m), newpos, objNb * sizeof(mat4));
 
         glfwSwapBuffers(win);
