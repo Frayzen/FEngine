@@ -9,18 +9,11 @@
 #include "shader/render.hh"
 #include "tools.hh"
 #include <GLFW/glfw3.h>
+#include <ostream>
 #include <string.h>
 
-void prettyPrintMat4(const glm::mat4 &matrix) {
 
-    for (int i = 0; i < 4; ++i) {
-        for (int j = 0; j < 4; ++j) {
-            std::cout << matrix[i][j] << " ";
-        }
 
-        std::cout << std::endl;
-    }
-}
 void GLAPIENTRY DebugCallback(GLenum source, GLenum type, GLuint id,
                               GLenum severity, GLsizei length,
                               const GLchar *msg, const void *userParam) {
@@ -101,6 +94,9 @@ int main() {
                    GL_DYNAMIC_DRAW);
 
     /* exit(1); */
+
+
+
 
     glfwSetTime(0);
     double last = glfwGetTime();
