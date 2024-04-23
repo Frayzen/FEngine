@@ -3,6 +3,7 @@
 #include <glm/fwd.hpp>
 #include <iostream>
 #include <GL/glew.h>
+#include "constants.hh"
 #include "mesh/mesh.hh"
 #include "object/camera.hh"
 #include "object/object.hh"
@@ -47,12 +48,12 @@ int main(int argc, char *argv[]) {
 
     // Creation of the window
     GLFWwindow *win =
-        glfwCreateWindow(WIDTH, HEIGHT, "FEngine", nullptr, nullptr);
+        glfwCreateWindow(screenSize.x, screenSize.y, "FEngine", nullptr, nullptr);
     FAIL_ON(win == nullptr, "An error occured while creating the window");
     glfwMakeContextCurrent(win);
 
     FAIL_ON(glewInit() != GLEW_OK, "Glew could not be initialized");
-    glViewport(0, 0, WIDTH, HEIGHT);
+    glViewport(0, 0, screenSize.x, screenSize.y);
 
     glEnable(GL_DEBUG_OUTPUT);
     glDebugMessageCallback(DebugCallback, 0);
@@ -63,10 +64,7 @@ int main(int argc, char *argv[]) {
         Render("assets/shaders/default.vert", "assets/shaders/default.frag");
 
     Mesh m = Mesh::createFrom("assets/sphere.obj");
-    vec3 bounds = vec3(20.0f, 10.0f, 0.0f);
     const float radius = argc == 1 ? 3.0f : atoi(argv[1]);
-    const vec2 size = uvec2(10, 11);
-    const vec2 offset = vec2(1.0f, 1.0f);
     for (int i = 0; i < size.x; i++) {
         for (int j = 0; j < size.y; j++) {
             Object &o = m.createObject();
@@ -94,6 +92,8 @@ int main(int argc, char *argv[]) {
     vec3 lbound = -bounds;
     glUniform3fv(grav.getUniformLoc("ubound"), 1, (GLfloat *)&ubound);
     glUniform3fv(grav.getUniformLoc("lbound"), 1, (GLfloat *)&lbound);
+    glUniform3fv(grav.getUniformLoc("interaction"), 1,
+                 (float *)&Camera::mainCamera().interactionPoint);
     glUniform1f(grav.getUniformLoc("radius"), radius);
     grav.setupData(Object::getTransforms(m), objNb, sizeof(mat4), 0,
                    GL_DYNAMIC_DRAW);
@@ -110,7 +110,7 @@ int main(int argc, char *argv[]) {
     int fps = 0;
 
     glEnable(GL_DEPTH_TEST);
-    Camera::mainCamera().transform.position.z = -30;
+    Camera::mainCamera().transform.position.z = -13.5;
     // Main loop
     while (!glfwWindowShouldClose(win)) {
         // Take care of events
@@ -129,11 +129,15 @@ int main(int argc, char *argv[]) {
         }
         fps++;
 
-        Camera::mainCamera().inputs(win);
+        Camera::mainCamera().inputs();
 
         m.render(render, Camera::mainCamera());
         bbox_m.render(render, Camera::mainCamera());
 
+        glUniform3fv(grav.getUniformLoc("interaction"), 1,
+                     (float *)&Camera::mainCamera().interactionPoint);
+        glUniform1i(grav.getUniformLoc("inputState"),
+                    Camera::mainCamera().clickState);
         grav.updateData(Object::getTransforms(m), 0);
         grav.updateData(Object::getVelocities(m), 1);
         grav.updateData(Object::getColors(m), 2);
