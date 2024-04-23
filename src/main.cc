@@ -62,17 +62,19 @@ int main() {
         Render("assets/shaders/default.vert", "assets/shaders/default.frag");
 
     Mesh m = Mesh::createFrom("assets/sphere.obj");
-    vec3 bounds = vec3(10.0f, 10.0f, 0.0f);
-    for (int i = 0; i < 10; i++) {
-        for (int j = 0; j < 10; j++) {
-            for (int k = 0; k < 1; k++) {
-                Object &o = m.createObject();
-                *o.getColor() = vec4(1.0f);
-                Transform t = o.getTransform();
-                t.position = vec3(i * 0.1f, j * 0.1f, 0.1f * k) - bounds / 2.0f;
-                t.scale = vec3(0.4f);
-                o.setTransform(t);
-            }
+    vec3 bounds = vec3(20.0f, 20.0f, 0.0f);
+    const vec2 size = uvec2(10, 10);
+    const vec2 offset = vec2(1.0f, 1.0f);
+    for (int i = 0; i < size.x; i++) {
+        for (int j = 0; j < size.y; j++) {
+            Object &o = m.createObject();
+            *o.getColor() = vec4(1.0f);
+            Transform t = o.getTransform();
+            t.position = vec3(i * offset.x, j * offset.y, 0.0f);
+            t.position -=
+                vec3(offset.x * size.x / 2, offset.y * size.y / 2, 0.0f);
+            t.scale = vec3(0.4f);
+            o.setTransform(t);
         }
     }
     const int objNb = m.getObjects().size();
@@ -137,7 +139,7 @@ int main() {
         glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
         const vec4 *newvel = (const vec4 *)grav.retrieveData(1);
         memcpy(Object::getVelocities(m), newvel, objNb * sizeof(vec4));
-        
+
         glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
 
         glfwSwapBuffers(win);
