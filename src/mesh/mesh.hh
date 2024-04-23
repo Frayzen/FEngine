@@ -24,7 +24,7 @@ class Mesh : public Renderable{
   private:
     Mesh();
     void updateBuffers();
-    void updateTransforms();
+    void updateObjects();
     void appendVertices(const vec3 *vertices, unsigned long size);
     void appendIndices(const uvec3 *indices, size_t size);
 
@@ -32,6 +32,7 @@ class Mesh : public Renderable{
     std::vector<uvec3> indices_;
     //object related
     std::vector<Object> objects_;
-    // IBT = Instance Buffer Transform
-    GLuint VAO, VBO, EBO, IBT = 0;
+    // TBO = Transform Buffer Object
+    // CBO = Color Buffer Object
+    GLuint VAO, VBO, EBO, TBO, CBO = 0;
 };
