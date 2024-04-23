@@ -62,8 +62,8 @@ int main() {
         Render("assets/shaders/default.vert", "assets/shaders/default.frag");
 
     Mesh m = Mesh::createFrom("assets/sphere.obj");
-    vec3 bounds = vec3(40.0f, 20.0f, 0.0f);
-    const vec2 size = uvec2(15, 10);
+    vec3 bounds = vec3(20.0f, 10.0f, 0.0f);
+    const vec2 size = uvec2(15, 14);
     const vec2 offset = vec2(1.0f, 1.0f);
     for (int i = 0; i < size.x; i++) {
         for (int j = 0; j < size.y; j++) {
