@@ -4,6 +4,9 @@
 #include <iostream>
 #include <GL/glew.h>
 #include "constants.hh"
+#include "gui/imgui.h"
+#include "gui/imgui_impl_glfw.h"
+#include "gui/imgui_impl_opengl3.h"
 #include "mesh/mesh.hh"
 #include "object/camera.hh"
 #include "object/object.hh"
@@ -35,6 +38,66 @@ void GLAPIENTRY DebugCallback(GLenum source, GLenum type, GLuint id,
     std::cout << msg << '\n';
     std::flush(std::cout);
 }
+
+void updateGUI() {
+    ImGui_ImplOpenGL3_NewFrame();
+    ImGui_ImplGlfw_NewFrame();
+    ImGui::NewFrame();
+    static float f = 0.0f;
+    static int counter = 0;
+
+    ImGui::Begin("Hello, world!"); // Create a window called "Hello, world!" and
+                                   // append into it.
+
+    ImGui::Text("This is some useful text."); // Display some text (you can use
+                                              // a format strings too)
+    bool win, show_another_window;
+    ImGui::Checkbox("Demo Window", &win);
+    // Edit bools storing our window open/close state
+    ImGui::Checkbox("Another Window", &show_another_window);
+
+    ImGui::SliderFloat("float", &f, 0.0f,
+                       1.0f); // Edit 1 float using a slider from 0.0f to 1.0f
+    vec3 clear_color;
+    ImGui::ColorEdit3(
+        "clear color",
+        (float *)&clear_color); // Edit 3 floats representing a color
+
+    if (ImGui::Button("Button")) // Buttons return true when clicked (most
+                                 // widgets return true when edited/activated)
+        counter++;
+    ImGui::SameLine();
+    ImGui::Text("counter = %d", counter);
+
+    ImGuiIO &io = ImGui::GetIO();
+    ImGui::Text("Application average %.3f ms/frame (%.1f FPS)",
+                1000.0f / io.Framerate, io.Framerate);
+    ImGui::End();
+}
+
+void setupGUI(GLFWwindow *win) {
+    const char *glsl_version = "#version 430";
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO &io = ImGui::GetIO();
+    (void)io;
+    io.ConfigFlags |=
+        ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
+    io.ConfigFlags |=
+        ImGuiConfigFlags_NavEnableGamepad; // Enable Gamepad Controls
+
+    // Setup Dear ImGui style
+    ImGui::StyleColorsDark();
+    // ImGui::StyleColorsLight();
+
+    // Setup Platform/Renderer backends
+    ImGui_ImplGlfw_InitForOpenGL(win, true);
+#ifdef __EMSCRIPTEN__
+    ImGui_ImplGlfw_InstallEmscriptenCanvasResizeCallback("#canvas");
+#endif
+    ImGui_ImplOpenGL3_Init(glsl_version);
+}
+
 int main(int argc, char *argv[]) {
     glfwInit();
     // Define required version of OpenGL
@@ -47,8 +110,8 @@ int main(int argc, char *argv[]) {
     glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
 
     // Creation of the window
-    GLFWwindow *win =
-        glfwCreateWindow(screenSize.x, screenSize.y, "FEngine", nullptr, nullptr);
+    GLFWwindow *win = glfwCreateWindow(screenSize.x, screenSize.y, "FEngine",
+                                       nullptr, nullptr);
     FAIL_ON(win == nullptr, "An error occured while creating the window");
     glfwMakeContextCurrent(win);
 
@@ -57,6 +120,8 @@ int main(int argc, char *argv[]) {
 
     glEnable(GL_DEBUG_OUTPUT);
     glDebugMessageCallback(DebugCallback, 0);
+
+    setupGUI(win);
 
     /* sum(); */
 
@@ -115,6 +180,9 @@ int main(int argc, char *argv[]) {
     while (!glfwWindowShouldClose(win)) {
         // Take care of events
         glfwPollEvents();
+
+        updateGUI();
+
         // Background color
         glClearColor(0.6f, 0.6f, 0.6f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -154,6 +222,10 @@ int main(int argc, char *argv[]) {
         const vec4 *newcol = (const vec4 *)grav.retrieveData(2);
         memcpy(Object::getColors(m), newcol, objNb * sizeof(vec4));
         glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
+
+        // Rendering
+        ImGui::Render();
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
         glfwSwapBuffers(win);
     }
