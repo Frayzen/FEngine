@@ -1,8 +1,8 @@
 #pragma once
 
 // Constants
-#define WIDTH 1000
-#define HEIGHT 800
+#define WIDTH 2000
+#define HEIGHT 1200
 
 #include <iostream>
 #include <ostream>
