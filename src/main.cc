@@ -63,7 +63,7 @@ int main() {
 
     Mesh m = Mesh::createFrom("assets/sphere.obj");
     vec3 bounds = vec3(40.0f, 20.0f, 0.0f);
-    const vec2 size = uvec2(15, 10);
+    const vec2 size = uvec2(18, 10);
     const vec2 offset = vec2(1.0f, 1.0f);
     for (int i = 0; i < size.x; i++) {
         for (int j = 0; j < size.y; j++) {
@@ -96,6 +96,8 @@ int main() {
     grav.setupData(Object::getTransforms(m), objNb, sizeof(mat4), 0,
                    GL_DYNAMIC_DRAW);
     grav.setupData(Object::getVelocities(m), objNb, sizeof(vec4), 1,
+                   GL_DYNAMIC_DRAW);
+    grav.setupData(Object::getColors(m), objNb, sizeof(vec4), 2,
                    GL_DYNAMIC_DRAW);
 
     /* exit(1); */
@@ -139,6 +141,10 @@ int main() {
         glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
         const vec4 *newvel = (const vec4 *)grav.retrieveData(1);
         memcpy(Object::getVelocities(m), newvel, objNb * sizeof(vec4));
+
+        glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
+        const vec4 *newcol = (const vec4 *)grav.retrieveData(2);
+        memcpy(Object::getColors(m), newcol, objNb * sizeof(vec4));
 
         glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
 
