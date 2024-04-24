@@ -13,15 +13,18 @@ class Simulation {
     Simulation();
     vec2 screenSize = vec2(2000, 1000);
     vec3 bounds = vec3(10.0f, 10.0f, 0.0f);
-    vec2 size = uvec2(10, 11);
+    ivec2 size = ivec2(10, 11);
     vec2 offset = vec2(1.0f, 1.0f);
     float mass = 1.0f;
     float pressureMultiplier = 100.0f;
     float radius = 1.5f;
+    const float appearanceRadiusCoeff = .3f;
+    float gravity = 0;
     Camera cam;
     bool isRunning = true;
     void restartSimulation();
     void mainLoop();
+    std::vector<Object>& getParticles();
 
   private:
     void createObjects();

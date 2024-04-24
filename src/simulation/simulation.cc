@@ -43,8 +43,7 @@ Simulation::Simulation()
     last_ = glfwGetTime();
 }
 
-void Simulation::updateBuffers()
-{
+void Simulation::updateBuffers() {
     velocityCpt_.updateData(Object::getTransforms(particleMesh_), 0);
     velocityCpt_.updateData(Object::getVelocities(particleMesh_), 1);
     velocityCpt_.updateData(Object::getColors(particleMesh_), 2);
@@ -60,7 +59,8 @@ void Simulation::createObjects() {
             t.position = vec3(i * offset.x, j * offset.y, 0.0f);
             t.position -=
                 vec3(offset.x * size.x / 2, offset.y * size.y / 2, 0.0f);
-            t.scale = vec3(radius / 3, radius / 3, 0.0f);
+            t.scale = vec3(radius * appearanceRadiusCoeff,
+                           radius * appearanceRadiusCoeff, 0.0f);
             o.setTransform(t);
         }
     }
@@ -91,6 +91,7 @@ void Simulation::compute() {
     glUniform1i(velocityCpt_.getUniformLoc("inputState"), cam.clickState);
     glUniform1f(velocityCpt_.getUniformLoc("radius"), radius);
     glUniform1f(velocityCpt_.getUniformLoc("mass"), mass);
+    glUniform1f(velocityCpt_.getUniformLoc("gravity"), gravity);
     glUniform3f(velocityCpt_.getUniformLoc("ubound"), UBOUNDS.x, UBOUNDS.y,
                 UBOUNDS.z);
     glUniform3f(velocityCpt_.getUniformLoc("lbound"), LBOUNDS.x, LBOUNDS.y,
@@ -139,4 +140,8 @@ void Simulation::mainLoop() {
 
         glfwSwapBuffers(win_);
     }
+}
+
+std::vector<Object> &Simulation::getParticles() {
+    return particleMesh_.getObjects();
 }
