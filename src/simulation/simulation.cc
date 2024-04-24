@@ -40,7 +40,8 @@ Simulation::Simulation()
                            sizeof(vec4), 2, GL_DYNAMIC_DRAW);
     velocityCpt_.setupData(0, densityCmpt_.getBuffer(0));
     velocityCpt_.setupData(1, densityCmpt_.getBuffer(1));
-    createBbox();
+    boundingMesh_.createObject();
+    updateBbox();
 
     glfwSetTime(0);
     last_ = glfwGetTime();
@@ -62,8 +63,8 @@ void Simulation::createObjects() {
     }
 }
 
-void Simulation::createBbox() {
-    Object bbox = boundingMesh_.createObject();
+void Simulation::updateBbox() {
+    auto bbox = boundingMesh_.getObjects()[0];
     auto bbox_t = bbox.getTransform();
     bbox_t.scale = bounds + vec3(radius);
     bbox_t.position.z = -1.0f;
@@ -122,6 +123,7 @@ void Simulation::mainLoop() {
 
         // RENDER
         particleMesh_.render(renderer_, cam);
+        updateBbox();
         boundingMesh_.render(renderer_, cam);
 
         ImGui::Render();

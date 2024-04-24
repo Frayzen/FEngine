@@ -6,6 +6,7 @@
 #include "shader/render.hh"
 #include <glm/vec3.hpp>
 #include <glm/vec2.hpp>
+
 using namespace glm;
 class Simulation {
   public:
@@ -25,7 +26,7 @@ class Simulation {
 
   private:
     void createObjects();
-    void createBbox();
+    void updateBbox();
     double last_;
     GUI gui_;
     Mesh particleMesh_;

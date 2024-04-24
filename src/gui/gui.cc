@@ -12,6 +12,7 @@ void GUI::update() {
     ImGui::NewFrame();
     ImGui::Begin("FEngine_t");
     ImGui::InputFloat2("Bounds", (float *)&sim_.bounds);
+    
     ImGuiIO &io = ImGui::GetIO();
     ImGui::Text("Application average %.3f ms/frame (%.1f FPS)",
                 1000.0f / io.Framerate, io.Framerate);
@@ -32,12 +33,7 @@ void GUI::setup() {
         ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
     io.ConfigFlags |=
         ImGuiConfigFlags_NavEnableGamepad; // Enable Gamepad Controls
-
-    // Setup Dear ImGui style
     ImGui::StyleColorsDark();
-    // ImGui::StyleColorsLight();
-
-    // Setup Platform/Renderer backends
     ImGui_ImplGlfw_InitForOpenGL(win_, true);
 #ifdef __EMSCRIPTEN__
     ImGui_ImplGlfw_InstallEmscriptenCanvasResizeCallback("#canvas");
