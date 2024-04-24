@@ -24,7 +24,7 @@ Camera::Camera(float fov, float near, float far)
     win_ = glfwGetCurrentContext();
 }
 
-void Camera::inputs() {
+void Camera::inputs(vec2 bounds) {
     transform.setRotation(vec3(0, rotY_, 0));
     if (glfwGetKey(win_, GLFW_KEY_D) == GLFW_PRESS)
         transform.position += speed * -transform.left();
@@ -65,7 +65,3 @@ void Camera::inputs() {
         clickState += RCLICK;
 }
 
-Camera &Camera::mainCamera() {
-    static Camera camera;
-    return camera;
-}
