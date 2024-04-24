@@ -4,6 +4,7 @@
 #include "mesh/mesh.hh"
 #include "shader/render.hh"
 #include <cstring>
+#include <iostream>
 
 #define OBJNB (particleMesh_.getObjects().size())
 #define UBOUNDS (bounds)
@@ -13,6 +14,7 @@ void Simulation::restartSimulation() {
     isRunning = false;
     particleMesh_.getObjects().clear();
     createObjects();
+    updateBuffers();
 }
 
 Simulation::Simulation()
@@ -24,18 +26,8 @@ Simulation::Simulation()
           Render("assets/shaders/default.vert", "assets/shaders/default.frag")),
       win_(glfwGetCurrentContext()) {
     gui_.setup();
-    for (int i = 0; i < size.x; i++) {
-        for (int j = 0; j < size.y; j++) {
-            Object &o = particleMesh_.createObject();
-            *o.getColor() = vec4(1.0f);
-            Transform t = o.getTransform();
-            t.position = vec3(i * offset.x, j * offset.y, 0.0f);
-            t.position -=
-                vec3(offset.x * size.x / 2, offset.y * size.y / 2, 0.0f);
-            t.scale = vec3(radius / 3, radius / 3, 0.0f);
-            o.setTransform(t);
-        }
-    }
+
+    createObjects();
     densityCmpt_.setupData(Object::getTransforms(particleMesh_), OBJNB,
                            sizeof(mat4), 0, GL_DYNAMIC_DRAW);
     densityCmpt_.setupData(Object::getVelocities(particleMesh_), OBJNB,
@@ -51,7 +43,15 @@ Simulation::Simulation()
     last_ = glfwGetTime();
 }
 
+void Simulation::updateBuffers()
+{
+    velocityCpt_.updateData(Object::getTransforms(particleMesh_), 0);
+    velocityCpt_.updateData(Object::getVelocities(particleMesh_), 1);
+    velocityCpt_.updateData(Object::getColors(particleMesh_), 2);
+}
+
 void Simulation::createObjects() {
+    particleMesh_.clearObjects();
     for (int i = 0; i < size.x; i++) {
         for (int j = 0; j < size.y; j++) {
             Object &o = particleMesh_.createObject();
@@ -60,7 +60,7 @@ void Simulation::createObjects() {
             t.position = vec3(i * offset.x, j * offset.y, 0.0f);
             t.position -=
                 vec3(offset.x * size.x / 2, offset.y * size.y / 2, 0.0f);
-            t.scale = vec3(radius / 10, radius / 10, 0.0f);
+            t.scale = vec3(radius / 3, radius / 3, 0.0f);
             o.setTransform(t);
         }
     }

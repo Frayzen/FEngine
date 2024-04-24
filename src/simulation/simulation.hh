@@ -19,12 +19,13 @@ class Simulation {
     float pressureMultiplier = 100.0f;
     float radius = 1.5f;
     Camera cam;
-    bool isRunning;
+    bool isRunning = true;
     void restartSimulation();
     void mainLoop();
 
   private:
     void createObjects();
+    void updateBuffers();
     void updateBbox();
     void compute();
     double last_;
