@@ -165,6 +165,6 @@ void Mesh::render(Shader &shader, Camera &camera) {
 std::vector<Object> &Mesh::getObjects() { return objects_; }
 
 void Mesh::clearObjects() {
-    objects_.clear();
     Object::clearObjects(*this);
+    objects_ = std::vector<Object>();
 }

@@ -13,6 +13,7 @@ Compute::Compute(std::string computeFilePath) {
 }
 
 GLuint Compute::getBuffer(unsigned int bindingPosition) {
+    glUseProgram(program_);
     assert(buffers_[bindingPosition] != 0);
     return buffers_[bindingPosition];
 }
@@ -40,6 +41,7 @@ void Compute::setupData(void *data, unsigned int element_count,
 }
 
 void Compute::updateData(void *data, unsigned int bindingPosition) {
+    glUseProgram(program_);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, buffers_[bindingPosition]);
     GLint size = 0;
     glGetBufferParameteriv(GL_SHADER_STORAGE_BUFFER, GL_BUFFER_SIZE, &size);

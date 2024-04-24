@@ -12,7 +12,7 @@
 
 void Simulation::restartSimulation() {
     isRunning = false;
-    particleMesh_.getObjects().clear();
+    particleMesh_.clearObjects();
     createObjects();
     updateBuffers();
 }
@@ -28,12 +28,16 @@ Simulation::Simulation()
     gui_.setup();
 
     createObjects();
+    //SETUP DENS
     densityCmpt_.setupData(Object::getTransforms(particleMesh_), OBJNB,
                            sizeof(mat4), 0, GL_DYNAMIC_DRAW);
     densityCmpt_.setupData(Object::getVelocities(particleMesh_), OBJNB,
                            sizeof(vec4), 1, GL_DYNAMIC_DRAW);
-    velocityCpt_.setupData(0, densityCmpt_.getBuffer(0));
-    velocityCpt_.setupData(1, densityCmpt_.getBuffer(1));
+    // SETUP VEL
+    velocityCpt_.setupData(Object::getTransforms(particleMesh_), OBJNB,
+                           sizeof(mat4), 0, GL_DYNAMIC_DRAW);
+    velocityCpt_.setupData(Object::getVelocities(particleMesh_), OBJNB,
+                           sizeof(vec4), 1, GL_DYNAMIC_DRAW);
     velocityCpt_.setupData(Object::getColors(particleMesh_), OBJNB,
                            sizeof(vec4), 2, GL_DYNAMIC_DRAW);
     boundingMesh_.createObject();
@@ -47,10 +51,11 @@ void Simulation::updateBuffers() {
     velocityCpt_.updateData(Object::getTransforms(particleMesh_), 0);
     velocityCpt_.updateData(Object::getVelocities(particleMesh_), 1);
     velocityCpt_.updateData(Object::getColors(particleMesh_), 2);
+    velocityCpt_.setupData(0, densityCmpt_.getBuffer(0));
+    velocityCpt_.setupData(1, densityCmpt_.getBuffer(1));
 }
 
 void Simulation::createObjects() {
-particleMesh_.clearObjects();
     for (int i = 0; i < size.x; i++) {
         for (int j = 0; j < size.y; j++) {
             Object &o = particleMesh_.createObject();
@@ -78,14 +83,16 @@ void Simulation::updateBbox() {
 void Simulation::compute() {
 
     // COMPUTE DENSITY
+    densityCmpt_.updateData(Object::getTransforms(particleMesh_), 0);
+    densityCmpt_.updateData(Object::getVelocities(particleMesh_), 1);
     glUniform1f(densityCmpt_.getUniformLoc("radius"), radius);
     glUniform1f(densityCmpt_.getUniformLoc("mass"), mass);
     densityCmpt_.dispatch(OBJNB);
     vec4* vels = (vec4*) densityCmpt_.retrieveData(1);
+    std::cout << vels[0].w << '\n';
     memcpy(Object::getVelocities(particleMesh_), vels,
            OBJNB * sizeof(vec4));
     glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
-    std::cout << vels[0].w << '\n';
  
     // COMPUTE VELOCITY
     velocityCpt_.updateData(Object::getTransforms(particleMesh_), 0);
@@ -128,6 +135,7 @@ void Simulation::mainLoop() {
         // INPUTS
         double cur = glfwGetTime();
         glUniform1f(velocityCpt_.getUniformLoc("deltaTime"), cur - last_);
+        glUniform1f(densityCmpt_.getUniformLoc("deltaTime"), cur - last_);
         last_ = cur;
         glfwPollEvents();
         gui_.update();

@@ -17,8 +17,9 @@ std::map<unsigned int, std::vector<vec4>> Object::objColors_;
 void Object::clearObjects(Mesh& m)
 {
     objIds_[m.id] = 0;
-    objVelocity_[m.id].clear();
-    objColors_[m.id].clear();
+    objVelocity_[m.id] = std::vector<vec4>();
+    objTransforms_[m.id] = std::vector<mat4>();
+    objColors_[m.id] = std::vector<vec4>();
 }
 
 unsigned int Object::getId(Mesh &m) {
