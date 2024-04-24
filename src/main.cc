@@ -129,7 +129,7 @@ int main(int argc, char *argv[]) {
         Render("assets/shaders/default.vert", "assets/shaders/default.frag");
 
     Mesh m = Mesh::createFrom("assets/sphere.obj");
-    const float radius = argc == 1 ? 3.0f : atoi(argv[1]);
+    const float radius = argc == 1 ? 1.0f : std::stof(argv[1]);
     for (int i = 0; i < size.x; i++) {
         for (int j = 0; j < size.y; j++) {
             Object &o = m.createObject();
@@ -138,7 +138,7 @@ int main(int argc, char *argv[]) {
             t.position = vec3(i * offset.x, j * offset.y, 0.0f);
             t.position -=
                 vec3(offset.x * size.x / 2, offset.y * size.y / 2, 0.0f);
-            t.scale = vec3(radius / 3, radius / 3, 0.0f);
+            t.scale = vec3(radius / 10, radius / 10, 0.0f);
             o.setTransform(t);
         }
     }
@@ -152,20 +152,27 @@ int main(int argc, char *argv[]) {
     bbox.setTransform(bbox_t);
     *bbox.getColor() = vec4(1.0f, 0.1f, 0.1f, 1.0f);
 
+    Compute dens("assets/shaders/density.comp");
+    glUniform1f(dens.getUniformLoc("radius"), radius);
+    glUniform1f(dens.getUniformLoc("mass"), mass);
+    dens.setupData(Object::getTransforms(m), objNb, sizeof(mat4), 0,
+                   GL_DYNAMIC_DRAW);
+    dens.setupData(Object::getVelocities(m), objNb, sizeof(vec4), 1,
+                   GL_DYNAMIC_DRAW);
+
     Compute grav("assets/shaders/gravity.comp");
     vec3 ubound = bounds;
     vec3 lbound = -bounds;
+    grav.setupData(0, dens.getBuffer(0));
+    grav.setupData(1, dens.getBuffer(1));
+    grav.setupData(Object::getColors(m), objNb, sizeof(vec4), 2,
+                   GL_DYNAMIC_DRAW);
     glUniform3fv(grav.getUniformLoc("ubound"), 1, (GLfloat *)&ubound);
     glUniform3fv(grav.getUniformLoc("lbound"), 1, (GLfloat *)&lbound);
     glUniform3fv(grav.getUniformLoc("interaction"), 1,
                  (float *)&Camera::mainCamera().interactionPoint);
     glUniform1f(grav.getUniformLoc("radius"), radius);
-    grav.setupData(Object::getTransforms(m), objNb, sizeof(mat4), 0,
-                   GL_DYNAMIC_DRAW);
-    grav.setupData(Object::getVelocities(m), objNb, sizeof(vec4), 1,
-                   GL_DYNAMIC_DRAW);
-    grav.setupData(Object::getColors(m), objNb, sizeof(vec4), 2,
-                   GL_DYNAMIC_DRAW);
+    glUniform1f(grav.getUniformLoc("mass"), mass);
 
     /* exit(1); */
 
@@ -175,7 +182,7 @@ int main(int argc, char *argv[]) {
     int fps = 0;
 
     glEnable(GL_DEPTH_TEST);
-    Camera::mainCamera().transform.position.z = -13.5;
+    Camera::mainCamera().transform.position.z = -12;
     // Main loop
     while (!glfwWindowShouldClose(win)) {
         // Take care of events
@@ -190,6 +197,7 @@ int main(int argc, char *argv[]) {
         double dt = cur - last;
         last = cur;
         glUniform1f(grav.getUniformLoc("deltaTime"), static_cast<float>(dt));
+        glUniform1f(dens.getUniformLoc("deltaTime"), static_cast<float>(dt));
         if (cur - lastSec >= 1.0) {
             lastSec += 1.0;
             std::cout << "FPS: " << fps << '\n';
@@ -202,13 +210,12 @@ int main(int argc, char *argv[]) {
         m.render(render, Camera::mainCamera());
         bbox_m.render(render, Camera::mainCamera());
 
+        dens.dispatch(objNb);
+
         glUniform3fv(grav.getUniformLoc("interaction"), 1,
                      (float *)&Camera::mainCamera().interactionPoint);
         glUniform1i(grav.getUniformLoc("inputState"),
                     Camera::mainCamera().clickState);
-        grav.updateData(Object::getTransforms(m), 0);
-        grav.updateData(Object::getVelocities(m), 1);
-        grav.updateData(Object::getColors(m), 2);
         grav.dispatch(objNb);
 
         const mat4 *newpos = (const mat4 *)grav.retrieveData(0);
