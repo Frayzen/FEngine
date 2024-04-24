@@ -17,7 +17,7 @@ void GUI::update() {
         created = true;
         ImGui::SetWindowFontScale(1.8f);
         ImGui::SetWindowPos(ImVec2(50, 50));
-        ImGui::SetWindowSize(ImVec2(500, 500));
+        ImGui::SetWindowSize(ImVec2(300, 500));
     }
     ImGui::SliderFloat2("Bounds", (float *)&sim_.bounds, 5.0f, 100.0f);
     ImGui::SliderFloat("Mass", (float *)&sim_.mass, 0.0f, 5.0f);
