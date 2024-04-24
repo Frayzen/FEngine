@@ -16,6 +16,8 @@ class Object {
 
     vec3& getVelocity();
 
+    static void clearObjects(Mesh& m);
+
     static mat4* getTransforms(Mesh& m);
     static vec4* getVelocities(Mesh& m);
     static vec4* getColors(Mesh& m);

@@ -9,7 +9,11 @@
 #define UBOUNDS (bounds)
 #define LBOUNDS (-bounds)
 
-void Simulation::restartSimulation() { isRunning = false; }
+void Simulation::restartSimulation() {
+    isRunning = false;
+    particleMesh_.getObjects().clear();
+    createObjects();
+}
 
 Simulation::Simulation()
     : gui_(GUI(*this)), particleMesh_(Mesh::createFrom("assets/sphere.obj")),
@@ -48,12 +52,11 @@ Simulation::Simulation()
 }
 
 void Simulation::createObjects() {
-    particleMesh_.getObjects().clear();
     for (int i = 0; i < size.x; i++) {
         for (int j = 0; j < size.y; j++) {
             Object &o = particleMesh_.createObject();
             *o.getColor() = vec4(1.0f);
-            Transform t = o.getTransform();
+            Transform t = Transform::identity();
             t.position = vec3(i * offset.x, j * offset.y, 0.0f);
             t.position -=
                 vec3(offset.x * size.x / 2, offset.y * size.y / 2, 0.0f);
@@ -72,6 +75,41 @@ void Simulation::updateBbox() {
     *bbox.getColor() = vec4(1.0f, 0.1f, 0.1f, 1.0f);
 }
 
+void Simulation::compute() {
+
+    // COMPUTE DENSITY
+    glUniform1f(densityCmpt_.getUniformLoc("radius"), radius);
+    glUniform1f(densityCmpt_.getUniformLoc("mass"), mass);
+    densityCmpt_.dispatch(OBJNB);
+
+    // COMPUTE VELOCITY
+    velocityCpt_.updateData(Object::getTransforms(particleMesh_), 0);
+    velocityCpt_.updateData(Object::getVelocities(particleMesh_), 1);
+    velocityCpt_.updateData(Object::getColors(particleMesh_), 2);
+    glUniform3fv(velocityCpt_.getUniformLoc("interaction"), 1,
+                 (float *)&cam.interactionPoint);
+    glUniform1i(velocityCpt_.getUniformLoc("inputState"), cam.clickState);
+    glUniform1f(velocityCpt_.getUniformLoc("radius"), radius);
+    glUniform1f(velocityCpt_.getUniformLoc("mass"), mass);
+    glUniform3f(velocityCpt_.getUniformLoc("ubound"), UBOUNDS.x, UBOUNDS.y,
+                UBOUNDS.z);
+    glUniform3f(velocityCpt_.getUniformLoc("lbound"), LBOUNDS.x, LBOUNDS.y,
+                LBOUNDS.z);
+    velocityCpt_.dispatch(OBJNB);
+    // RETRIEVE DATA
+    memcpy(Object::getTransforms(particleMesh_), velocityCpt_.retrieveData(0),
+           OBJNB * sizeof(mat4));
+    glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
+
+    memcpy(Object::getVelocities(particleMesh_), velocityCpt_.retrieveData(1),
+           OBJNB * sizeof(vec4));
+    glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
+
+    memcpy(Object::getColors(particleMesh_), velocityCpt_.retrieveData(2),
+           OBJNB * sizeof(vec4));
+    glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
+}
+
 // Main loop
 void Simulation::mainLoop() {
     while (!glfwWindowShouldClose(win_)) {
@@ -88,38 +126,8 @@ void Simulation::mainLoop() {
         gui_.update();
         cam.inputs(vec2(bounds.x, bounds.y));
 
-        // COMPUTE DENSITY
-        glUniform1f(densityCmpt_.getUniformLoc("radius"), radius);
-        glUniform1f(densityCmpt_.getUniformLoc("mass"), mass);
-        densityCmpt_.dispatch(OBJNB);
-
-        // COMPUTE VELOCITY
-        velocityCpt_.updateData(Object::getTransforms(particleMesh_), 0);
-        velocityCpt_.updateData(Object::getVelocities(particleMesh_), 1);
-        velocityCpt_.updateData(Object::getColors(particleMesh_), 2);
-        glUniform3fv(velocityCpt_.getUniformLoc("interaction"), 1,
-                     (float *)&cam.interactionPoint);
-        glUniform1i(velocityCpt_.getUniformLoc("inputState"), cam.clickState);
-        glUniform1f(velocityCpt_.getUniformLoc("radius"), radius);
-        glUniform1f(velocityCpt_.getUniformLoc("mass"), mass);
-        glUniform3f(velocityCpt_.getUniformLoc("ubound"), UBOUNDS.x, UBOUNDS.y,
-                    UBOUNDS.z);
-        glUniform3f(velocityCpt_.getUniformLoc("lbound"), LBOUNDS.x, LBOUNDS.y,
-                    LBOUNDS.z);
-        velocityCpt_.dispatch(OBJNB);
-
-        // RETRIEVE DATA
-        memcpy(Object::getTransforms(particleMesh_),
-               velocityCpt_.retrieveData(0), OBJNB * sizeof(mat4));
-        glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
-
-        memcpy(Object::getVelocities(particleMesh_),
-               velocityCpt_.retrieveData(1), OBJNB * sizeof(vec4));
-        glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
-
-        memcpy(Object::getColors(particleMesh_), velocityCpt_.retrieveData(2),
-               OBJNB * sizeof(vec4));
-        glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
+        if (isRunning)
+            compute();
 
         // RENDER
         particleMesh_.render(renderer_, cam);

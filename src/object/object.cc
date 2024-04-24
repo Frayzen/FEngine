@@ -13,6 +13,14 @@ std::map<unsigned int, std::vector<mat4>> Object::objTransforms_;
 std::map<unsigned int, std::vector<vec4>> Object::objVelocity_;
 std::map<unsigned int, std::vector<vec4>> Object::objColors_;
 
+
+void Object::clearObjects(Mesh& m)
+{
+    objIds_[m.id] = 0;
+    objVelocity_[m.id].clear();
+    objColors_[m.id].clear();
+}
+
 unsigned int Object::getId(Mesh &m) {
     objIds_.try_emplace(m.id, 0);
     return objIds_[m.id]++;

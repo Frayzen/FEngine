@@ -12,7 +12,7 @@ class Simulation {
   public:
     Simulation();
     vec2 screenSize = vec2(2000, 1000);
-    vec3 bounds = vec3(20.0f, 10.0f, 0.0f);
+    vec3 bounds = vec3(10.0f, 10.0f, 0.0f);
     vec2 size = uvec2(10, 11);
     vec2 offset = vec2(1.0f, 1.0f);
     float mass = 1.0f;
@@ -21,12 +21,12 @@ class Simulation {
     Camera cam;
     bool isRunning;
     void restartSimulation();
-    void togglePause();
     void mainLoop();
 
   private:
     void createObjects();
     void updateBbox();
+    void compute();
     double last_;
     GUI gui_;
     Mesh particleMesh_;

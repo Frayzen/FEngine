@@ -18,6 +18,7 @@ class Mesh : public Renderable{
     void render(Shader &shader, Camera &camera);
 
     Object& createObject();
+    void clearObjects();
     std::vector<Object>& getObjects();
      const unsigned int id;
 
