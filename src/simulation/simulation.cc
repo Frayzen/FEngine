@@ -32,10 +32,10 @@ Simulation::Simulation()
                            sizeof(mat4), 0, GL_DYNAMIC_DRAW);
     densityCmpt_.setupData(Object::getVelocities(particleMesh_), OBJNB,
                            sizeof(vec4), 1, GL_DYNAMIC_DRAW);
-    velocityCpt_.setupData(Object::getColors(particleMesh_), OBJNB,
-                           sizeof(vec4), 2, GL_DYNAMIC_DRAW);
     velocityCpt_.setupData(0, densityCmpt_.getBuffer(0));
     velocityCpt_.setupData(1, densityCmpt_.getBuffer(1));
+    velocityCpt_.setupData(Object::getColors(particleMesh_), OBJNB,
+                           sizeof(vec4), 2, GL_DYNAMIC_DRAW);
     boundingMesh_.createObject();
     updateBbox();
 
@@ -50,7 +50,7 @@ void Simulation::updateBuffers() {
 }
 
 void Simulation::createObjects() {
-    particleMesh_.clearObjects();
+particleMesh_.clearObjects();
     for (int i = 0; i < size.x; i++) {
         for (int j = 0; j < size.y; j++) {
             Object &o = particleMesh_.createObject();
@@ -72,7 +72,7 @@ void Simulation::updateBbox() {
     bbox_t.scale = bounds + vec3(radius);
     bbox_t.position.z = -1.0f;
     bbox.setTransform(bbox_t);
-    *bbox.getColor() = vec4(1.0f, 0.1f, 0.1f, 1.0f);
+    *bbox.getColor() = vec4(0.1f, 0.1f, 0.1f, 1.0f);
 }
 
 void Simulation::compute() {
@@ -81,7 +81,12 @@ void Simulation::compute() {
     glUniform1f(densityCmpt_.getUniformLoc("radius"), radius);
     glUniform1f(densityCmpt_.getUniformLoc("mass"), mass);
     densityCmpt_.dispatch(OBJNB);
-
+    vec4* vels = (vec4*) densityCmpt_.retrieveData(1);
+    memcpy(Object::getVelocities(particleMesh_), vels,
+           OBJNB * sizeof(vec4));
+    glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
+    std::cout << vels[0].w << '\n';
+ 
     // COMPUTE VELOCITY
     velocityCpt_.updateData(Object::getTransforms(particleMesh_), 0);
     velocityCpt_.updateData(Object::getVelocities(particleMesh_), 1);
