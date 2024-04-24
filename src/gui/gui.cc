@@ -21,6 +21,7 @@ void GUI::update() {
     }
     ImGui::SliderFloat2("Bounds", (float *)&sim_.bounds, 5.0f, 100.0f);
     ImGui::SliderFloat("Mass", &sim_.mass, 0.0f, 5.0f);
+    ImGui::SliderFloat("Targeted Density", &sim_.targetedDensity, 0.0f, 5.0f);
     ImGui::SliderFloat("Gravity", &sim_.gravity, -10.0f, 10.0f);
     ImGui::SliderFloat("Pressure Multiplier", (float *)&sim_.pressureMultiplier,
                        0.0f, 500.0f);

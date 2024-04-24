@@ -91,6 +91,7 @@ void Simulation::compute() {
     glUniform1i(velocityCpt_.getUniformLoc("inputState"), cam.clickState);
     glUniform1f(velocityCpt_.getUniformLoc("radius"), radius);
     glUniform1f(velocityCpt_.getUniformLoc("mass"), mass);
+    glUniform1f(velocityCpt_.getUniformLoc("targetedDensity"), targetedDensity);
     glUniform1f(velocityCpt_.getUniformLoc("gravity"), gravity);
     glUniform3f(velocityCpt_.getUniformLoc("ubound"), UBOUNDS.x, UBOUNDS.y,
                 UBOUNDS.z);

@@ -17,6 +17,7 @@ class Simulation {
     vec2 offset = vec2(1.0f, 1.0f);
     float mass = 1.0f;
     float pressureMultiplier = 100.0f;
+    float targetedDensity = 2.0f;
     float radius = 1.5f;
     const float appearanceRadiusCoeff = .3f;
     float gravity = 0;
