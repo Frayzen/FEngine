@@ -47,8 +47,8 @@ int main() {
     glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
 
     // Creation of the window
-    GLFWwindow *win =
-        glfwCreateWindow(screenSize.x, screenSize.y, "FEngine", nullptr, nullptr);
+    GLFWwindow *win = glfwCreateWindow(screenSize.x, screenSize.y, "FEngine",
+                                       nullptr, nullptr);
     FAIL_ON(win == nullptr, "An error occured while creating the window");
     glfwMakeContextCurrent(win);
 
@@ -61,13 +61,16 @@ int main() {
     Render render =
         Render("assets/shaders/default.vert", "assets/shaders/default.frag");
 
-    Mesh mesh = Mesh::createFrom("assets/teddy.obj");
+    Mesh mesh = Mesh::createFrom("assets/airplane/airplane.obj");
     Object obj = mesh.createObject();
     auto t = obj.getTransform();
-    t.position.z = -1.0f;
-    //t.scale = vec3(0.1f);
+    t.position.x -= 100.0f;
+    t.position.z -= 50.0f;
+    t.rotation = glm::rotate(t.rotation, glm::radians(-90.0f), vec3(1.0f, 0, 0));
+    t.rotation = glm::rotate(t.rotation, glm::radians(-90.0f), vec3(0, 0, 1.0f));
+    t.scale = vec3(0.1f);
     obj.setTransform(t);
-    *obj.getColor() = vec4(1.0f, 0.1f, 0.1f, 1.0f);
+    *obj.getColor() = vec4(0.1f, 0.1f, 0.1f, 1.0f);
 
     glfwSetTime(0);
     double lastSec = glfwGetTime();
@@ -91,7 +94,7 @@ int main() {
         fps++;
 
         Camera::mainCamera().inputs();
-        mesh.render(render, Camera::mainCamera()); 
+        mesh.render(render, Camera::mainCamera());
 
         glfwSwapBuffers(win);
     }
