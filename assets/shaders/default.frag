@@ -12,5 +12,5 @@ void main()
     float diffuse  = 1.0f;
     if (length(norm) > 0.001f)
         diffuse = max(dot(normalize(norm), lightDir), 0);
-    result = color /** diffuse*/;
+    result = color * diffuse;
 }

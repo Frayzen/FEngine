@@ -23,37 +23,37 @@ Mesh Mesh::createFrom(std::string path) {
     const aiScene *scene = importer.ReadFile(
         path.c_str(),
         aiProcess_Triangulate | aiProcess_JoinIdenticalVertices |
+            aiProcess_GlobalScale |
             aiProcess_GenSmoothNormals /* or aiProcess_GenNormals */);
     FAIL_ON(scene == nullptr, "The mesh " << path
                                           << "could not be loaded.\nReason:"
                                           << importer.GetErrorString());
     Mesh m = Mesh();
 
-    aiMesh *mesh =
-        scene->mMeshes[0]; // Assuming there's only one mesh in the scene
-
-    if (!mesh->mNormals)
-        std::cout << "NO NORMALS FOUND" << '\n';
-    // Retrieve vertices
-    for (unsigned int i = 0; i < mesh->mNumVertices; ++i) {
-        auto v = mesh->mVertices[i];
-        vec3 vert = {v.x, v.y, v.z};
-
-        vec3 vn = vec3(0.0f);
-        if (mesh->mNormals) {
+    int curId = 0;
+    for (unsigned int mid = 0; mid < scene->mNumMeshes; mid++) {
+        aiMesh *mesh = scene->mMeshes[mid];
+        if (!mesh->mNormals)
+            std::cout << "NO NORMALS FOUND" << '\n';
+        // Retrieve vertices
+        for (unsigned int i = 0; i < mesh->mNumVertices; ++i) {
+            auto v = mesh->mVertices[i];
+            vec3 vert = {v.x, v.y, v.z};
             auto norm = mesh->mNormals[i];
-            vn = {norm.x, norm.y, norm.z};
+            vec3 vn = {norm.x, norm.y, norm.z};
+            m.vertices_.push_back(vert);
+            m.vertices_.push_back(vn);
         }
-        m.vertices_.push_back(vert);
-        m.vertices_.push_back(vn);
-    }
 
-    // Retrieve indices (assuming triangles)
-    for (unsigned int i = 0; i < mesh->mNumFaces; ++i) {
-        aiFace face = mesh->mFaces[i];
-        if (face.mNumIndices == 3) // Assuming triangles
-            m.indices_.push_back(
-                uvec3(face.mIndices[0], face.mIndices[1], face.mIndices[2]));
+        // Retrieve indices (assuming triangles)
+        for (unsigned int i = 0; i < mesh->mNumFaces; ++i) {
+            aiFace face = mesh->mFaces[i];
+            if (face.mNumIndices == 3) // Assuming triangles
+                m.indices_.push_back(uvec3(curId + face.mIndices[0],
+                                           curId + face.mIndices[1],
+                                           curId + face.mIndices[2]));
+        }
+        curId += mesh->mNumVertices;
     }
 
     return m;
