@@ -63,7 +63,7 @@ int main() {
     Render render =
         Render("assets/shaders/default.vert", "assets/shaders/default.frag");
 
-    Mesh mesh = Mesh::createFrom("assets/airplane/airplane.obj");
+    Mesh mesh = Mesh::createFrom("assets/ironman/IronMan.obj");
     Object obj = mesh.createObject();
     auto t = obj.getTransform();
     t.position.x -= 100.0f;
@@ -72,7 +72,7 @@ int main() {
         glm::rotate(t.rotation, glm::radians(-90.0f), vec3(1.0f, 0, 0));
     t.rotation =
         glm::rotate(t.rotation, glm::radians(-90.0f), vec3(0, 0, 1.0f));
-    t.scale = vec3(0.1f);
+    /* t.scale = vec3(0.1f); */
     obj.setTransform(t);
     *obj.getColor() = vec4(1.0f);
 
@@ -87,7 +87,7 @@ int main() {
         // Take care of events
         glfwPollEvents();
         // Background color
-        glClearColor(0.6f, 0.6f, 0.6f, 1.0f);
+        glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         double cur = glfwGetTime();
         if (cur - lastSec >= 1.0) {

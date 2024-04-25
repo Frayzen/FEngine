@@ -27,3 +27,14 @@ std::string get_file_content(const char *filename) {
 }
 Shader::~Shader() { glDeleteProgram(program_); }
 GLuint Shader::getProgram() { return program_; }
+
+void Shader::setInt(std::string name, int val) {
+    glUniform1i(glGetUniformLocation(program_, name.c_str()), val);
+}
+void Shader::setFloat(std::string name, float val) {
+    glUniform1f(glGetUniformLocation(program_, name.c_str()), val);
+}
+void Shader::setVec3(std::string name, glm::vec3 &val) {
+    glUniform3fv(glGetUniformLocation(program_, name.c_str()), 1,
+                 (float *)&val);
+}
