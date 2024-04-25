@@ -36,7 +36,7 @@ void GUI::update() {
         }
     }
     ImGui::Spacing();
-    if (ImGui::SliderInt2("Number", (int *)&sim_.size, 1, 50))
+    if (ImGui::SliderInt2("Number", (int *)&sim_.size, 1, 300))
         sim_.restartSimulation();
     if (ImGui::SliderFloat2("Offset", (float *)&sim_.offset, 0.0f, 3.0f))
         sim_.restartSimulation();

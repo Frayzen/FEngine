@@ -29,6 +29,7 @@ class Simulation {
 
   private:
     void createObjects();
+    void setupBuffers();
     void updateBuffers();
     void updateBbox();
     void compute();

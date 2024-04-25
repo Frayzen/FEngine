@@ -27,31 +27,26 @@ void Compute::setupData(unsigned int bindingPosition, GLuint buffer) {
 void Compute::setupData(void *data, int datasize, unsigned int bindingPosition,
                         GLenum usage) {
     FAIL_ON(bindingPosition > MAX_INPUTS, "The input position is too high");
-    FAIL_ON(buffers_[bindingPosition], "Reassigning binding position");
     glUseProgram(program_);
-    GLuint buf;
-    glGenBuffers(1, &buf);
-    buffers_[bindingPosition] = buf;
+    bool exist = buffers_[bindingPosition] != 0;
+    GLuint buf = buffers_[bindingPosition];
+    if (!exist) {
+        glGenBuffers(1, &buf);
+        buffers_[bindingPosition] = buf;
+    }
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, buf);
     glBufferData(GL_SHADER_STORAGE_BUFFER, datasize, data, usage);
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, bindingPosition, buf);
+    if (!exist)
+        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, bindingPosition, buf);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 }
 
-void Compute::updateData(void *data, int datasize,
-                         unsigned int bindingPosition) {
+void Compute::updateData(void *data, unsigned int bindingPosition) {
     glUseProgram(program_);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, buffers_[bindingPosition]);
-    GLint size, usage = 0;
+    GLint size = 0;
     glGetBufferParameteriv(GL_SHADER_STORAGE_BUFFER, GL_BUFFER_SIZE, &size);
-    if (size <= datasize)
-        glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, size, data);
-    else {
-        glGetBufferParameteriv(GL_SHADER_STORAGE_BUFFER, GL_BUFFER_USAGE,
-                               &usage);
-        glBufferData(GL_SHADER_STORAGE_BUFFER, datasize, data, usage);
-        glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
-    }
+    glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, size, data);
 }
 
 GLuint Compute::getUniformLoc(std::string name) {
