@@ -61,11 +61,11 @@ int main() {
     Render render =
         Render("assets/shaders/default.vert", "assets/shaders/default.frag");
 
-    Mesh mesh = Mesh::createFrom("assets/airplane/airplane.obj");
+    Mesh mesh = Mesh::createFrom("assets/teddy.obj");
     Object obj = mesh.createObject();
     auto t = obj.getTransform();
     t.position.z = -1.0f;
-    t.scale = vec3(0.1f);
+    //t.scale = vec3(0.1f);
     obj.setTransform(t);
     *obj.getColor() = vec4(1.0f, 0.1f, 0.1f, 1.0f);
 
