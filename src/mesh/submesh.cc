@@ -23,8 +23,11 @@ SubMesh SubMesh::createFrom(Mesh &m, aiMesh *mesh) {
         vec3 vert = {v.x, v.y, v.z};
         auto norm = mesh->mNormals[i];
         vec3 vn = {norm.x, norm.y, norm.z};
-        auto uv_vec = mesh->mTextureCoords[0][i];
-        vec3 uv = {uv_vec.x, uv_vec.y, uv_vec.z};
+        vec3 uv = vec3(0);
+        if (mesh->HasTextureCoords(0)) {
+            auto uv_vec = mesh->mTextureCoords[0][i];
+            uv = {uv_vec.x, uv_vec.y, uv_vec.z};
+        }
         sm.vertices_.emplace_back(vert);
         sm.vertices_.emplace_back(vn);
         sm.vertices_.emplace_back(uv);
