@@ -74,7 +74,7 @@ int main() {
         glm::rotate(t.rotation, glm::radians(-90.0f), vec3(0, 0, 1.0f));
     t.scale = vec3(0.1f);
     obj.setTransform(t);
-    *obj.getColor() = vec4(0.1f, 0.1f, 0.1f, 1.0f);
+    *obj.getColor() = vec4(1.0f);
 
     glfwSetTime(0);
     double lastSec = glfwGetTime();
