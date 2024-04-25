@@ -7,6 +7,7 @@
 #include <assimp/postprocess.h>
 #include <assimp/scene.h>
 #include <assimp/mesh.h>
+#include <cstdio>
 #include <cstdlib>
 #include <cstring>
 
@@ -20,16 +21,45 @@ Mesh Mesh::createFrom(std::string path) {
     const aiScene *scene = importer.ReadFile(
         path.c_str(),
         aiProcess_Triangulate | aiProcess_JoinIdenticalVertices |
-            aiProcess_GlobalScale |
+            aiProcess_GlobalScale | aiProcess_GenUVCoords |
+            aiProcess_EmbedTextures | aiProcess_FlipUVs |
+            aiProcess_RemoveRedundantMaterials |
             aiProcess_GenSmoothNormals /* or aiProcess_GenNormals */);
-    FAIL_ON(scene == nullptr, "The mesh " << path
-                                          << "could not be loaded.\nReason:"
-                                          << importer.GetErrorString());
+    FAIL_ON(!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE ||
+                !scene->mRootNode,
+            "The mesh " << path << "could not be loaded.\nReason:"
+                        << importer.GetErrorString());
     Mesh m = Mesh();
     std::cout << " = Creating the mesh..." << '\n';
 
+    if (scene->HasMaterials()) {
+        // For all materials
+        for (unsigned int m = 0; m < scene->mNumMaterials; ++m) {
+            aiMaterial *material = scene->mMaterials[m];
+            aiString materialName;
+            aiReturn ret;
+            ret = material->Get(AI_MATKEY_NAME, materialName);
+            if (ret != AI_SUCCESS)
+                materialName = "";
+
+            std::cout << materialName.C_Str() << '\n';
+            // Diffuse maps
+            int numTextures = material->GetTextureCount(aiTextureType_DIFFUSE);
+            aiString textureName;
+            if (numTextures > 0) {
+                ret = material->Get(AI_MATKEY_TEXTURE(aiTextureType_DIFFUSE, 0),
+                                    textureName);
+                std::string textureType = "diff_";
+                std::string textureFileName = textureType + textureName.data;
+                std::cout << textureName.C_Str() << '\n';
+            }
+        }
+    }
+
     for (unsigned int mid = 0; mid < scene->mNumMeshes; mid++) {
         aiMesh *mesh = scene->mMeshes[mid];
+        unsigned int mat = mesh->mMaterialIndex;
+        std::cout << mat << '\n';
         SubMesh &sm = m.subMeshes_.emplace_back(SubMesh(m));
         if (!mesh->mNormals)
             std::cout << "/!\\ NO NORMALS FOUND IN " << mesh->mName.C_Str()
@@ -54,7 +84,8 @@ Mesh Mesh::createFrom(std::string path) {
         std::cout << "[+] " << mesh->mName.C_Str() << " (" << mesh->mNumVertices
                   << " vertices)" << '\n';
     }
-    std::cout << " = Mesh built ! (" << m.subMeshes_.size() << " part.s)" << '\n';
+    std::cout << " = Mesh built ! (" << m.subMeshes_.size() << " parts)"
+              << '\n';
     return m;
 }
 
