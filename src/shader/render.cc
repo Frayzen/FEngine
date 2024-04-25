@@ -16,9 +16,21 @@ void Render::setupShaders() {
     glAttachShader(program_, vertexShader);
     glAttachShader(program_, fragmentShader);
     glLinkProgram(program_);
+    GLint linkStatus;
+    glGetProgramiv(program_, GL_LINK_STATUS, &linkStatus);
+    FAIL_ON(linkStatus == GL_FALSE, "The program could not be linked...");
 }
 
 Render::Render(std::string vertexFilePath, std::string fragmentFilePath)
     : fragmentFilePath_(fragmentFilePath), vertexFilePath_(vertexFilePath) {
     setupShaders();
+    // Define texture locations
+    glUseProgram(program_);
+    glUniform1i(glGetUniformLocation(program_, "diffuseText"), 0);
+    glUniform1i(glGetUniformLocation(program_, "specularText"), 1);
+}
+
+Render::~Render()
+{
+    glDeleteProgram(program_);
 }

@@ -26,6 +26,8 @@ class SubMesh {
 
     Mesh &mesh_;
 
+    unsigned int materialId_ = 0;
+
     std::vector<vec3> vertices_;
     std::vector<uvec3> indices_;
     // TBO = Transform Buffer Object

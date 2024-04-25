@@ -20,8 +20,10 @@ static GLuint load(aiMaterial *mat, aiTextureType type,
             int width, height, nrChannels;
             auto path = folderRoot + "/" + fileName.C_Str();
 
-            if (textureCache.find(path) != textureCache.end())
+            if (textureCache.find(path) != textureCache.end()) {
+                std::cout << "Caching " << path << '\n';
                 return textureCache[path];
+            }
 
             auto *data =
                 stbi_load(path.c_str(), &width, &height, &nrChannels, 0);
@@ -30,7 +32,14 @@ static GLuint load(aiMaterial *mat, aiTextureType type,
             glGenTextures(1, &buffer);
             textureCache[path] = buffer;
             glBindTexture(GL_TEXTURE_2D, buffer);
-            glTexImage2D(buffer, 0, GL_RGB, width, height, 0, GL_RGB,
+
+            // set the texture wrapping/filtering options
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+                            GL_LINEAR_MIPMAP_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB,
                          GL_UNSIGNED_BYTE, data);
             __glewGenerateMipmap(GL_TEXTURE_2D);
             glBindTexture(GL_TEXTURE_2D, 0);
@@ -48,6 +57,24 @@ Material Material::createFrom(std::string folderRoot, aiMaterial *mat) {
     ret = mat->Get(AI_MATKEY_NAME, materialName);
     FAIL_ON(ret != AI_SUCCESS, "Failed to load a material");
     std::cout << "Material " << materialName.C_Str() << " loaded" << '\n';
+    mat->Get(AI_MATKEY_SHININESS, m.shininess_);
+    mat->Get(AI_MATKEY_SHININESS_STRENGTH, m.shininessStrength_);
     m.diffuseText_ = load(mat, aiTextureType_DIFFUSE, folderRoot);
+    m.specularText_ = load(mat, aiTextureType_SPECULAR, folderRoot);
     return m;
+}
+
+void Material::enable(Render &r) {
+    r.activate();
+    /* /!\ activate the texture unit first before binding texture */
+    if (diffuseText_) {
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, diffuseText_);
+    }
+    if (specularText_) {
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, specularText_);
+    }
+    glUniform1f(glGetUniformLocation(r.getProgram(), "shininess"), shininess_);
+    glUniform1f(glGetUniformLocation(r.getProgram(), "shininessStrength"), shininessStrength_);
 }

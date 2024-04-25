@@ -34,7 +34,8 @@ Mesh Mesh::createFrom(std::string path) {
     Mesh m = Mesh();
     std::cout << " = Creating the mesh..." << '\n';
     for (unsigned int i = 0; i < scene->mNumMaterials; ++i)
-        m.materials_.emplace_back(Material::createFrom(p.parent_path(), scene->mMaterials[i]));
+        m.materials_.emplace_back(
+            Material::createFrom(p.parent_path(), scene->mMaterials[i]));
     for (unsigned int i = 0; i < scene->mNumMeshes; i++)
         m.subMeshes_.emplace_back(SubMesh::createFrom(m, scene->mMeshes[i]));
     std::cout << " = Mesh built ! (" << m.subMeshes_.size() << " parts)"
@@ -50,5 +51,6 @@ void Mesh::render(Render &shader, Camera &camera) {
 }
 
 std::vector<Object> &Mesh::getObjects() { return objects_; }
+std::vector<Material> &Mesh::getMaterials() { return materials_; }
 
 Object &Mesh::createObject() { return objects_.emplace_back(Object(*this)); }

@@ -29,7 +29,7 @@ SubMesh SubMesh::createFrom(Mesh &m, aiMesh *mesh) {
         sm.vertices_.emplace_back(vn);
         sm.vertices_.emplace_back(uv);
     }
-
+    sm.materialId_ = mesh->mMaterialIndex;
     // Retrieve indices (assuming triangles)
     for (unsigned int i = 0; i < mesh->mNumFaces; ++i) {
         aiFace face = mesh->mFaces[i];
@@ -125,11 +125,13 @@ void SubMesh::render(Render &r, mat4 &camMat) {
     glUniformMatrix4fv(camMatUniID, 1, GL_FALSE, &camMat[0][0]);
 
     GLuint posLightUniID = glGetUniformLocation(r.getProgram(), "lightPos");
-    vec3 lightPos = vec3(0.0f, 1000.f, 0.0f);
+    vec3 lightPos = vec3(0.0f, 0.0f, 2000.0f);
     glUniform3fv(posLightUniID, 1, &lightPos[0]);
 
     updateBuffers();
     updateObjects();
+    if (mesh_.getMaterials().size() > materialId_)
+        mesh_.getMaterials()[materialId_].enable(r);
     enable();
     glDrawElementsInstanced(GL_TRIANGLES, triangleNumber() * 3, GL_UNSIGNED_INT,
                             nullptr, mesh_.getObjects().size());

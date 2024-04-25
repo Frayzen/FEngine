@@ -19,6 +19,7 @@ class Mesh : public Renderable {
     const unsigned int id;
 
     std::vector<Object> &getObjects();
+    std::vector<Material> &getMaterials();
     Object &createObject();
 
   private:
