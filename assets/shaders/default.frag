@@ -2,6 +2,7 @@
 out vec4 result;
 in vec4 pos;
 in vec3 norm;
+in vec3 uv;
 in vec4 color;
 
 uniform vec3 lightPos;
