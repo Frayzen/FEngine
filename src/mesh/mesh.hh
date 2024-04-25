@@ -1,38 +1,27 @@
 #pragma once
 
+#include "mesh/submesh.hh"
 #include "object/object.hh"
 #include <GL/gl.h>
 #include "object/transform.hh"
+#include "shader/render.hh"
 #include <glm/fwd.hpp>
 #include <string>
 #include <vector>
 
 using namespace glm;
 
-class Mesh : public Renderable{
+class Mesh : public Renderable {
   public:
     static Mesh createFrom(std::string path);
-    ~Mesh();
-    void enable();
-    unsigned int triangleNumber();
-    void render(Shader &shader, Camera &camera);
+    void render(Render &shader, Camera &camera);
+    const unsigned int id;
 
-    Object& createObject();
-    std::vector<Object>& getObjects();
-     const unsigned int id;
+    std::vector<Object> &getObjects();
+    Object &createObject();
 
   private:
-    Mesh();
-    void updateBuffers();
-    void updateObjects();
-    void appendVertices(const vec3 *vertices, unsigned long size);
-    void appendIndices(const uvec3 *indices, size_t size);
-
-    std::vector<vec3> vertices_;
-    std::vector<uvec3> indices_;
-    //object related
+    std::vector<SubMesh> subMeshes_;
     std::vector<Object> objects_;
-    // TBO = Transform Buffer Object
-    // CBO = Color Buffer Object
-    GLuint VAO, VBO, EBO, TBO, CBO = 0;
+    Mesh();
 };
