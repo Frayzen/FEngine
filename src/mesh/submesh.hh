@@ -3,6 +3,7 @@
 #include "object/object.hh"
 #include "object/renderable.hh"
 #include "shader/render.hh"
+#include <assimp/mesh.h>
 #include <glm/fwd.hpp>
 #include <GL/gl.h>
 #include <vector>
@@ -13,6 +14,7 @@ class SubMesh {
 
   public:
     SubMesh(Mesh &m);
+    static SubMesh createFrom(Mesh& m, aiMesh* mesh);
     void enable();
     unsigned int triangleNumber();
     void render(Render &r, mat4 &transform);

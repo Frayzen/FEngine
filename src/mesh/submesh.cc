@@ -2,6 +2,8 @@
 #include "object/object.hh"
 #include "shader/render.hh"
 #include "mesh.hh"
+#include <assimp/mesh.h>
+#include <iostream>
 
 #define LOC_VERTEX 0
 #define LOC_NORMAL 1
@@ -9,6 +11,34 @@
 #define LOC_COLOR 7
 
 SubMesh::SubMesh(Mesh &m) : mesh_(m) {}
+
+SubMesh SubMesh::createFrom(Mesh &m, aiMesh *mesh) {
+    unsigned int mat = mesh->mMaterialIndex;
+    std::cout << mat << '\n';
+    SubMesh sm = SubMesh(m);
+    if (!mesh->mNormals)
+        std::cout << "/!\\ NO NORMALS FOUND IN " << mesh->mName.C_Str() << '\n';
+    // Retrieve vertices
+    for (unsigned int i = 0; i < mesh->mNumVertices; ++i) {
+        auto v = mesh->mVertices[i];
+        vec3 vert = {v.x, v.y, v.z};
+        auto norm = mesh->mNormals[i];
+        vec3 vn = {norm.x, norm.y, norm.z};
+        sm.vertices_.emplace_back(vert);
+        sm.vertices_.emplace_back(vn);
+    }
+
+    // Retrieve indices (assuming triangles)
+    for (unsigned int i = 0; i < mesh->mNumFaces; ++i) {
+        aiFace face = mesh->mFaces[i];
+        if (face.mNumIndices == 3) // Assuming triangles
+            sm.indices_.emplace_back(
+                uvec3(face.mIndices[0], face.mIndices[1], face.mIndices[2]));
+    }
+    std::cout << "[+] " << mesh->mName.C_Str() << " (" << mesh->mNumVertices
+              << " vertices)" << '\n';
+    return sm;
+}
 
 void SubMesh::updateBuffers() {
     if (VAO + VBO + EBO != 0)

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "material/material.hh"
 #include "mesh/submesh.hh"
 #include "object/object.hh"
 #include <GL/gl.h>
@@ -23,5 +24,7 @@ class Mesh : public Renderable {
   private:
     std::vector<SubMesh> subMeshes_;
     std::vector<Object> objects_;
+    std::vector<Material> materials_;
+
     Mesh();
 };

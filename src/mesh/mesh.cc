@@ -1,4 +1,5 @@
 #include <GL/glew.h>
+#include "material/material.hh"
 #include "mesh.hh"
 #include "mesh/submesh.hh"
 #include "shader/render.hh"
@@ -31,59 +32,10 @@ Mesh Mesh::createFrom(std::string path) {
                         << importer.GetErrorString());
     Mesh m = Mesh();
     std::cout << " = Creating the mesh..." << '\n';
-
-    if (scene->HasMaterials()) {
-        // For all materials
-        for (unsigned int m = 0; m < scene->mNumMaterials; ++m) {
-            aiMaterial *material = scene->mMaterials[m];
-            aiString materialName;
-            aiReturn ret;
-            ret = material->Get(AI_MATKEY_NAME, materialName);
-            if (ret != AI_SUCCESS)
-                materialName = "";
-
-            std::cout << materialName.C_Str() << '\n';
-            // Diffuse maps
-            int numTextures = material->GetTextureCount(aiTextureType_DIFFUSE);
-            aiString textureName;
-            if (numTextures > 0) {
-                ret = material->Get(AI_MATKEY_TEXTURE(aiTextureType_DIFFUSE, 0),
-                                    textureName);
-                std::string textureType = "diff_";
-                std::string textureFileName = textureType + textureName.data;
-                std::cout << textureName.C_Str() << '\n';
-            }
-        }
-    }
-
-    for (unsigned int mid = 0; mid < scene->mNumMeshes; mid++) {
-        aiMesh *mesh = scene->mMeshes[mid];
-        unsigned int mat = mesh->mMaterialIndex;
-        std::cout << mat << '\n';
-        SubMesh &sm = m.subMeshes_.emplace_back(SubMesh(m));
-        if (!mesh->mNormals)
-            std::cout << "/!\\ NO NORMALS FOUND IN " << mesh->mName.C_Str()
-                      << '\n';
-        // Retrieve vertices
-        for (unsigned int i = 0; i < mesh->mNumVertices; ++i) {
-            auto v = mesh->mVertices[i];
-            vec3 vert = {v.x, v.y, v.z};
-            auto norm = mesh->mNormals[i];
-            vec3 vn = {norm.x, norm.y, norm.z};
-            sm.vertices_.emplace_back(vert);
-            sm.vertices_.emplace_back(vn);
-        }
-
-        // Retrieve indices (assuming triangles)
-        for (unsigned int i = 0; i < mesh->mNumFaces; ++i) {
-            aiFace face = mesh->mFaces[i];
-            if (face.mNumIndices == 3) // Assuming triangles
-                sm.indices_.emplace_back(uvec3(
-                    face.mIndices[0], face.mIndices[1], face.mIndices[2]));
-        }
-        std::cout << "[+] " << mesh->mName.C_Str() << " (" << mesh->mNumVertices
-                  << " vertices)" << '\n';
-    }
+    for (unsigned int i = 0; i < scene->mNumMaterials; ++i)
+        m.materials_.emplace_back(Material::createFrom(scene->mMaterials[i]));
+    for (unsigned int i = 0; i < scene->mNumMeshes; i++)
+        m.subMeshes_.emplace_back(SubMesh::createFrom(m, scene->mMeshes[i]));
     std::cout << " = Mesh built ! (" << m.subMeshes_.size() << " parts)"
               << '\n';
     return m;
