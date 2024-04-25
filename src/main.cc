@@ -36,6 +36,7 @@ void GLAPIENTRY DebugCallback(GLenum source, GLenum type, GLuint id,
     (void)severity;
     (void)length;
     (void)userParam;
+    return;
     std::cout << msg << '\n';
     std::flush(std::cout);
 }
