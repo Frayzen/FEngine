@@ -8,3 +8,4 @@ The dependecies of the project:
 - OpenGL
 - GLM
 - Assimp
+- stb

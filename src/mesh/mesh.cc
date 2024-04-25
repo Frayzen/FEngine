@@ -11,6 +11,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <filesystem>
 
 static int curId = 0;
 
@@ -22,18 +23,18 @@ Mesh Mesh::createFrom(std::string path) {
     const aiScene *scene = importer.ReadFile(
         path.c_str(),
         aiProcess_Triangulate | aiProcess_JoinIdenticalVertices |
-            aiProcess_GlobalScale | aiProcess_GenUVCoords |
-            aiProcess_EmbedTextures | aiProcess_FlipUVs |
+            aiProcess_GlobalScale | aiProcess_GenUVCoords | aiProcess_FlipUVs |
             aiProcess_RemoveRedundantMaterials |
             aiProcess_GenSmoothNormals /* or aiProcess_GenNormals */);
     FAIL_ON(!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE ||
                 !scene->mRootNode,
             "The mesh " << path << "could not be loaded.\nReason:"
                         << importer.GetErrorString());
+    auto p = std::filesystem::path(path);
     Mesh m = Mesh();
     std::cout << " = Creating the mesh..." << '\n';
     for (unsigned int i = 0; i < scene->mNumMaterials; ++i)
-        m.materials_.emplace_back(Material::createFrom(scene->mMaterials[i]));
+        m.materials_.emplace_back(Material::createFrom(p.parent_path(), scene->mMaterials[i]));
     for (unsigned int i = 0; i < scene->mNumMeshes; i++)
         m.subMeshes_.emplace_back(SubMesh::createFrom(m, scene->mMeshes[i]));
     std::cout << " = Mesh built ! (" << m.subMeshes_.size() << " parts)"

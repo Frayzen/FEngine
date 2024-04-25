@@ -53,6 +53,8 @@ int main() {
     glfwMakeContextCurrent(win);
 
     FAIL_ON(glewInit() != GLEW_OK, "Glew could not be initialized");
+    FAIL_ON(!GLEW_ARB_framebuffer_object,
+            "Error: GL_ARB_framebuffer_object extension is not supported");
     glViewport(0, 0, screenSize.x, screenSize.y);
 
     glEnable(GL_DEBUG_OUTPUT);
@@ -66,8 +68,10 @@ int main() {
     auto t = obj.getTransform();
     t.position.x -= 100.0f;
     t.position.z -= 50.0f;
-    t.rotation = glm::rotate(t.rotation, glm::radians(-90.0f), vec3(1.0f, 0, 0));
-    t.rotation = glm::rotate(t.rotation, glm::radians(-90.0f), vec3(0, 0, 1.0f));
+    t.rotation =
+        glm::rotate(t.rotation, glm::radians(-90.0f), vec3(1.0f, 0, 0));
+    t.rotation =
+        glm::rotate(t.rotation, glm::radians(-90.0f), vec3(0, 0, 1.0f));
     t.scale = vec3(0.1f);
     obj.setTransform(t);
     *obj.getColor() = vec4(0.1f, 0.1f, 0.1f, 1.0f);

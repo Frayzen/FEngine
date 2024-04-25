@@ -7,14 +7,13 @@
 
 #define LOC_VERTEX 0
 #define LOC_NORMAL 1
-#define LOC_TRANSFORM 2
-#define LOC_COLOR 7
+#define LOC_UV 2
+#define LOC_TRANSFORM 3
+#define LOC_COLOR 8
 
 SubMesh::SubMesh(Mesh &m) : mesh_(m) {}
 
 SubMesh SubMesh::createFrom(Mesh &m, aiMesh *mesh) {
-    unsigned int mat = mesh->mMaterialIndex;
-    std::cout << mat << '\n';
     SubMesh sm = SubMesh(m);
     if (!mesh->mNormals)
         std::cout << "/!\\ NO NORMALS FOUND IN " << mesh->mName.C_Str() << '\n';
@@ -24,8 +23,11 @@ SubMesh SubMesh::createFrom(Mesh &m, aiMesh *mesh) {
         vec3 vert = {v.x, v.y, v.z};
         auto norm = mesh->mNormals[i];
         vec3 vn = {norm.x, norm.y, norm.z};
+        auto uv_vec = mesh->mTextureCoords[0][i];
+        vec3 uv = {uv_vec.x, uv_vec.y, uv_vec.z};
         sm.vertices_.emplace_back(vert);
         sm.vertices_.emplace_back(vn);
+        sm.vertices_.emplace_back(uv);
     }
 
     // Retrieve indices (assuming triangles)
@@ -57,12 +59,15 @@ void SubMesh::updateBuffers() {
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices_.size() * sizeof(uvec3),
                  indices_.data(), GL_STATIC_DRAW);
 
-    glVertexAttribPointer(LOC_VERTEX, 3, GL_FLOAT, GL_FALSE, sizeof(vec3) * 2,
+    glVertexAttribPointer(LOC_VERTEX, 3, GL_FLOAT, GL_FALSE, sizeof(vec3) * 3,
                           nullptr);
     glEnableVertexAttribArray(LOC_VERTEX);
-    glVertexAttribPointer(LOC_NORMAL, 3, GL_FLOAT, GL_FALSE, sizeof(vec3) * 2,
+    glVertexAttribPointer(LOC_NORMAL, 3, GL_FLOAT, GL_FALSE, sizeof(vec3) * 3,
                           (void *)sizeof(vec3));
     glEnableVertexAttribArray(LOC_NORMAL);
+    glVertexAttribPointer(LOC_UV, 3, GL_FLOAT, GL_FALSE, sizeof(vec3) * 3,
+                          (void *)(2 * sizeof(vec3)));
+    glEnableVertexAttribArray(LOC_UV);
 
     glBindVertexArray(0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
