@@ -63,18 +63,26 @@ int main() {
     Render render =
         Render("assets/shaders/default.vert", "assets/shaders/default.frag");
 
-    Mesh mesh = Mesh::createFrom("assets/ironman/IronMan.obj");
+    Mesh mesh = Mesh::createFrom("assets/teddy.obj");
+    auto& col = mesh.getMaterials()[0];
+    col.diffuseCol = vec3(1.0f);
     Object obj = mesh.createObject();
     auto t = obj.getTransform();
-    t.position.x -= 100.0f;
-    t.position.z -= 50.0f;
-    t.rotation =
-        glm::rotate(t.rotation, glm::radians(-90.0f), vec3(1.0f, 0, 0));
-    t.rotation =
-        glm::rotate(t.rotation, glm::radians(-90.0f), vec3(0, 0, 1.0f));
+    /* t.position.x -= 100.0f; */
+    /* t.position.z -= 50.0f; */
+    /* t.rotation = */
+    /*     glm::rotate(t.rotation, glm::radians(-90.0f), vec3(1.0f, 0, 0)); */
+    /* t.rotation = */
+    /*     glm::rotate(t.rotation, glm::radians(-90.0f), vec3(0, 0, 1.0f)); */
     /* t.scale = vec3(0.1f); */
     obj.setTransform(t);
-    *obj.getColor() = vec4(1.0f);
+
+
+    Mesh sph = Mesh::createFrom("assets/sphere.obj");
+    Object spho = sph.createObject();
+    Transform st = spho.getTransform();
+    st.position = lightPos;
+    spho.setTransform(st);
 
     glfwSetTime(0);
     double lastSec = glfwGetTime();
@@ -99,6 +107,7 @@ int main() {
 
         Camera::mainCamera().inputs();
         mesh.render(render, Camera::mainCamera());
+        sph.render(render, Camera::mainCamera());
 
         glfwSwapBuffers(win);
     }

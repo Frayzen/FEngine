@@ -1,4 +1,5 @@
 #include <GL/glew.h>
+#include "constants.hh"
 #include "material/material.hh"
 #include "mesh.hh"
 #include "mesh/submesh.hh"
@@ -23,7 +24,7 @@ Mesh Mesh::createFrom(std::string path) {
     const aiScene *scene = importer.ReadFile(
         path.c_str(),
         aiProcess_Triangulate | aiProcess_JoinIdenticalVertices |
-            aiProcess_GlobalScale | aiProcess_GenUVCoords | aiProcess_FlipUVs |
+            aiProcess_GenUVCoords | aiProcess_FlipUVs |
             aiProcess_RemoveRedundantMaterials |
             aiProcess_GenSmoothNormals /* or aiProcess_GenNormals */);
     FAIL_ON(!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE ||
@@ -43,11 +44,13 @@ Mesh Mesh::createFrom(std::string path) {
     return m;
 }
 
-void Mesh::render(Render &shader, Camera &camera) {
-    shader.activate();
+void Mesh::render(Render &r, Camera &camera) {
+    r.activate();
+    r.setVec3("camPos", camera.transform.position);
+    r.setVec3("lightPos", lightPos);
     mat4 m = camera.getMatrix();
     for (SubMesh &sm : subMeshes_)
-        sm.render(shader, m);
+        sm.render(r, m);
 }
 
 std::vector<Object> &Mesh::getObjects() { return objects_; }

@@ -11,11 +11,13 @@ class Material {
 
   public:
     static Material createFrom(std::string folderRoot, aiMaterial *mat);
-    void enable(Render& r);
+    void enable(Render &r);
+
+    float shininess = 0.0f;
+    float shininessStrength = 1.0f;
+    vec3 diffuseCol, specularCol = vec3(1.0f);
+    vec3 ambientCol = vec3(1.0f);
 
   private:
     GLuint diffuseText_, specularText_ = 0;
-    float shininess_ = 0.0f;
-    float shininessStrength_  = 1.0f;
-    vec3 diffuseCol_, specularCol_, ambientCol_;
 };

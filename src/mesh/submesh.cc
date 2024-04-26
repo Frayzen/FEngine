@@ -127,10 +127,6 @@ void SubMesh::render(Render &r, mat4 &camMat) {
     GLuint camMatUniID = glGetUniformLocation(r.getProgram(), "camMat");
     glUniformMatrix4fv(camMatUniID, 1, GL_FALSE, &camMat[0][0]);
 
-    GLuint posLightUniID = glGetUniformLocation(r.getProgram(), "lightPos");
-    vec3 lightPos = vec3(0.0f, 0.0f, 2000.0f);
-    glUniform3fv(posLightUniID, 1, &lightPos[0]);
-
     updateBuffers();
     updateObjects();
     if (mesh_.getMaterials().size() > materialId_)

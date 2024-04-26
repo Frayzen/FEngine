@@ -59,14 +59,14 @@ Material Material::createFrom(std::string folderRoot, aiMaterial *mat) {
     FAIL_ON(ret != AI_SUCCESS, "Failed to load a material");
     std::cout << "Material " << materialName.C_Str() << " loaded" << '\n';
     aiColor3D c;
-    mat->Get(AI_MATKEY_SHININESS, m.shininess_);
-    mat->Get(AI_MATKEY_SHININESS_STRENGTH, m.shininessStrength_);
-    if (AI_SUCCESS == mat->Get(AI_MATKEY_COLOR_DIFFUSE, c))
-        m.diffuseCol_ = vec3(c.r, c.g, c.b);
-    if (AI_SUCCESS == mat->Get(AI_MATKEY_COLOR_SPECULAR, c))
-        m.specularCol_ = vec3(c.r, c.g, c.b);
-    if (AI_SUCCESS == mat->Get(AI_MATKEY_COLOR_AMBIENT, c))
-        m.ambientCol_ = vec3(c.r, c.g, c.b);
+    mat->Get(AI_MATKEY_SHININESS, m.shininess);
+    mat->Get(AI_MATKEY_SHININESS_STRENGTH, m.shininessStrength);
+    /* if (AI_SUCCESS == mat->Get(AI_MATKEY_COLOR_DIFFUSE, c)) */
+    /*     m.diffuseCol = vec3(c.r, c.g, c.b); */
+    /* if (AI_SUCCESS == mat->Get(AI_MATKEY_COLOR_SPECULAR, c)) */
+    /*     m.specularCol = vec3(c.r, c.g, c.b); */
+    /* if (AI_SUCCESS == mat->Get(AI_MATKEY_COLOR_AMBIENT, c)) */
+    /*     m.ambientCol = vec3(c.r, c.g, c.b); */
     m.diffuseText_ = load(mat, aiTextureType_DIFFUSE, folderRoot);
     m.specularText_ = load(mat, aiTextureType_SPECULAR, folderRoot);
     return m;
@@ -83,9 +83,9 @@ void Material::enable(Render &r) {
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, specularText_);
     }
-    r.setFloat("shininess", shininess_);
-    r.setFloat("shininessStrength", shininessStrength_);
-    r.setVec3("diffuseCol", diffuseCol_);
-    r.setVec3("specularCol", specularCol_);
-    r.setVec3("ambientCol", ambientCol_);
+    r.setFloat("shininess", shininess);
+    r.setFloat("shininessStrength", shininessStrength);
+    r.setVec3("diffuseCol", diffuseCol);
+    r.setVec3("specularCol", specularCol);
+    r.setVec3("ambientCol", ambientCol);
 }
