@@ -12,9 +12,9 @@ class Shader {
         ~Shader();
         void activate();
         GLuint getProgram();
-        void setInt(std::string name, int val);
-        void setFloat(std::string name, float val);
-        void setVec3(std::string name, glm::vec3& val);
+        void setInt(std::string name, const int val);
+        void setFloat(std::string name, const float val);
+        void setVec3(std::string name, const glm::vec3& val);
     protected:
         GLuint createShader(int shaderType, const char *text);
         GLuint program_;
