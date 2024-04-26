@@ -66,8 +66,7 @@ int main() {
     Mesh mesh = Mesh::createFrom("assets/airplane/airplane.obj");
     Object obj = mesh.createObject();
     auto t = obj.getTransform();
-    t.position.x -= 100.0f;
-    t.position.z -= 50.0f;
+    t.position.y -= 100.0f;
     t.rotation =
         glm::rotate(t.rotation, glm::radians(-90.0f), vec3(1.0f, 0, 0));
     t.rotation =
@@ -106,6 +105,16 @@ int main() {
         Camera::mainCamera().inputs();
         mesh.render(render, Camera::mainCamera());
         sph.render(render, Camera::mainCamera());
+
+        std::cout << "====" << '\n';
+        for (int i = 0; i < 4; i++)
+        {
+            for (int j = 0; j < 4; j++)
+                std::cout << Camera::mainCamera().transform.getMatrix()[i][j] << ' ';
+            std::cout << "" << '\n';
+        }
+        vec3 v = Camera::mainCamera().transform.position;
+        std::cout << v.x << " " << v.y << " " << v.z << '\n';
 
         glfwSwapBuffers(win);
     }
