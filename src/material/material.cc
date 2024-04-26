@@ -61,12 +61,12 @@ Material Material::createFrom(std::string folderRoot, aiMaterial *mat) {
     aiColor3D c;
     mat->Get(AI_MATKEY_SHININESS, m.shininess);
     mat->Get(AI_MATKEY_SHININESS_STRENGTH, m.shininessStrength);
-    /* if (AI_SUCCESS == mat->Get(AI_MATKEY_COLOR_DIFFUSE, c)) */
-    /*     m.diffuseCol = vec3(c.r, c.g, c.b); */
-    /* if (AI_SUCCESS == mat->Get(AI_MATKEY_COLOR_SPECULAR, c)) */
-    /*     m.specularCol = vec3(c.r, c.g, c.b); */
-    /* if (AI_SUCCESS == mat->Get(AI_MATKEY_COLOR_AMBIENT, c)) */
-    /*     m.ambientCol = vec3(c.r, c.g, c.b); */
+    if (AI_SUCCESS == mat->Get(AI_MATKEY_COLOR_DIFFUSE, c))
+        m.diffuseCol = vec3(c.r, c.g, c.b);
+    if (AI_SUCCESS == mat->Get(AI_MATKEY_COLOR_SPECULAR, c))
+        m.specularCol = vec3(c.r, c.g, c.b);
+    if (AI_SUCCESS == mat->Get(AI_MATKEY_COLOR_AMBIENT, c))
+        m.ambientCol = vec3(c.r, c.g, c.b);
     m.diffuseText_ = load(mat, aiTextureType_DIFFUSE, folderRoot);
     m.specularText_ = load(mat, aiTextureType_SPECULAR, folderRoot);
     return m;
