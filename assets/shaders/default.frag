@@ -40,7 +40,6 @@ void main()
     vec3 specular = spec * spetex * specularCol;
 
     // Combine diffuse and specular
-    vec3 result = ambientCol + diffuse + specular;
-    result = specular;
+    vec3 result = ambientCol * diffuse + specular;
     fragColor = vec4(result, 1.0f);
 }

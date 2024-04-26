@@ -63,10 +63,10 @@ int main() {
     Render render =
         Render("assets/shaders/default.vert", "assets/shaders/default.frag");
 
-    Mesh mesh = Mesh::createFrom("assets/teddy.obj");
+    Mesh mesh = Mesh::createFrom("assets/ironman/IronMan.obj");
     Object obj = mesh.createObject();
     auto t = obj.getTransform();
-    t.position.z -= 5.0f;
+    t.position.y -= 10.0f;
     /* t.rotation = */
     /*     glm::rotate(t.rotation, glm::radians(-90.0f), vec3(1.0f, 0, 0)); */
     /* t.rotation = */
@@ -101,8 +101,8 @@ int main() {
             fps = 0;
         }
         fps++;
-        t.setRotation(vec3(0.0f, cur, 0.0f));
-        obj.setTransform(t);
+        /* t.setRotation(vec3(0.0f, cur, 0.0f)); */
+        /* obj.setTransform(t); */
 
         Camera::mainCamera().inputs();
         mesh.render(render, Camera::mainCamera());
