@@ -2,6 +2,7 @@
 out vec4 fragColor;
 in vec3 norm;
 in vec3 uv;
+in vec3 wordPos;
 in vec4 color;
 
 uniform vec3 lightPos;
@@ -25,14 +26,19 @@ void main()
     vec3 diffuse = (diftex + diffuseCol) * dif;
 
     // Specular calculation
-    vec3 viewDir = normalize(camPos - gl_FragCoord.xyz);
+    vec3 viewDir = normalize(camPos - wordPos.xyz);
     vec3 reflectDir = reflect(lightDir, normalize(norm));
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0f), shininess) * shininessStrength;
+    float val = max(dot(viewDir, reflectDir), 0.0f);
+    float spec;
+    if (val == 0 && shininess == 0)
+        spec = shininessStrength;
+    else
+        spec = pow(val, shininess) * shininessStrength;
     vec3 spetex = texture(specularText, uv.xy).rgb;
-    vec3 specular = spec * (spetex + specularCol);
+    vec3 specular = spec * spetex * specularCol;
 
     // Combine diffuse and specular
-    vec3 result = color.xyz * (ambientCol + diffuse + specular);
+    vec3 result = ambientCol + diffuse + specular;
     
     fragColor = vec4(result, 1.0f);
 }
