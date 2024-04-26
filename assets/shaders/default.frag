@@ -30,15 +30,17 @@ void main()
     vec3 reflectDir = reflect(lightDir, norm);
     float val = max(dot(viewDir, reflectDir), 0.0f);
     float spec;
+    float shininess_ = 10.0f;
+    float shininessStrength_ = 1.0f;
     if (val == 0 && shininess == 0)
         spec = shininessStrength;
     else
-        spec = pow(val, shininess) * shininessStrength;
+        spec = pow(val, shininess_) * shininessStrength_;
     vec3 spetex = texture(specularText, uv.xy).rgb;
     vec3 specular = spec * spetex * specularCol;
 
     // Combine diffuse and specular
-    vec3 result = ambientCol * diffuse; //+ specular;
-    
+    vec3 result = ambientCol + diffuse + specular;
+    result = specular;
     fragColor = vec4(result, 1.0f);
 }

@@ -123,10 +123,7 @@ void SubMesh::updateObjects() {
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-void SubMesh::render(Render &r, mat4 &camMat) {
-    GLuint camMatUniID = glGetUniformLocation(r.getProgram(), "camMat");
-    glUniformMatrix4fv(camMatUniID, 1, GL_FALSE, &camMat[0][0]);
-
+void SubMesh::render(Render &r) {
     updateBuffers();
     updateObjects();
     if (mesh_.getMaterials().size() > materialId_)

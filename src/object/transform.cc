@@ -13,7 +13,7 @@ mat4 Transform::getMatrix() {
     glm::mat4 pos = glm::translate(glm::mat4(1.0f), position);
     glm::mat4 rot = getRotationMatrix();
     glm::mat4 scl = glm::scale(glm::mat4(1.0f), scale);
-    return pos * rot * scl;
+    return rot * pos * scl;
 }
 
 mat4 Transform::getRotationMatrix() {
@@ -31,15 +31,15 @@ Transform Transform::identity() {
 
 vec3 Transform::front() {
     return glm::normalize(
-        vec3(glm::inverse(getRotationMatrix()) * vec4(0.0f, 0.0f, 1.0f, 1.0f)));
+        vec3(glm::inverse(getRotationMatrix()) * vec4(0.0f, 0.0f, 0.5f, 0.5f)));
 }
 vec3 Transform::left() {
     return glm::normalize(
-        vec3(glm::inverse(getRotationMatrix()) * vec4(1.0f, 0.0f, 0.0f, 1.0f)));
+        vec3(glm::inverse(getRotationMatrix()) * vec4(0.5f, 0.0f, 0.0f, 0.5f)));
 }
 vec3 Transform::up() {
     return glm::normalize(
-        vec3(glm::inverse(getRotationMatrix()) * vec4(0.0f, 1.0f, 0.0f, 1.0f)));
+        vec3(glm::inverse(getRotationMatrix()) * vec4(0.0f, 0.5f, 0.0f, 0.5f)));
 }
 
 Transform::Transform() {}
@@ -47,7 +47,7 @@ Transform::Transform() {}
 
 void Transform::setRotation(vec3 v)
 {
-   rotation = quat(1.0f, 0.0f, 0.0f, 0.0f); 
+   rotation = quat(vec3(0,0,0)); 
    rotation = rotate(rotation, v.x, vec3(1.0f, 0.0f, 0.0f));
    rotation = rotate(rotation, v.y, vec3(0.0f, 1.0f, 0.0f));
    rotation = rotate(rotation, v.z, vec3(0.0f, 0.0f, 1.0f));

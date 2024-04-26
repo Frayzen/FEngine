@@ -88,4 +88,8 @@ void Material::enable(Render &r) {
     r.setVec3("diffuseCol", diffuseCol);
     r.setVec3("specularCol", specularCol);
     r.setVec3("ambientCol", ambientCol);
+    std::cout << "AMBIENT" << '\n';
+    std::cout << ambientCol.x << '\n';
+    std::cout << ambientCol.y << '\n';
+    std::cout << ambientCol.z << '\n';
 }

@@ -47,11 +47,12 @@ Mesh Mesh::createFrom(std::string path) {
 
 void Mesh::render(Render &r, Camera &camera) {
     r.activate();
-    r.setVec3("camPos", camera.transform.position);
+    r.setMat4("projection", camera.getProjMat());
+    r.setMat4("view", camera.getViewMat());
     r.setVec3("lightPos", lightPos);
-    mat4 m = camera.getMatrix();
+    r.setVec3("camPos", camera.position);
     for (SubMesh &sm : subMeshes_)
-        sm.render(r, m);
+        sm.render(r);
 }
 
 std::vector<Object> &Mesh::getObjects() { return objects_; }
