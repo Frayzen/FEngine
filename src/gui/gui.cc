@@ -36,15 +36,32 @@ void GUI::update() {
         }
     }
     ImGui::Spacing();
-    if (ImGui::SliderInt2("Number", (int *)&sim_.size, 1, 300))
+    if (ImGui::InputInt2("Number", (int *)&sim_.size))
         sim_.restartSimulation();
     if (ImGui::SliderFloat2("Offset", (float *)&sim_.offset, 0.0f, 3.0f))
         sim_.restartSimulation();
-    if (ImGui::Button("Restart"))
-        sim_.restartSimulation();
+    static bool pPressStep = false;
+    bool pressStep =
+        glfwGetKey(glfwGetCurrentContext(), GLFW_KEY_ENTER) == GLFW_PRESS;
+    if (ImGui::Button("Step") || (pressStep && !pPressStep)) {
+        sim_.isRunning = false;
+        sim_.step();
+    }
+    pPressStep = pressStep;
 
-    if (ImGui::Button(sim_.isRunning ? "Pause" : "Play"))
+    static bool pPressRestart = false;
+    bool pressRestart =
+        glfwGetKey(glfwGetCurrentContext(), GLFW_KEY_BACKSPACE) == GLFW_PRESS;
+    if (ImGui::Button("Restart") || (pressRestart && !pPressRestart))
+        sim_.restartSimulation();
+    pPressRestart = pressRestart;
+
+    static bool pPressPause = false;
+    bool pressPause =
+        glfwGetKey(glfwGetCurrentContext(), GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS;
+    if (ImGui::Button("Pause") || (pressPause && !pPressPause))
         sim_.isRunning = !sim_.isRunning;
+    pPressPause = pressPause;
 
     ImGuiIO &io = ImGui::GetIO();
     ImGui::Text("Application average %.3f ms/frame (%.1f FPS)",

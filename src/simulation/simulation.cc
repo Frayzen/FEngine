@@ -86,7 +86,7 @@ void Simulation::updateBbox() {
     *bbox.getColor() = vec4(0.1f, 0.1f, 0.1f, 1.0f);
 }
 
-void Simulation::compute() {
+void Simulation::step() {
 
     // COMPUTE DENSITY
     densityCmpt_.updateData(Object::getTransforms(particleMesh_), 0);
@@ -109,6 +109,7 @@ void Simulation::compute() {
     glUniform1i(velocityCpt_.getUniformLoc("inputState"), cam.clickState);
     glUniform1f(velocityCpt_.getUniformLoc("radius"), radius);
     glUniform1f(velocityCpt_.getUniformLoc("mass"), mass);
+    glUniform1f(velocityCpt_.getUniformLoc("pressureMultiplier"), pressureMultiplier);
     glUniform1f(velocityCpt_.getUniformLoc("targetedDensity"), targetedDensity);
     glUniform1f(velocityCpt_.getUniformLoc("gravity"), gravity);
     glUniform3f(velocityCpt_.getUniformLoc("ubound"), UBOUNDS.x, UBOUNDS.y,
@@ -148,7 +149,7 @@ void Simulation::mainLoop() {
         cam.inputs(vec2(bounds.x, bounds.y));
 
         if (isRunning)
-            compute();
+            step();
 
         // RENDER
         particleMesh_.render(renderer_, cam);

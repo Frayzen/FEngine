@@ -19,12 +19,13 @@ class Simulation {
     float pressureMultiplier = 100.0f;
     float targetedDensity = 2.0f;
     float radius = 1.5f;
-    const float appearanceRadiusCoeff = .3f;
+    const float appearanceRadiusCoeff = 0.3f;
     float gravity = 9.0f;
     Camera cam;
-    bool isRunning = true;
+    bool isRunning = false;
     void restartSimulation();
     void mainLoop();
+    void step();
     std::vector<Object>& getParticles();
 
   private:
@@ -32,7 +33,6 @@ class Simulation {
     void setupBuffers();
     void updateBuffers();
     void updateBbox();
-    void compute();
     double last_;
     GUI gui_;
     Mesh particleMesh_;
