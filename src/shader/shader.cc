@@ -5,6 +5,7 @@
 #include <sstream>
 #include <string>
 #include <iostream>
+#include <glm/mat4x4.hpp>
 
 GLuint Shader::createShader(int shaderType, const char *text) {
     GLuint shader = glCreateShader(shaderType);
@@ -37,4 +38,9 @@ void Shader::setFloat(std::string name, const float val) {
 void Shader::setVec3(std::string name, const glm::vec3 &val) {
     glUniform3fv(glGetUniformLocation(program_, name.c_str()), 1,
                  (float *)&val);
+}
+
+void Shader::setMat4(std::string name, const glm::mat4 &val) {
+    glUniformMatrix4fv(glGetUniformLocation(program_, name.c_str()), 1,
+                       GL_FALSE, &val[0][0]);
 }

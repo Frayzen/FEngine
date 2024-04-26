@@ -17,7 +17,7 @@ class SubMesh {
     static SubMesh createFrom(Mesh& m, aiMesh* mesh);
     void enable();
     unsigned int triangleNumber();
-    void render(Render &r, mat4 &transform);
+    void render(Render &r);
     ~SubMesh();
 
   private:
