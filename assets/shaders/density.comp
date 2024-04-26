@@ -17,10 +17,13 @@ uniform float deltaTime;
 
 float smoothing(float radius, float dst)
 {
-    if (dst >= radius) return 0;
-    float volume = PI * pow(radius, 4) / 6.0f;
-    float val = (radius - dst) * (radius - dst);
-    return val / volume;
+    float q = dst / radius;
+    if (q > 2.0f) return 0;
+    //NOT TO BE REMOVED : for 3d
+    //float cd = 1 / (4 * PI * radius * radius * radius)
+    float cd = 15 / (14 * PI * radius * radius);
+    if (q >= 1.0f) return cd * pow((2 - q), 3);
+    return cd * (pow((2-q), 3) - 4 * pow((1-q), 3));
 }
 
 
