@@ -34,6 +34,7 @@ Mesh Mesh::createFrom(std::string path) {
     auto p = std::filesystem::path(path);
     Mesh m = Mesh();
     std::cout << " = Creating the mesh..." << '\n';
+    std::cout << scene->mNumMaterials << " materials detected" << '\n';
     for (unsigned int i = 0; i < scene->mNumMaterials; ++i)
         m.materials_.emplace_back(
             Material::createFrom(p.parent_path(), scene->mMaterials[i]));

@@ -26,13 +26,13 @@ void main()
 
     // Specular calculation
     vec3 viewDir = normalize(camPos - gl_FragCoord.xyz);
-    vec3 reflectDir = reflect(-lightDir, normalize(norm));
+    vec3 reflectDir = reflect(lightDir, normalize(norm));
     float spec = pow(max(dot(viewDir, reflectDir), 0.0f), shininess) * shininessStrength;
     vec3 spetex = texture(specularText, uv.xy).rgb;
     vec3 specular = spec * (spetex + specularCol);
 
     // Combine diffuse and specular
-    vec3 result = color.xyz * ambientCol * (diffuse /*+ spec*/);
+    vec3 result = color.xyz * (ambientCol + diffuse + specular);
     
     fragColor = vec4(result, 1.0f);
 }

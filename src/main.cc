@@ -64,9 +64,9 @@ int main() {
         Render("assets/shaders/default.vert", "assets/shaders/default.frag");
 
     Mesh mesh = Mesh::createFrom("assets/teddy.obj");
-    auto& col = mesh.getMaterials()[0];
-    col.diffuseCol = vec3(1.0f);
     Object obj = mesh.createObject();
+    auto& col = mesh.getMaterials()[0];
+    std::cout << col.ambientCol.x << '\n';
     auto t = obj.getTransform();
     /* t.position.x -= 100.0f; */
     /* t.position.z -= 50.0f; */
