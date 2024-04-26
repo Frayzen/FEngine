@@ -63,18 +63,16 @@ int main() {
     Render render =
         Render("assets/shaders/default.vert", "assets/shaders/default.frag");
 
-    Mesh mesh = Mesh::createFrom("assets/teddy.obj");
+    Mesh mesh = Mesh::createFrom("assets/airplane/airplane.obj");
     Object obj = mesh.createObject();
-    auto& col = mesh.getMaterials()[0];
-    std::cout << col.ambientCol.x << '\n';
     auto t = obj.getTransform();
-    /* t.position.x -= 100.0f; */
-    /* t.position.z -= 50.0f; */
-    /* t.rotation = */
-    /*     glm::rotate(t.rotation, glm::radians(-90.0f), vec3(1.0f, 0, 0)); */
-    /* t.rotation = */
-    /*     glm::rotate(t.rotation, glm::radians(-90.0f), vec3(0, 0, 1.0f)); */
-    /* t.scale = vec3(0.1f); */
+    t.position.x -= 100.0f;
+    t.position.z -= 50.0f;
+    t.rotation =
+        glm::rotate(t.rotation, glm::radians(-90.0f), vec3(1.0f, 0, 0));
+    t.rotation =
+        glm::rotate(t.rotation, glm::radians(-90.0f), vec3(0, 0, 1.0f));
+    t.scale = vec3(0.1f);
     obj.setTransform(t);
 
 

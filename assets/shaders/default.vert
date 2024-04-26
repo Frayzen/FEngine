@@ -13,7 +13,7 @@ void main()
 {
     wordPos = vec3(objTransform * vec4(aPos.xyz, 1.0f));
     mat4 mat = camMat * objTransform;
-    norm = aNorm;
+    norm = vec3(normalize(objTransform * vec4(aNorm, 0.0f)));
     color = aColor;
     uv = aUv;
     gl_Position = camMat * vec4(wordPos, 1.0f);
