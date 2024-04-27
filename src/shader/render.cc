@@ -29,6 +29,7 @@ Render::Render(std::string vertexFilePath, std::string fragmentFilePath)
     glUniform1i(glGetUniformLocation(program_, "ambientText"), 0);
     glUniform1i(glGetUniformLocation(program_, "diffuseText"), 1);
     glUniform1i(glGetUniformLocation(program_, "specularText"), 2);
+    glUniform1i(glGetUniformLocation(program_, "normalMap"), 3);
 }
 
 Render::~Render()

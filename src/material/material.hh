@@ -23,11 +23,10 @@ class Material {
   private:
     int textureMask_ = 0;
     GLuint diffuseText_, specularText_, ambientText_ = 0;
+    GLuint normalMap_ = 0;
 };
 
 #define AMBIENT_TEXMASK (1 << 0)
-#define AMBIENT_COLMASK (1 << 1)
-#define DIFFUSE_TEXMASK (1 << 2)
-#define DIFFUSE_COLMASK (1 << 3)
-#define SPECULAR_TEXMASK (1 << 4)
-#define SPECULAR_COLMASK (1 << 5)
+#define DIFFUSE_TEXMASK (1 << 1)
+#define SPECULAR_TEXMASK (1 << 2)
+#define NORMAL_MAPMASK (1 << 3)

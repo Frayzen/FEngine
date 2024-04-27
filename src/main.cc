@@ -63,10 +63,10 @@ int main() {
     Render render =
         Render("assets/shaders/default.vert", "assets/shaders/default.frag");
 
-    Mesh mesh = Mesh::createFrom("assets/airplane/airplane.obj");
+    Mesh mesh = Mesh::createFrom("assets/camera/camera.obj");
     auto obj = mesh.createObject();
     auto t = obj.getTransform();
-    t.scale = vec3(0.01f);
+    t.scale = vec3(100.0f);
     obj.setTransform(t);
 
     /* Mesh iron = Mesh::createFrom("assets/ironman/IronMan.obj"); */
