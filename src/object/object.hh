@@ -1,6 +1,5 @@
 #pragma once
 
-#include "object/renderable.hh"
 #include "object/transform.hh"
 #include <map>
 #include <vector>

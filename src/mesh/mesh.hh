@@ -2,6 +2,7 @@
 
 #include "material/material.hh"
 #include "mesh/submesh.hh"
+#include "object/camera.hh"
 #include "object/object.hh"
 #include <GL/gl.h>
 #include "object/transform.hh"
@@ -12,7 +13,7 @@
 
 using namespace glm;
 
-class Mesh : public Renderable {
+class Mesh {
   public:
     static Mesh createFrom(std::string path);
     void render(Render &shader, Camera &camera);
