@@ -40,7 +40,21 @@ static GLuint load(aiMaterial *mat, aiTextureType type,
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
                             GL_LINEAR_MIPMAP_LINEAR);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB,
+            int from;
+            switch(nrChannels)
+            {
+                case 3:
+                    from = GL_RGB;
+                    break;
+                case 4:
+                    from = GL_RGBA;
+                    break;
+                default:
+                    FAIL_ON(true, "Unsupoorted number of channel : " << nrChannels);
+                    return 0;
+            }
+
+            glTexImage2D(GL_TEXTURE_2D, 0, from, width, height, 0, GL_RGB,
                          GL_UNSIGNED_BYTE, data);
             __glewGenerateMipmap(GL_TEXTURE_2D);
             glBindTexture(GL_TEXTURE_2D, 0);
@@ -57,45 +71,68 @@ Material Material::createFrom(std::string folderRoot, aiMaterial *mat) {
     aiReturn ret;
     ret = mat->Get(AI_MATKEY_NAME, materialName);
     FAIL_ON(ret != AI_SUCCESS, "Failed to load a material");
-    std::cout << "Material " << materialName.C_Str() << " loaded" << '\n';
     aiColor3D c;
+    mat->Get(AI_MATKEY_TWOSIDED, m.twosided);
     mat->Get(AI_MATKEY_SHININESS, m.shininess);
     mat->Get(AI_MATKEY_SHININESS_STRENGTH, m.shininessStrength);
-    if (AI_SUCCESS == mat->Get(AI_MATKEY_COLOR_DIFFUSE, c))
-        m.diffuseCol = vec3(c.r, c.g, c.b);
-    if (AI_SUCCESS == mat->Get(AI_MATKEY_COLOR_SPECULAR, c))
-        m.specularCol = vec3(c.r, c.g, c.b);
+    mat->Get(AI_MATKEY_OPACITY, m.opacity);
     if (AI_SUCCESS == mat->Get(AI_MATKEY_COLOR_AMBIENT, c))
+    {
+        m.textureMask_ |= AMBIENT_COLMASK;
         m.ambientCol = vec3(c.r, c.g, c.b);
-    m.diffuseText_ = load(mat, aiTextureType_DIFFUSE, folderRoot);
-    m.ambientText_ = load(mat, aiTextureType_AMBIENT, folderRoot);
-    m.specularText_ = load(mat, aiTextureType_SPECULAR, folderRoot);
+    }
+    if (AI_SUCCESS == mat->Get(AI_MATKEY_COLOR_DIFFUSE, c))
+    {
+        m.textureMask_ |= DIFFUSE_COLMASK;
+        m.diffuseCol = vec3(c.r, c.g, c.b);
+    }
+    if (AI_SUCCESS == mat->Get(AI_MATKEY_COLOR_SPECULAR, c))
+    {
+        m.textureMask_ |= SPECULAR_COLMASK;
+        m.specularCol = vec3(c.r, c.g, c.b);
+    }
+    if (AI_SUCCESS == mat->Get(AI_MATKEY_COLOR_EMISSIVE, c))
+        m.emissiveCol = vec3(c.r, c.g, c.b);
+    if ((m.ambientText_ = load(mat, aiTextureType_AMBIENT, folderRoot)))
+        m.textureMask_ |= AMBIENT_TEXMASK;
+    if ((m.diffuseText_ = load(mat, aiTextureType_DIFFUSE, folderRoot)))
+        m.textureMask_ |= DIFFUSE_TEXMASK;
+    if ((m.specularText_ = load(mat, aiTextureType_SPECULAR, folderRoot)))
+        m.textureMask_ |= SPECULAR_TEXMASK;
+    std::cout << "Material " << materialName.C_Str() << " loaded";
+    int textCount =
+        (m.diffuseText_ != 0) + (m.ambientText_ != 0) + (m.specularText_ != 0);
+    std::cout << "(" << textCount << "textures)" << '\n';
     return m;
 }
 
 void Material::enable(Render &r) {
     r.activate();
     /* /!\ activate the texture unit first before binding texture */
-    int textureMask = 0;
     if (ambientText_) {
-        textureMask |= AMBIENT_TEXMASK;
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, ambientText_);
     }
     if (diffuseText_) {
-        textureMask |= DIFFUSE_TEXMASK;
+        textureMask_ |= DIFFUSE_TEXMASK;
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, diffuseText_);
     }
     if (specularText_) {
-        textureMask |= SPECULAR_TEXMASK;
+        textureMask_ |= SPECULAR_TEXMASK;
         glActiveTexture(GL_TEXTURE2);
         glBindTexture(GL_TEXTURE_2D, specularText_);
     }
-    r.setInt("textureMask", textureMask);
+    if (twosided && opacity == 1.0f)
+        glEnable(GL_CULL_FACE);
+    else
+        glDisable(GL_CULL_FACE);
+    r.setInt("textureMask", textureMask_);
     r.setFloat("shininess", shininess);
     r.setFloat("shininessStrength", shininessStrength);
+    r.setFloat("opacity", opacity);
     r.setVec3("diffuseCol", diffuseCol);
     r.setVec3("specularCol", specularCol);
+    r.setVec3("emissiveCol", emissiveCol);
     r.setVec3("ambientCol", ambientCol);
 }
