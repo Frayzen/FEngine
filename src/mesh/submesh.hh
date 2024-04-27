@@ -1,7 +1,6 @@
 #pragma once
 
 #include "object/object.hh"
-#include "object/renderable.hh"
 #include "shader/render.hh"
 #include <assimp/mesh.h>
 #include <glm/fwd.hpp>
