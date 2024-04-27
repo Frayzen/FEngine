@@ -8,6 +8,8 @@ layout (location = 3) in mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
 
+uniform vec3 camPos;
+
 out vec3 uv;
 out vec3 wordPos;
 out vec4 color;
@@ -19,5 +21,5 @@ void main()
     color = aColor;
     uv = aUv;
     wordPos = vec3(model * vec4(aPos, 1.0));
-    gl_Position = projection * view * model * vec4(wordPos, 1.0);
+    gl_Position = projection * view * model * vec4(aPos, 1.0);
 }

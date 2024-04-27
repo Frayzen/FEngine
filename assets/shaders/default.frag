@@ -42,10 +42,9 @@ void main()
     diffuse *= dif;
 
     // Specular calculation
-    vec3 viewDir = normalize(camPos - wordPos.xyz);
-    vec3 reflectDir = reflect(lightDir, norm);
-    vec3 halfwayDir = normalize(lightDir + viewDir);
-    float spec = max(dot(reflectDir, halfwayDir), 0.0);
+    vec3 viewDir = normalize(camPos - wordPos);
+    vec3 reflectDir = reflect(-lightDir, norm);
+    float spec = max(dot(reflectDir, viewDir), 0.0);
     spec = pow(spec, shininess) * shininessStrength;
     vec3 specular = specularCol;
     if ((textureMask & SPECULAR_TEXMASK) != 0)
@@ -54,6 +53,5 @@ void main()
 
     // Combine diffuse and specular
     vec3 result = ambient + diffuse + specular;
-    result = vec3(spec);
     fragColor = vec4(result, 1.0f);
 }
