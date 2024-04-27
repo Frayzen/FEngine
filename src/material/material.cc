@@ -41,17 +41,19 @@ static GLuint load(aiMaterial *mat, aiTextureType type,
                             GL_LINEAR_MIPMAP_LINEAR);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
             int from;
-            switch(nrChannels)
-            {
-                case 3:
-                    from = GL_RGB;
-                    break;
-                case 4:
-                    from = GL_RGBA;
-                    break;
-                default:
-                    FAIL_ON(true, "Unsupoorted number of channel : " << nrChannels);
-                    return 0;
+            switch (nrChannels) {
+            case 1:
+                from = GL_RED;
+                break;
+            case 3:
+                from = GL_RGB;
+                break;
+            case 4:
+                from = GL_RGBA;
+                break;
+            default:
+                FAIL_ON(true, "Unsupoorted number of channel : " << nrChannels);
+                return 0;
             }
 
             glTexImage2D(GL_TEXTURE_2D, 0, from, width, height, 0, GL_RGB,
@@ -71,34 +73,40 @@ Material Material::createFrom(std::string folderRoot, aiMaterial *mat) {
     aiReturn ret;
     ret = mat->Get(AI_MATKEY_NAME, materialName);
     FAIL_ON(ret != AI_SUCCESS, "Failed to load a material");
-    aiColor3D c;
+
+    // Load textures
+    if ((m.ambientText_ = load(mat, aiTextureType_AMBIENT, folderRoot))) {
+        m.ambientCol = vec3(1.0f);
+        m.textureMask_ |= AMBIENT_TEXMASK;
+    }
+    if ((m.diffuseText_ = load(mat, aiTextureType_DIFFUSE, folderRoot))) {
+        m.diffuseCol = vec3(1.0f);
+        m.textureMask_ |= DIFFUSE_TEXMASK;
+    }
+    if ((m.specularText_ = load(mat, aiTextureType_SPECULAR, folderRoot))) {
+        m.specularCol = vec3(1.0f);
+        m.textureMask_ |= SPECULAR_TEXMASK;
+    }
+    if ((m.normalMap_ = load(mat, aiTextureType_NORMALS, folderRoot)))
+        m.textureMask_ |= NORMAL_MAPMASK;
+
+    // Load colors and scalars
     mat->Get(AI_MATKEY_TWOSIDED, m.twosided);
     mat->Get(AI_MATKEY_SHININESS, m.shininess);
     mat->Get(AI_MATKEY_SHININESS_STRENGTH, m.shininessStrength);
     mat->Get(AI_MATKEY_OPACITY, m.opacity);
+
+    aiColor3D c;
     if (AI_SUCCESS == mat->Get(AI_MATKEY_COLOR_AMBIENT, c))
-    {
-        m.textureMask_ |= AMBIENT_COLMASK;
         m.ambientCol = vec3(c.r, c.g, c.b);
-    }
     if (AI_SUCCESS == mat->Get(AI_MATKEY_COLOR_DIFFUSE, c))
-    {
-        m.textureMask_ |= DIFFUSE_COLMASK;
         m.diffuseCol = vec3(c.r, c.g, c.b);
-    }
     if (AI_SUCCESS == mat->Get(AI_MATKEY_COLOR_SPECULAR, c))
-    {
-        m.textureMask_ |= SPECULAR_COLMASK;
         m.specularCol = vec3(c.r, c.g, c.b);
-    }
     if (AI_SUCCESS == mat->Get(AI_MATKEY_COLOR_EMISSIVE, c))
         m.emissiveCol = vec3(c.r, c.g, c.b);
-    if ((m.ambientText_ = load(mat, aiTextureType_AMBIENT, folderRoot)))
-        m.textureMask_ |= AMBIENT_TEXMASK;
-    if ((m.diffuseText_ = load(mat, aiTextureType_DIFFUSE, folderRoot)))
-        m.textureMask_ |= DIFFUSE_TEXMASK;
-    if ((m.specularText_ = load(mat, aiTextureType_SPECULAR, folderRoot)))
-        m.textureMask_ |= SPECULAR_TEXMASK;
+
+    // Print informations
     std::cout << "Material " << materialName.C_Str() << " loaded";
     int textCount =
         (m.diffuseText_ != 0) + (m.ambientText_ != 0) + (m.specularText_ != 0);
@@ -114,14 +122,16 @@ void Material::enable(Render &r) {
         glBindTexture(GL_TEXTURE_2D, ambientText_);
     }
     if (diffuseText_) {
-        textureMask_ |= DIFFUSE_TEXMASK;
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, diffuseText_);
     }
     if (specularText_) {
-        textureMask_ |= SPECULAR_TEXMASK;
         glActiveTexture(GL_TEXTURE2);
         glBindTexture(GL_TEXTURE_2D, specularText_);
+    }
+    if (normalMap_) {
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture(GL_TEXTURE_2D, normalMap_);
     }
     if (twosided && opacity == 1.0f)
         glEnable(GL_CULL_FACE);
