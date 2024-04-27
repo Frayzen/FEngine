@@ -22,7 +22,7 @@ void GUI::update() {
     ImGui::SliderFloat2("Bounds", (float *)&sim_.bounds, 5.0f, 100.0f);
     ImGui::SliderFloat("Mass", &sim_.mass, 0.0f, 5.0f);
     ImGui::SliderFloat("Targeted Density", &sim_.targetedDensity, 0.0f, 5.0f);
-    ImGui::SliderFloat("Gravity", &sim_.gravity, -10.0f, 10.0f);
+    ImGui::DragFloat3("Gravity", &sim_.gravity[0], -0.1f, 0.1f);
     ImGui::SliderFloat("Pressure Multiplier", (float *)&sim_.pressureMultiplier,
                        0.0f, 500.0f);
     if (ImGui::InputFloat("Radius", &sim_.radius)) {
@@ -38,7 +38,7 @@ void GUI::update() {
     ImGui::Spacing();
     if (ImGui::InputInt2("Number", (int *)&sim_.size))
         sim_.restartSimulation();
-    if (ImGui::SliderFloat2("Offset", (float *)&sim_.offset, 0.0f, 3.0f))
+    if (ImGui::InputFloat2("Offset", (float *)&sim_.offset))
         sim_.restartSimulation();
     static bool pPressStep = false;
     bool pressStep =
