@@ -24,7 +24,7 @@ Transform Transform::identity() {
     Transform tf = Transform();
     tf.scale = vec3(1.0f, 1.0f, 1.0f);
     tf.position = vec3(0.0f, 0.0f, 0.0f);
-    tf.rotation = glm::quat(1.0f, 0.0f, 0.0f, 0.0f);
+    tf.rotation = glm::quat(vec3(0.0f));
 ;
     return tf;
 }
