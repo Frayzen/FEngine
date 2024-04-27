@@ -26,7 +26,6 @@ vec3 Camera::getFront() {
     front.y = sin(glm::radians(pitch_));
     front.z = sin(glm::radians(yaw_)) * cos(glm::radians(pitch_));
     front = normalize(front);
-    std::cout << front.x << " " << front.y << " " << front.z << '\n';
     return front;
 }
 

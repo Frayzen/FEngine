@@ -19,5 +19,9 @@ class Material {
     vec3 ambientCol = vec3(1.0f);
 
   private:
-    GLuint diffuseText_, specularText_ = 0;
+    GLuint diffuseText_, specularText_, ambientText_ = 0;
 };
+
+#define AMBIENT_TEXMASK (1 << 0)
+#define DIFFUSE_TEXMASK (1 << 1)
+#define SPECULAR_TEXMASK (1 << 2)

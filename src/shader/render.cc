@@ -26,8 +26,9 @@ Render::Render(std::string vertexFilePath, std::string fragmentFilePath)
     setupShaders();
     // Define texture locations
     glUseProgram(program_);
-    glUniform1i(glGetUniformLocation(program_, "diffuseText"), 0);
-    glUniform1i(glGetUniformLocation(program_, "specularText"), 1);
+    glUniform1i(glGetUniformLocation(program_, "ambientText"), 0);
+    glUniform1i(glGetUniformLocation(program_, "diffuseText"), 1);
+    glUniform1i(glGetUniformLocation(program_, "specularText"), 2);
 }
 
 Render::~Render()
