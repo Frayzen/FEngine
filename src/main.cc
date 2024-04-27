@@ -67,10 +67,10 @@ int main() {
     Object obj = mesh.createObject();
     auto t = obj.getTransform();
     t.rotation =
-        glm::rotate(t.rotation, glm::radians(45.0f), vec3(-1.0f, 0, 0));
+        glm::rotate(t.rotation, glm::radians(90.0f), vec3(-1.0f, 0, 0));
     t.position.y += 10.0f;
     t.position.x += 10.0f;
-    t.scale = vec3(0.1f);
+    t.scale = vec3(0.01f);
     obj.setTransform(t);
 
     Mesh sph = Mesh::createFrom("assets/sphere.obj");
