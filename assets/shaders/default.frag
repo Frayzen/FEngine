@@ -26,7 +26,7 @@ uniform sampler2D specularText;
 
 void main()
 {
-    vec3 lightDir = normalize(lightPos);
+    vec3 lightDir = normalize(lightPos - wordPos.xyz);
 
 
     // Ambient calculation
@@ -44,14 +44,9 @@ void main()
     // Specular calculation
     vec3 viewDir = normalize(camPos - wordPos.xyz);
     vec3 reflectDir = reflect(lightDir, norm);
-    float val = max(dot(viewDir, reflectDir), 0.0f);
-    float spec;
-    float shininess_ = 10.0f;
-    float shininessStrength_ = 1.0f;
-    if (val == 0 && shininess == 0)
-        spec = shininessStrength;
-    else
-        spec = pow(val, shininess_) * shininessStrength_;
+    vec3 halfwayDir = normalize(lightDir + viewDir);
+    float spec = max(dot(reflectDir, halfwayDir), 0.0);
+    spec = pow(spec, shininess) * shininessStrength;
     vec3 specular = specularCol;
     if ((textureMask & SPECULAR_TEXMASK) != 0)
         specular *= texture(specularText, uv.xy).rgb;
@@ -59,6 +54,6 @@ void main()
 
     // Combine diffuse and specular
     vec3 result = ambient + diffuse + specular;
-    result = ambient;
+    result = vec3(spec);
     fragColor = vec4(result, 1.0f);
 }

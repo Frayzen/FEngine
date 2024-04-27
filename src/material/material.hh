@@ -14,7 +14,7 @@ class Material {
     void enable(Render &r);
 
     float shininess = 0.0f;
-    float shininessStrength = 0.0f;
+    float shininessStrength = 1.0f;
     vec3 diffuseCol, specularCol = vec3(1.0f);
     vec3 ambientCol = vec3(1.0f);
 

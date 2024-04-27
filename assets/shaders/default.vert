@@ -18,6 +18,6 @@ void main()
     norm = normalize(mat3(model) * aNorm);
     color = aColor;
     uv = aUv;
-    wordPos = vec3(view * model * vec4(aPos, 1.0));
-    gl_Position = projection * vec4(wordPos, 1.0);
+    wordPos = vec3(model * vec4(aPos, 1.0));
+    gl_Position = projection * view * model * vec4(wordPos, 1.0);
 }
