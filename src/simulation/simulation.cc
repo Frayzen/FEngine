@@ -111,7 +111,7 @@ void Simulation::step() {
     glUniform1f(velocityCpt_.getUniformLoc("mass"), mass);
     glUniform1f(velocityCpt_.getUniformLoc("pressureMultiplier"), pressureMultiplier);
     glUniform1f(velocityCpt_.getUniformLoc("targetedDensity"), targetedDensity);
-    glUniform1f(velocityCpt_.getUniformLoc("gravity"), gravity);
+    glUniform3fv(velocityCpt_.getUniformLoc("gravity"), 1, &gravity[0]);
     glUniform3f(velocityCpt_.getUniformLoc("ubound"), UBOUNDS.x, UBOUNDS.y,
                 UBOUNDS.z);
     glUniform3f(velocityCpt_.getUniformLoc("lbound"), LBOUNDS.x, LBOUNDS.y,

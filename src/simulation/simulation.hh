@@ -20,7 +20,7 @@ class Simulation {
     float targetedDensity = 2.0f;
     float radius = 1.5f;
     const float appearanceRadiusCoeff = 0.3f;
-    float gravity = 9.0f;
+    vec3 gravity = vec3(0.0, -9.0f, 0.0f);
     Camera cam;
     bool isRunning = false;
     void restartSimulation();

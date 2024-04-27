@@ -20,10 +20,13 @@ uniform float deltaTime;
 uniform float radius;
 uniform vec3 interaction;
 uniform int inputState;
-uniform float gravity;
+uniform vec3 gravity;
 uniform float targetedDensity;
 uniform float pressureMultiplier;
 uniform float mass;
+
+const float minVelocity = 0.0;
+const float maxVelocity = 25.0;
 
 float smoothingDerivative(float radius, float dst)
 {
@@ -44,8 +47,6 @@ float toPressure(float density)
 
 
 vec4 mapVelocityToColor(float velocityMagnitude) {
-    const float minVelocity = 0.0;
-    const float maxVelocity = 30.0;
     const vec4 hotColor = vec4(168.0f, 10.0f, 23.0f, 255.0f) /225.0; 
     const vec4 coldColor = vec4(63.0f, 114.0f, 217.0f, 255.0f) / 255.0; 
     if (velocityMagnitude <= minVelocity) {
@@ -102,15 +103,20 @@ void main()
     //colors[id] = vec4(densityToPressure(density) / pressureMultiplier * normalize(vec3(1.0f)), 1.0f);
     //colors[id] = vec4(vec3(length(t.xyz - interaction)), 1.0f);
 
-    vel.xyz += gravity * density * vec3(0.0f, -1.0f, 0.0f) * deltaTime;
+    vel.xyz += gravity * density * deltaTime;
     vel.xyz -= dp * deltaTime / density;
-
-    colors[id] = mapVelocityToColor(length(vel.xyz));
 
     //INTERACT VELOCITY
     vec3 interactVec = interaction - t.xyz;
     if (inputState != 0 && length(interactVec) <= radius * 2.0f)
         vel += vec4(normalize(interactVec) * inputState * length(interactVec), 0.0f);
+
+    if (length(vel.xyz) >= maxVelocity)
+        vel.xyz = normalize(vel.xyz) * maxVelocity;
+    else
+        vel.xyz *= 0.98;
+
+    colors[id] = mapVelocityToColor(length(vel.xyz));
 
     //ADD VELOCITY
     t += vel * deltaTime;
