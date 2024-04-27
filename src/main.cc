@@ -63,15 +63,15 @@ int main() {
     Render render =
         Render("assets/shaders/default.vert", "assets/shaders/default.frag");
 
-    Mesh mesh = Mesh::createFrom("assets/ironman/IronMan.obj");
+    Mesh mesh = Mesh::createFrom("assets/airplane/airplane.obj");
     Object obj = mesh.createObject();
     auto t = obj.getTransform();
     t.position.y -= 10.0f;
-    /* t.rotation = */
-    /*     glm::rotate(t.rotation, glm::radians(-90.0f), vec3(1.0f, 0, 0)); */
-    /* t.rotation = */
-    /*     glm::rotate(t.rotation, glm::radians(-90.0f), vec3(0, 0, 1.0f)); */
-    /* t.scale = vec3(0.1f); */
+    t.rotation =
+        glm::rotate(t.rotation, glm::radians(-90.0f), vec3(1.0f, 0, 0));
+    t.rotation =
+        glm::rotate(t.rotation, glm::radians(-90.0f), vec3(0, 0, 1.0f));
+    t.scale = vec3(0.1f);
     obj.setTransform(t);
 
 

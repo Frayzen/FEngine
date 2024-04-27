@@ -68,6 +68,7 @@ Material Material::createFrom(std::string folderRoot, aiMaterial *mat) {
     if (AI_SUCCESS == mat->Get(AI_MATKEY_COLOR_AMBIENT, c))
         m.ambientCol = vec3(c.r, c.g, c.b);
     m.diffuseText_ = load(mat, aiTextureType_DIFFUSE, folderRoot);
+    m.ambientText_ = load(mat, aiTextureType_AMBIENT, folderRoot);
     m.specularText_ = load(mat, aiTextureType_SPECULAR, folderRoot);
     return m;
 }
@@ -75,14 +76,23 @@ Material Material::createFrom(std::string folderRoot, aiMaterial *mat) {
 void Material::enable(Render &r) {
     r.activate();
     /* /!\ activate the texture unit first before binding texture */
-    if (diffuseText_) {
+    int textureMask = 0;
+    if (ambientText_) {
+        textureMask |= AMBIENT_TEXMASK;
         glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, ambientText_);
+    }
+    if (diffuseText_) {
+        textureMask |= DIFFUSE_TEXMASK;
+        glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, diffuseText_);
     }
     if (specularText_) {
-        glActiveTexture(GL_TEXTURE1);
+        textureMask |= SPECULAR_TEXMASK;
+        glActiveTexture(GL_TEXTURE2);
         glBindTexture(GL_TEXTURE_2D, specularText_);
     }
+    r.setInt("textureMask", textureMask);
     r.setFloat("shininess", shininess);
     r.setFloat("shininessStrength", shininessStrength);
     r.setVec3("diffuseCol", diffuseCol);
