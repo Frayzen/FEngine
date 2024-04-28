@@ -53,5 +53,6 @@ void generateNoise(float vals[CHUNK_SIZE][CHUNK_SIZE]) {
 Terrain Terrain::generate(int seed) {
     srand(seed);
     static float vals[CHUNK_SIZE][CHUNK_SIZE];
+    (void) vals;
     return Terrain();
 }
