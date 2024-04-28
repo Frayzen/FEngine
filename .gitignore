@@ -14,7 +14,7 @@
 !*.comp
 !*/
 !**/Makefile
-!README
 !.clang-format
+!README.md
 .git
 assets/dragon.obj
