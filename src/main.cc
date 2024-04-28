@@ -13,6 +13,7 @@
 #include "shader/compute.hh"
 #include "shader/render.hh"
 #include "simulation/simulation.hh"
+#include "terrain/terrain.hh"
 #include "tools.hh"
 #include <GLFW/glfw3.h>
 #include <string.h>
@@ -60,8 +61,9 @@ int main() {
     glEnable(GL_DEBUG_OUTPUT);
     glDebugMessageCallback(DebugCallback, 0);
     glEnable(GL_DEPTH_TEST);
-    Simulation s = Simulation();
-    s.cam.transform.position.z = -13.5;
-    s.mainLoop();
+    Terrain::generate(42);
+    /* Simulation s = Simulation(); */
+    /* s.cam.transform.position.z = -13.5; */
+    /* s.mainLoop(); */
     clean_exit(0);
 }
