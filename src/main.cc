@@ -61,7 +61,7 @@ int main() {
     glEnable(GL_DEBUG_OUTPUT);
     glDebugMessageCallback(DebugCallback, 0);
     glEnable(GL_DEPTH_TEST);
-    Terrain::generate(42);
+    Terrain::generate();
     /* Simulation s = Simulation(); */
     /* s.cam.transform.position.z = -13.5; */
     /* s.mainLoop(); */
