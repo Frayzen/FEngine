@@ -6,7 +6,7 @@
 
 It is **heavily** recommended to take a look at the [Official Notion](https://personnalflo.notion.site/FEngine-60c2663a4c6d421a9e158c33331ef499). As it is our note-taking and it summary a lot of the work that has been made.
 
-It initially was planned to remain the graphic engine it was aimed to be but after realising how powerfull a tool like this is, we decided to explore more about the physic and math that hide behind 3 our dimensional world.
+It initially was planned to remain the graphic engine it was aimed to be but after realising how powerfull a tool like this is, we decided to explore more about the physic and math that hides behind our 3 dimensional world.
 
 ## Rquirements
 
