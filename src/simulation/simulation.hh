@@ -15,8 +15,8 @@ class Simulation {
     vec3 bounds = vec3(10.0f, 10.0f, 0.0f);
     ivec2 size = ivec2(10, 10);
     vec2 offset = vec2(1.0f, 1.0f);
-    float mass = 1.0f;
-    float pressureMultiplier = 100.0f;
+    float mass = 3.0f;
+    float pressureMultiplier = 20.0f;
     float targetedDensity = 2.0f;
     float radius = 1.5f;
     const float appearanceRadiusCoeff = 0.3f;
