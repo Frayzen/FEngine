@@ -66,7 +66,12 @@ void spawnParticle(Mesh &m, float x, float y, float dimension) {
     *o.getColor() = vec4(1.0f);
     Transform t = Transform::identity();
     t.position = vec3(x, y, 0.0f);
-    t.scale = vec3(dimension);
+    if (dimension == -1) {
+        // BOUNDING BALLS
+        t.scale = vec3(0.5f);
+        *o.getColor() = vec4(0);
+    } else
+        t.scale = vec3(dimension);
     o.setTransform(t);
 }
 
@@ -78,12 +83,12 @@ void Simulation::createObjects() {
     const float bx = bounds.x + dist / 2;
     const float by = bounds.y + dist / 2;
     for (int i = 0; i < 2 * nbx; i++) {
-        spawnParticle(particleMesh_, -bx + i * dist, -by, 0);
-        spawnParticle(particleMesh_, -bx + i * dist, by, 0);
+        spawnParticle(particleMesh_, -bx + i * dist, -by, -1);
+        spawnParticle(particleMesh_, -bx + i * dist, by, -1);
     }
     for (int i = 0; i < 2 * nby; i++) {
-        spawnParticle(particleMesh_, -bx, -by + i * dist, 0);
-        spawnParticle(particleMesh_, bx, -by + i * dist, 0);
+        spawnParticle(particleMesh_, -bx, -by + i * dist, -1);
+        spawnParticle(particleMesh_, bx, -by + i * dist, -1);
     }
     for (int i = 0; i < size.x; i++) {
         for (int j = 0; j < size.y; j++) {
