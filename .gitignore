@@ -18,3 +18,7 @@
 !.clang-format
 .git
 assets/
+!assets/*.glsl
+!assets/*.comp
+!assets/*.vert
+!assets/*.frag
