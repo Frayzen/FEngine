@@ -60,19 +60,36 @@ void Simulation::updateBuffers() {
     densityCmpt_.updateData(Object::getVelocities(particleMesh_), 1);
 }
 
+void spawnParticle(Mesh &m, float x, float y, float dimension) {
+
+    Object &o = m.createObject();
+    *o.getColor() = vec4(1.0f);
+    Transform t = Transform::identity();
+    t.position = vec3(x, y, 0.0f);
+    t.scale = vec3(dimension);
+    o.setTransform(t);
+}
+
 void Simulation::createObjects() {
     particleMesh_.clearObjects();
+    const float dist = radius;
+    const int nbx = 1 + bounds.x / dist;
+    const int nby = 1 + bounds.y / dist;
+    const float bx = bounds.x + dist / 2;
+    const float by = bounds.y + dist / 2;
+    for (int i = 0; i < 2 * nbx; i++) {
+        spawnParticle(particleMesh_, -bx + i * dist, -by, 0);
+        spawnParticle(particleMesh_, -bx + i * dist, by, 0);
+    }
+    for (int i = 0; i < 2 * nby; i++) {
+        spawnParticle(particleMesh_, -bx, -by + i * dist, 0);
+        spawnParticle(particleMesh_, bx, -by + i * dist, 0);
+    }
     for (int i = 0; i < size.x; i++) {
         for (int j = 0; j < size.y; j++) {
-            Object &o = particleMesh_.createObject();
-            *o.getColor() = vec4(1.0f);
-            Transform t = Transform::identity();
-            t.position = vec3(i * offset.x, j * offset.y, 0.0f);
-            t.position -=
-                vec3(offset.x * size.x / 2, offset.y * size.y / 2, 0.0f);
-            t.scale = vec3(radius * appearanceRadiusCoeff,
-                           radius * appearanceRadiusCoeff, 0.0f);
-            o.setTransform(t);
+            spawnParticle(particleMesh_, offset.x * (i - size.x / 2),
+                          offset.y * (j - size.y / 2),
+                          radius * appearanceRadiusCoeff);
         }
     }
 }
@@ -109,7 +126,8 @@ void Simulation::step() {
     glUniform1i(velocityCpt_.getUniformLoc("inputState"), cam.clickState);
     glUniform1f(velocityCpt_.getUniformLoc("radius"), radius);
     glUniform1f(velocityCpt_.getUniformLoc("mass"), mass);
-    glUniform1f(velocityCpt_.getUniformLoc("pressureMultiplier"), pressureMultiplier);
+    glUniform1f(velocityCpt_.getUniformLoc("pressureMultiplier"),
+                pressureMultiplier);
     glUniform1f(velocityCpt_.getUniformLoc("targetedDensity"), targetedDensity);
     glUniform3fv(velocityCpt_.getUniformLoc("gravity"), 1, &gravity[0]);
     glUniform3f(velocityCpt_.getUniformLoc("ubound"), UBOUNDS.x, UBOUNDS.y,
@@ -149,8 +167,7 @@ void Simulation::mainLoop() {
         cam.inputs(vec2(bounds.x, bounds.y));
         static int frame = 0;
         frame++;
-        if (isRunning && frame % framePerComputation == 0)
-        {
+        if (isRunning && frame % framePerComputation == 0) {
             frame = 0;
             step();
         }

@@ -12,8 +12,8 @@ class Simulation {
   public:
     Simulation();
     vec2 screenSize = vec2(2000, 1000);
-    vec3 bounds = vec3(60.0f, 60.0f, 0.0f);
-    ivec2 size = ivec2(50, 50);
+    vec3 bounds = vec3(14.0f, 14.0f, 0.0f);
+    ivec2 size = ivec2(20, 20);
     vec2 offset = vec2(1.2f, 1.2f);
     float mass = 3.0f;
     float pressureMultiplier = 20.0f;
