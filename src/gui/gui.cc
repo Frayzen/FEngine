@@ -19,6 +19,7 @@ void GUI::update() {
         ImGui::SetWindowPos(ImVec2(50, 50));
         ImGui::SetWindowSize(ImVec2(300, 500));
     }
+    ImGui::SliderInt("Frame per computation", &sim_.framePerComputation, 1, 10);
     ImGui::SliderFloat2("Bounds", (float *)&sim_.bounds, 5.0f, 100.0f);
     ImGui::SliderFloat("Mass", &sim_.mass, 0.0f, 5.0f);
     ImGui::SliderFloat("Targeted Density", &sim_.targetedDensity, 1.0f, 5.0f);
@@ -56,6 +57,7 @@ void GUI::update() {
         sim_.restartSimulation();
     pPressRestart = pressRestart;
 
+
     static bool pPressPause = false;
     bool pressPause =
         glfwGetKey(glfwGetCurrentContext(), GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS;
@@ -66,6 +68,14 @@ void GUI::update() {
     ImGuiIO &io = ImGui::GetIO();
     ImGui::Text("Application average %.3f ms/frame (%.1f FPS)",
                 1000.0f / io.Framerate, io.Framerate);
+
+    if (ImGui::Button("Reset Velocity"))
+    {
+        for (auto& o :sim_.getParticles())
+            *o.getVelocity() = vec4(0.0f);
+        sim_.isRunning = false;
+    }
+
     ImGui::End();
 }
 

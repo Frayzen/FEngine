@@ -1,4 +1,5 @@
 *
+.git
 !*.cc
 !*.cpp
 !*.c
@@ -9,16 +10,12 @@
 !*.glsl
 !assets/**
 !.gitignore
-!*.vert
-!*.frag
-!*.comp
 !*/
+assets/
 !**/Makefile
 !README
 !.clang-format
-.git
-assets/
-!assets/*.glsl
-!assets/*.comp
-!assets/*.vert
-!assets/*.frag
+!assets/shaders/
+!*.vert
+!*.frag
+!*.comp

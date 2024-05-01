@@ -13,8 +13,9 @@ layout(binding = 1) buffer Velocities{
 
 uniform float mass;
 uniform float radius;
-uniform float deltaTime;
+//uniform float deltaTime;
 
+const float deltaTime = 0.02;
 float smoothing(float radius, float dst)
 {
     float q = dst / radius;

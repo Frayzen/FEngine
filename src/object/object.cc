@@ -68,3 +68,8 @@ vec4 *Object::getColors(Mesh &m) {
         return nullptr;
     return objColors_[m.id].data();
 }
+
+vec4* Object::getVelocity()
+{
+    return &objVelocity_[m_.id][id];
+}

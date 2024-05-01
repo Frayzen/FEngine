@@ -141,15 +141,19 @@ void Simulation::mainLoop() {
 
         // INPUTS
         double cur = glfwGetTime();
-        glUniform1f(velocityCpt_.getUniformLoc("deltaTime"), cur - last_);
-        glUniform1f(densityCmpt_.getUniformLoc("deltaTime"), cur - last_);
+        /* glUniform1f(velocityCpt_.getUniformLoc("deltaTime"), cur - last_); */
+        /* glUniform1f(densityCmpt_.getUniformLoc("deltaTime"), cur - last_); */
         last_ = cur;
         glfwPollEvents();
         gui_.update();
         cam.inputs(vec2(bounds.x, bounds.y));
-
-        if (isRunning)
+        static int frame = 0;
+        frame++;
+        if (isRunning && frame % framePerComputation == 0)
+        {
+            frame = 0;
             step();
+        }
 
         // RENDER
         particleMesh_.render(renderer_, cam);

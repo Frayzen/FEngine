@@ -16,7 +16,6 @@ layout(binding = 2) buffer Colors{
 
 uniform vec3 ubound;
 uniform vec3 lbound;
-uniform float deltaTime;
 uniform float radius;
 uniform vec3 interaction;
 uniform int inputState;
@@ -24,7 +23,9 @@ uniform vec3 gravity;
 uniform float targetedDensity;
 uniform float pressureMultiplier;
 uniform float mass;
+//uniform float deltaTime;
 
+const float deltaTime = 0.02;
 const float minVelocity = 0.0;
 const float maxVelocity = 25.0;
 
