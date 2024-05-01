@@ -14,7 +14,7 @@ class Object {
     Transform getTransform();
     void setTransform(Transform& t);
 
-    vec3& getVelocity();
+    vec4* getVelocity();
 
     static void clearObjects(Mesh& m);
 
