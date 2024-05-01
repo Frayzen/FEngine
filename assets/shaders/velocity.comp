@@ -25,7 +25,7 @@ uniform float pressureMultiplier;
 uniform float mass;
 //uniform float deltaTime;
 
-const float deltaTime = 0.02;
+const float deltaTime = 0.025;
 const float minVelocity = 0.0;
 const float maxVelocity = 25.0;
 
@@ -78,7 +78,8 @@ void main()
     const float dist = radius;
     const int nbx = int(1 + ubound.x / dist);
     const int nby = int(1 + ubound.y / dist);
-    if (id < (nbx + nby) * 4)
+    const int lim = (nbx + nby) * 4;
+    if (id < lim)
         return;
     vec4 t = trs[id][3];
     vec4 vel = vels[id];
@@ -99,7 +100,8 @@ void main()
 
         float otherDensity = vels[i].w;
         float otherPressure = toPressure(otherDensity);
-        float sp = sharedPressure(pressure, density, otherPressure, otherDensity);
+        float sp;
+        sp = sharedPressure(pressure, density, otherPressure, otherDensity);
         dp -= dir * mass * sp * smoothingDerivative(radius, dst);
 
         //vec3 dv = vel.xyz - vels[i].xyz;
@@ -151,7 +153,7 @@ void main()
     t.w = 1.0;
 
 
-    vels[id] = vel * 0.90;
+    vels[id] = vel * 0.98;
     trs[id][3] = t;
 }
 
