@@ -75,6 +75,11 @@ void main()
     
     //ID
     const uint id = gl_WorkGroupID.x;
+    const float dist = radius;
+    const int nbx = int(1 + ubound.x / dist);
+    const int nby = int(1 + ubound.y / dist);
+    if (id < (nbx + nby) * 4)
+        return;
     vec4 t = trs[id][3];
     vec4 vel = vels[id];
     float density = vel.w;
@@ -146,7 +151,7 @@ void main()
     t.w = 1.0;
 
 
-    vels[id] = vel * 0.97;
+    vels[id] = vel * 0.90;
     trs[id][3] = t;
 }
 
