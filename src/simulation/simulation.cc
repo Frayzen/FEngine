@@ -60,23 +60,44 @@ void Simulation::updateBuffers() {
     densityCmpt_.updateData(Object::getVelocities(particleMesh_), 1);
 }
 
+void spawnParticle(Mesh &m, float x, float y, float dimension) {
+
+    Object &o = m.createObject();
+    *o.getColor() = vec4(1.0f);
+    Transform t = Transform::identity();
+    t.position = vec3(x, y, 0.0f);
+    if (dimension == -1) {
+        // BOUNDING BALLS
+        t.scale = vec3(0.5f);
+        *o.getColor() = vec4(0);
+    } else
+        t.scale = vec3(dimension);
+    o.setTransform(t);
+}
+
 void Simulation::createObjects() {
     particleMesh_.clearObjects();
+    const float dist = radius;
+    const int nbx = 2 + bounds.x / dist;
+    const int nby = 2 + bounds.y / dist;
+    const float bx = bounds.x + dist / 2;
+    const float by = bounds.y + dist / 2;
+    for (int i = 0; i < 2 * nbx; i++) {
+        spawnParticle(particleMesh_, -bx + i * dist, -by, -1);
+        spawnParticle(particleMesh_, -bx + i * dist, by, -1);
+    }
+    for (int i = 0; i < 2 * nby; i++) {
+        spawnParticle(particleMesh_, -bx, -by + i * dist, -1);
+        spawnParticle(particleMesh_, bx, -by + i * dist, -1);
+    }
     for (int i = 0; i < size.x; i++) {
         for (int j = 0; j < size.y; j++) {
-            Object &o = particleMesh_.createObject();
-            *o.getColor() = vec4(1.0f);
-            Transform t = Transform::identity();
-            t.position = vec3(i * offset.x, j * offset.y, 0.0f);
-            t.position -=
-                vec3(offset.x * size.x / 2, offset.y * size.y / 2, 0.0f);
-            t.scale = vec3(radius * appearanceRadiusCoeff,
-                           radius * appearanceRadiusCoeff, 0.0f);
-            o.setTransform(t);
+            spawnParticle(particleMesh_, offset.x * (i - size.x / 2),
+                          offset.y * (j - size.y / 2),
+                          radius * appearanceRadiusCoeff);
         }
     }
 }
-
 void Simulation::updateBbox() {
     auto bbox = boundingMesh_.getObjects()[0];
     auto bbox_t = bbox.getTransform();
@@ -141,8 +162,8 @@ void Simulation::mainLoop() {
 
         // INPUTS
         double cur = glfwGetTime();
-        glUniform1f(velocityCpt_.getUniformLoc("deltaTime"), cur - last_);
-        glUniform1f(densityCmpt_.getUniformLoc("deltaTime"), cur - last_);
+        /* glUniform1f(velocityCpt_.getUniformLoc("deltaTime"), cur - last_); */
+        /* glUniform1f(densityCmpt_.getUniformLoc("deltaTime"), cur - last_); */
         last_ = cur;
         glfwPollEvents();
         gui_.update();

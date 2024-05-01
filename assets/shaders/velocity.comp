@@ -16,7 +16,6 @@ layout(binding = 2) buffer Colors{
 
 uniform vec3 ubound;
 uniform vec3 lbound;
-uniform float deltaTime;
 uniform float radius;
 uniform vec3 interaction;
 uniform int inputState;
@@ -25,6 +24,7 @@ uniform float targetedDensity;
 uniform float pressureMultiplier;
 uniform float mass;
 
+const float deltaTime = 0.02;
 const float minVelocity = 0.0;
 const float maxVelocity = 25.0;
 
@@ -74,6 +74,12 @@ void main()
     
     //ID
     const uint id = gl_WorkGroupID.x;
+    const float dist = radius;
+    const int nbx = int(2 + ubound.x / dist);
+    const int nby = int(2 + ubound.y / dist);
+    const int lim = (nbx + nby) * 4;
+    if (id < lim)
+        return;
     vec4 t = trs[id][3];
     vec4 vel = vels[id];
     float density = vel.w;
@@ -145,7 +151,7 @@ void main()
     t.w = 1.0;
 
 
-    vels[id] = vel * 0.97;
+    vels[id] = vel;
     trs[id][3] = t;
 }
 
