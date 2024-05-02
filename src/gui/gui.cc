@@ -23,6 +23,7 @@ void GUI::update() {
     ImGui::SliderFloat("Mass", &sim_.mass, 0.0f, 5.0f);
     ImGui::SliderFloat("Targeted Density", &sim_.targetedDensity, 1.0f, 5.0f);
     ImGui::DragFloat3("Gravity", &sim_.gravity[0], -0.1f, 0.1f);
+    ImGui::SliderFloat("Viscosity", (float *)&sim_.viscosity, 0.2f, 10.0f);
     ImGui::SliderFloat("Pressure Multiplier", (float *)&sim_.pressureMultiplier,
                        0.0f, 500.0f);
     if (ImGui::InputFloat("Radius", &sim_.radius)) {

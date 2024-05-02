@@ -23,6 +23,7 @@ uniform vec3 gravity;
 uniform float targetedDensity;
 uniform float pressureMultiplier;
 uniform float mass;
+uniform float viscosity;
 
 const float deltaTime = 0.02;
 const float minVelocity = 0.0;
@@ -85,14 +86,15 @@ void main()
     float density = vel.w;
     float pressure = toPressure(density);
 
-    vec3 dp = vec3(0);
-    //vec3 viscosity = vec3(0);
+    vec3 pressureForce = vec3(0);
+    vec3 viscosityForce = vec3(0);
     for (int i = 0; i < gl_NumWorkGroups.x; i++)
     {
         if (i == id)
             continue;
         vec3 other = trs[i][3].xyz;
-        float dst = length(other.xyz - t.xyz);
+        vec3 rij = other.xyz - t.xyz;
+        float dst = length(rij);
         vec3 dir = dst == 0 ? normalize(vec3(1.0f)) : ((other.xyz - t.xyz) / dst);
 
         float slope = smoothingDerivative(radius, dst);
@@ -100,22 +102,27 @@ void main()
         float otherDensity = vels[i].w;
         float otherPressure = toPressure(otherDensity);
         float sp = sharedPressure(pressure, density, otherPressure, otherDensity);
-        dp -= dir * mass * sp * smoothingDerivative(radius, dst);
+        pressureForce -= dir * mass * sp * slope;
 
-        //vec3 dv = vel.xyz - vels[i].xyz;
-        //viscosity += dv * mass;
+        if (dst > 0.00001)
+        {
+            vec3 vij = vels[i].xyz - vel.xyz;
+            //vec3 visc = mass / (otherDensity * density);
+            viscosityForce += vij * slope;
+        }
     }
 
     //colors[id] = vec4(densityToPressure(density) / pressureMultiplier * normalize(vec3(1.0f)), 1.0f);
     //colors[id] = vec4(vec3(length(t.xyz - interaction)), 1.0f);
 
     vel.xyz += gravity * density * deltaTime;
-    vel.xyz -= dp * deltaTime / density;
+    vel.xyz -= viscosityForce * viscosity * deltaTime;
+    vel.xyz -= pressureForce * deltaTime / density;
 
     //INTERACT VELOCITY
     vec3 interactVec = interaction - t.xyz;
-    if (inputState != 0 && length(interactVec) <= radius * 2.0f)
-        vel += vec4(normalize(interactVec) * inputState * length(interactVec), 0.0f);
+    if (inputState != 0 && length(interactVec) <= radius * 10.0f)
+        vel += vec4(normalize(interactVec) * inputState * 0.1f * length(interactVec), 0.0f);
 
     if (length(vel.xyz) >= maxVelocity)
         vel.xyz = normalize(vel.xyz) * maxVelocity;
@@ -151,7 +158,7 @@ void main()
     t.w = 1.0;
 
 
-    vels[id] = vel;
+    vels[id] = vel * 0.97;
     trs[id][3] = t;
 }
 

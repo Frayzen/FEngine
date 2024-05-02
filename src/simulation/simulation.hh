@@ -19,6 +19,7 @@ class Simulation {
     float pressureMultiplier = 20.0f;
     float targetedDensity = 2.0f;
     float radius = 1.5f;
+    float viscosity = 1.5f;
     const float appearanceRadiusCoeff = 0.3f;
     vec3 gravity = vec3(0.0, -9.0f, 0.0f);
     Camera cam;
