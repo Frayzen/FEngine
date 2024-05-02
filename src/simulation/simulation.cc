@@ -129,6 +129,7 @@ void Simulation::step() {
                  (float *)&cam.interactionPoint);
     glUniform1i(velocityCpt_.getUniformLoc("inputState"), cam.clickState);
     glUniform1f(velocityCpt_.getUniformLoc("radius"), radius);
+    glUniform1f(velocityCpt_.getUniformLoc("viscosity"), viscosity);
     glUniform1f(velocityCpt_.getUniformLoc("mass"), mass);
     glUniform1f(velocityCpt_.getUniformLoc("pressureMultiplier"), pressureMultiplier);
     glUniform1f(velocityCpt_.getUniformLoc("targetedDensity"), targetedDensity);
