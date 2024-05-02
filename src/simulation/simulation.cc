@@ -68,7 +68,7 @@ void spawnParticle(Mesh &m, float x, float y, float dimension) {
     t.position = vec3(x, y, 0.0f);
     if (dimension == -1) {
         // BOUNDING BALLS
-        t.scale = vec3(0.5f);
+        t.scale = vec3(0);
         *o.getColor() = vec4(0);
     } else
         t.scale = vec3(dimension);
