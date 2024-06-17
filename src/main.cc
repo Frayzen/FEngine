@@ -64,19 +64,26 @@ int main() {
         Render("assets/shaders/default.vert", "assets/shaders/default.frag");
 
     Mesh mesh = Mesh::createFrom("assets/airplane/airplane.obj");
-    auto obj = mesh.createObject();
-    auto t = obj.getTransform();
-    t.scale = vec3(0.01f);
-    obj.setTransform(t);
+    for (int i = 0; i < 10; ++i) {
+        for (int j = 0; j < 10; ++j) {
+            auto obj = mesh.createObject();
+            auto t = obj.getTransform();
+            t.scale = vec3(0.01f);
+            t.position = vec3(i * 30.f, j * 30.f, 0.0f);
+            t.rotation = glm::rotate(t.rotation, glm::radians(-90.0f),
+                                     vec3(1.0f, 0.0f, 0.0f));
+            obj.setTransform(t);
+        }
+    }
 
-    /* Mesh iron = Mesh::createFrom("assets/ironman/IronMan.obj"); */
-    /* Object irono = iron.createObject(); */
-    /* t = obj.getTransform(); */
-    /* t.position.z -= 50.0f; */
-    /* t.rotation = */
-    /*     glm::rotate(t.rotation, glm::radians(-90.0f), vec3(-1.0f, 0, 0)); */
-    /* t.scale = vec3(0.1f); */
-    /* irono.setTransform(t); */
+    Mesh iron = Mesh::createFrom("assets/ironman/IronMan.obj");
+    Object irono = iron.createObject();
+    auto t = irono.getTransform();
+    t.position.z -= 50.0f;
+    t.rotation =
+        glm::rotate(t.rotation, glm::radians(-90.0f), vec3(-1.0f, 0, 0));
+    t.scale = vec3(0.1f);
+    irono.setTransform(t);
 
     Mesh sph = Mesh::createFrom("assets/sphere.obj");
     Object spho = sph.createObject();
@@ -107,7 +114,7 @@ int main() {
 
         Camera::mainCamera().inputs();
         mesh.render(render, Camera::mainCamera());
-        /* iron.render(render, Camera::mainCamera()); */
+        iron.render(render, Camera::mainCamera());
         sph.render(render, Camera::mainCamera());
 
         glfwSwapBuffers(win);
