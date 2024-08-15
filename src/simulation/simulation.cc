@@ -41,8 +41,6 @@ void Simulation::run() {
 
         // EVENTS
         glfwPollEvents();
-        if (gui_ != nullptr)
-            gui_->update();
 
         if (isRunning)
             update(curTime - lastTime_);
@@ -51,8 +49,12 @@ void Simulation::run() {
         for (unsigned long i = 0; i < meshes_.size(); i++)
             meshes_[i].get().render(renderer_, cam);
 
-        ImGui::Render();
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+        if (gui_ != nullptr) {
+
+            gui_->update();
+            ImGui::Render();
+            ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+        }
 
         glfwSwapBuffers(win_);
     }
