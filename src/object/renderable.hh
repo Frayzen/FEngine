@@ -1,10 +1,10 @@
 #pragma once
 
-#include "GL/glew.h"
-#include "object/camera.hh"
 #include "shader/shader.hh"
+#include "object/camera.hh"
 
 class Renderable {
   public:
-    virtual void render(Shader& shader, Camera &camera) = 0;
+    virtual void render(Shader &shader, Camera &camera) = 0;
+    virtual ~Renderable() = default;
 };

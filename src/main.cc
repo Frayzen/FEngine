@@ -12,6 +12,7 @@
 #include "object/object.hh"
 #include "shader/compute.hh"
 #include "shader/render.hh"
+#include "simulation/particles/ptc_simulation.hh"
 #include "simulation/simulation.hh"
 #include "tools.hh"
 #include <GLFW/glfw3.h>
@@ -60,8 +61,9 @@ int main() {
     glEnable(GL_DEBUG_OUTPUT);
     glDebugMessageCallback(DebugCallback, 0);
     glEnable(GL_DEPTH_TEST);
-    Simulation s = Simulation();
+
+    PtcSimulation s = PtcSimulation();
     s.cam.transform.position.z = -13.5;
-    s.mainLoop();
+    s.run();
     clean_exit(0);
 }

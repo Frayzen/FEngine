@@ -6,11 +6,11 @@ class Simulation;
 
 class GUI {
   public:
-    GUI(Simulation& sim);
-    void update();
+    GUI(Simulation &sim);
+    virtual void update() = 0;
     void setup();
 
-  private:
+  protected:
     GLFWwindow *win_;
-    Simulation& sim_;
+    Simulation &sim_;
 };

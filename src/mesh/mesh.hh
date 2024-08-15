@@ -1,8 +1,8 @@
 #pragma once
 
+#include "object/renderable.hh"
 #include "object/object.hh"
 #include <GL/gl.h>
-#include "object/transform.hh"
 #include <glm/fwd.hpp>
 #include <string>
 #include <vector>
@@ -15,7 +15,7 @@ class Mesh : public Renderable{
     ~Mesh();
     void enable();
     unsigned int triangleNumber();
-    void render(Shader &shader, Camera &camera);
+    void render(Shader &shader, Camera &camera) override;
 
     Object& createObject();
     void clearObjects();

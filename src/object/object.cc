@@ -1,10 +1,8 @@
 #include "object.hh"
 #include "mesh/mesh.hh"
-#include "object/camera.hh"
 #include <glm/fwd.hpp>
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/matrix_decompose.hpp>
-#include <iostream>
 #include <GL/glew.h>
 
 // Define static member variables
