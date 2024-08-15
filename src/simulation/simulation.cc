@@ -13,13 +13,11 @@ void Simulation::restartSimulation() {
     init();
 }
 
-Simulation::Simulation(GUI *gui)
-    : gui_(gui), renderer_(Render("assets/shaders/default.vert",
-                                  "assets/shaders/default.frag")),
+Simulation::Simulation()
+    : renderer_(
+          Render("assets/shaders/default.vert", "assets/shaders/default.frag")),
       win_(glfwGetCurrentContext()) {
     assert(glfwGetCurrentContext() != nullptr);
-    if (gui != nullptr)
-        gui_->setup();
     glfwSetTime(0);
     lastTime_ = glfwGetTime();
 }
@@ -42,8 +40,8 @@ void Simulation::run() {
         // EVENTS
         glfwPollEvents();
 
-        if (isRunning)
-            update(curTime - lastTime_);
+        cam.inputs();
+        update(curTime - lastTime_);
 
         // RENDER
         for (unsigned long i = 0; i < meshes_.size(); i++)
@@ -58,4 +56,11 @@ void Simulation::run() {
 
         glfwSwapBuffers(win_);
     }
+}
+
+void Simulation::attachGUI(GUI *gui) {
+    gui_ = gui;
+    if (gui_ == nullptr)
+        return;
+    gui->setup();
 }

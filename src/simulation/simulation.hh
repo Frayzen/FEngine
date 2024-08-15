@@ -25,7 +25,8 @@ class Simulation {
     void run();
 
   protected:
-    Simulation(GUI *gui);
+    Simulation();
+    void attachGUI(GUI *gui);
 
   private:
     void setupBuffers();
@@ -41,7 +42,7 @@ class Simulation {
     std::vector<std::reference_wrapper<Mesh>> meshes_ =
         std::vector<std::reference_wrapper<Mesh>>();
 
-    GUI *gui_;
+    GUI *gui_ = nullptr;
     Render renderer_;
     GLFWwindow *win_;
 };

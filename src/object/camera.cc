@@ -24,7 +24,7 @@ Camera::Camera(float fov, float near, float far)
     win_ = glfwGetCurrentContext();
 }
 
-void Camera::inputs(vec2 bounds) {
+void Camera::inputs() {
     transform.setRotation(vec3(0, rotY_, 0));
     if (glfwGetKey(win_, GLFW_KEY_D) == GLFW_PRESS)
         transform.position += speed * -transform.left();
@@ -50,7 +50,9 @@ void Camera::inputs(vec2 bounds) {
         rotX_ -= deg;
     rotX_ = max(min(rotX_, lockAxisX_), -lockAxisX_);
     transform.setRotation(vec3(rotX_, rotY_, 0));
+}
 
+void Camera::mouseInput(vec2 bounds) {
     double xpos, ypos;
     int height, width;
     glfwGetCursorPos(win_, &xpos, &ypos);
@@ -64,4 +66,3 @@ void Camera::inputs(vec2 bounds) {
     if (glfwGetMouseButton(win_, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS)
         clickState += RCLICK;
 }
-

@@ -1,7 +1,7 @@
 #include "ptc_simulation.hh"
 #include "mesh/mesh.hh"
+#include "simulation/particles/ptc_gui.hh"
 #include <cstring>
-#include <iostream>
 
 #define OBJNB (particleMesh_.getObjects().size())
 #define UBOUNDS (bounds)
@@ -10,7 +10,11 @@
 void PtcSimulation::update(double deltaTime) {
     glUniform1f(velocityCpt_.getUniformLoc("deltaTime"), deltaTime);
     glUniform1f(densityCmpt_.getUniformLoc("deltaTime"), deltaTime);
-    cam.inputs(vec2(bounds.x, bounds.y));
+    cam.mouseInput(vec2(bounds.x, bounds.y));
+    if (isRunning) {
+        compute();
+        updateBuffers();
+    }
     updateBbox();
 }
 void PtcSimulation::init() {
@@ -19,12 +23,13 @@ void PtcSimulation::init() {
 }
 
 PtcSimulation::PtcSimulation()
-    : Simulation(nullptr), particleMesh_(Mesh::createFrom("assets/sphere.obj")),
+    : particleMesh_(Mesh::createFrom("assets/sphere.obj")),
       boundingMesh_(Mesh::createFrom("assets/square.obj")),
       densityCmpt_(Compute("assets/shaders/density.comp")),
       velocityCpt_(Compute("assets/shaders/velocity.comp")) {
     registerMesh(particleMesh_);
     registerMesh(boundingMesh_);
+    attachGUI(new PtcGUI(*this));
 }
 
 void PtcSimulation::setupBuffers() {
