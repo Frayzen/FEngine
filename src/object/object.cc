@@ -53,3 +53,24 @@ vec4 *Object::getVelocities(Mesh &m) {
     return objVelocity_[m.id].data();
 }
 
+
+void Object::setScale(vec3 scale)
+{
+    Transform t = getTransform();
+    t.scale = scale;
+    setTransform(t);
+}
+
+void Object::setPosition(vec3 pos)
+{
+    Transform t = getTransform();
+    t.position = pos;
+    setTransform(t);
+}
+
+void Object::setRotation(quat rot)
+{
+    Transform t = getTransform();
+    t.rotation = rot;
+    setTransform(t);
+}

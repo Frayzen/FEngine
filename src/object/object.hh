@@ -12,6 +12,9 @@ class Object {
 
     Transform getTransform();
     void setTransform(Transform& t);
+    void setScale(vec3 scale);
+    void setPosition(vec3 pos);
+    void setRotation(quat rot);
 
     vec3& getVelocity();
 

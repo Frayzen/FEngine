@@ -17,7 +17,7 @@ class Camera {
     mat4 getViewMat();
     mat4 getProjMat();
 
-    Camera(float fov = 90.0f, float near = 0.0001f, float far = MAXFLOAT);
+    Camera(float fov = 90.0f, float near = 0.1f, float far = 1000000000.0f);
     void mouseInput(vec2 bounds);
     void inputs();
 
