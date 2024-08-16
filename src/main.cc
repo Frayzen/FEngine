@@ -48,6 +48,8 @@ int main() {
     FAIL_ON(win == nullptr, "An error occured while creating the window");
     glfwMakeContextCurrent(win);
     FAIL_ON(glewInit() != GLEW_OK, "Glew could not be initialized");
+    FAIL_ON(!GLEW_ARB_framebuffer_object,
+            "Error: GL_ARB_framebuffer_object extension is not supported");
     glViewport(0, 0, screenSize.x, screenSize.y);
     glEnable(GL_DEBUG_OUTPUT);
     glDebugMessageCallback(DebugCallback, 0);

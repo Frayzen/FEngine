@@ -10,13 +10,26 @@
 #include <glm/fwd.hpp>
 #include <glm/geometric.hpp>
 
-mat4 Camera::getMatrix() {
-    mat4 m = transform.getMatrix();
-    mat4 pers = glm::perspective(glm::radians(fov_),
-                                 screenSize.x / screenSize.y, near_, far_);
-    m = pers * m;
-    return m;
+mat4 Camera::getProjMat() {
+
+    const float ratio = screenSize.x / screenSize.y;
+    return glm::perspective(glm::radians(fov_), ratio, near_, far_);
 }
+
+mat4 Camera::getViewMat() {
+    return glm::lookAt(position, position + getFront(), up_);
+}
+
+vec3 Camera::getFront() {
+    vec3 front;
+    front.x = cos(glm::radians(yaw_)) * cos(glm::radians(pitch_));
+    front.y = sin(glm::radians(pitch_));
+    front.z = sin(glm::radians(yaw_)) * cos(glm::radians(pitch_));
+    front = normalize(front);
+    return front;
+}
+
+vec3 Camera::getRight() { return glm::cross(getFront(), up_); }
 
 Camera::Camera(float fov, float near, float far)
     : fov_(fov), near_(near), far_(far) {
@@ -25,31 +38,28 @@ Camera::Camera(float fov, float near, float far)
 }
 
 void Camera::inputs() {
-    transform.setRotation(vec3(0, rotY_, 0));
     if (glfwGetKey(win_, GLFW_KEY_D) == GLFW_PRESS)
-        transform.position += speed * -transform.left();
+        position += speed * getRight();
     if (glfwGetKey(win_, GLFW_KEY_A) == GLFW_PRESS)
-        transform.position += speed * transform.left();
+        position += speed * -getRight();
     if (glfwGetKey(win_, GLFW_KEY_W) == GLFW_PRESS)
-        transform.position += speed * transform.front();
+        position += speed * getFront();
     if (glfwGetKey(win_, GLFW_KEY_S) == GLFW_PRESS)
-        transform.position += speed * -transform.front();
+        position += speed * -getFront();
     if (glfwGetKey(win_, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
-        transform.position += speed * transform.up();
+        position += speed * -up_;
     if (glfwGetKey(win_, GLFW_KEY_SPACE) == GLFW_PRESS)
-        transform.position += speed * -transform.up();
+        position += speed * up_;
 
-    float deg = glm::radians(sensitivity);
     if (glfwGetKey(win_, GLFW_KEY_L) == GLFW_PRESS)
-        rotY_ += deg;
+        yaw_ += sensitivity;
     if (glfwGetKey(win_, GLFW_KEY_H) == GLFW_PRESS)
-        rotY_ -= deg;
+        yaw_ -= sensitivity;
     if (glfwGetKey(win_, GLFW_KEY_J) == GLFW_PRESS)
-        rotX_ += deg;
+        pitch_ -= sensitivity;
     if (glfwGetKey(win_, GLFW_KEY_K) == GLFW_PRESS)
-        rotX_ -= deg;
-    rotX_ = max(min(rotX_, lockAxisX_), -lockAxisX_);
-    transform.setRotation(vec3(rotX_, rotY_, 0));
+        pitch_ += sensitivity;
+    pitch_ = max(min(pitch_, lockAxisX_), -lockAxisX_);
 }
 
 void Camera::mouseInput(vec2 bounds) {

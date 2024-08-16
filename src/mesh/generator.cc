@@ -1,12 +1,15 @@
 #include "mesh.hh"
+#include "mesh/submesh.hh"
 
 #define M_PI 3.14159265358979323846
 
 Mesh Mesh::generateSphere(int n_slices, int n_stacks) {
     Mesh mesh = Mesh();
+    mesh.materials_.emplace_back(Material());
+    SubMesh& sm = mesh.createSubMesh();
 
     // add top vertex
-    auto v0 = mesh.addVertex(vec3(0, 1, 0));
+    auto v0 = sm.addVertex(vec3(0, 1, 0));
 
     // generate vertices per stack / slice
     for (int i = 0; i < n_stacks - 1; i++) {
@@ -16,21 +19,21 @@ Mesh Mesh::generateSphere(int n_slices, int n_stacks) {
             auto x = std::sin(phi) * std::cos(theta);
             auto y = std::cos(phi);
             auto z = std::sin(phi) * std::sin(theta);
-            mesh.addVertex(vec3(x, y, z));
+            sm.addVertex(vec3(x, y, z));
         }
     }
 
     // add bottom vertex
-    auto v1 = mesh.addVertex(vec3(0, -1, 0));
+    auto v1 = sm.addVertex(vec3(0, -1, 0));
 
     // add top / bottom triangles
     for (int i = 0; i < n_slices; ++i) {
         auto i0 = i + 1;
         auto i1 = (i + 1) % n_slices + 1;
-        mesh.addTriangle(uvec3(v0, i1, i0));
+        sm.addTriangle(uvec3(v0, i1, i0));
         i0 = i + n_slices * (n_stacks - 2) + 1;
         i1 = (i + 1) % n_slices + n_slices * (n_stacks - 2) + 1;
-        mesh.addTriangle(uvec3(v1, i0, i1));
+        sm.addTriangle(uvec3(v1, i0, i1));
     }
 
     // add quads per stack / slice
@@ -42,8 +45,8 @@ Mesh Mesh::generateSphere(int n_slices, int n_stacks) {
             auto i1 = j0 + (i + 1) % n_slices;
             auto i2 = j1 + (i + 1) % n_slices;
             auto i3 = j1 + i;
-            mesh.addTriangle(uvec3(i0, i1, i2));
-            mesh.addTriangle(uvec3(i0, i2, i3));
+            sm.addTriangle(uvec3(i0, i1, i2));
+            sm.addTriangle(uvec3(i0, i2, i3));
         }
     }
     return mesh;

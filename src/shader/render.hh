@@ -6,12 +6,14 @@
 #include <string>
 
 class Render : public Shader {
-    public:
-        Render(std::string vertexFilePath, std::string fragmentFilePath);
-    private:
-        void setupShaders();
-        const std::string fragmentFilePath_;
-        const std::string vertexFilePath_;
-        GLuint vertexShader_;
-        GLuint fragmentShader_;
+  public:
+    Render(std::string vertexFilePath, std::string fragmentFilePath);
+    ~Render();
+
+  private:
+    void setupShaders();
+    const std::string fragmentFilePath_;
+    const std::string vertexFilePath_;
+    GLuint vertexShader_;
+    GLuint fragmentShader_;
 };
