@@ -50,6 +50,11 @@ mat4 *Object::getTransforms(Mesh &m) {
     return objTransforms_[m.id].data();
 }
 
+void Object::setColor(vec4 &c)
+{
+    objColors_[m_.id][id] = c;
+}
+
 vec4* Object::getColor()
 {
     return &objColors_[m_.id][id];

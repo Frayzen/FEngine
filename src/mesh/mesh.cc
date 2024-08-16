@@ -168,3 +168,15 @@ void Mesh::clearObjects() {
     Object::clearObjects(*this);
     objects_ = std::vector<Object>();
 }
+
+int Mesh::addVertex(const vec3 &v)
+{
+    vertices_.push_back(v);
+    return vertices_.size() - 1;
+}
+
+int Mesh::addTriangle(const uvec3 &v)
+{
+    indices_.push_back(v);
+    return indices_.size() - 1;
+}

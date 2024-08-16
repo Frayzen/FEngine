@@ -1,22 +1,13 @@
-#include <algorithm>
 #include <cstdlib>
 #include <glm/fwd.hpp>
 #include <iostream>
 #include <GL/glew.h>
 #include "constants.hh"
-#include "gui/imgui.h"
-#include "gui/imgui_impl_glfw.h"
-#include "gui/imgui_impl_opengl3.h"
-#include "mesh/mesh.hh"
 #include "object/camera.hh"
-#include "object/object.hh"
-#include "shader/compute.hh"
-#include "shader/render.hh"
-#include "simulation/particles/ptc_simulation.hh"
-#include "simulation/simulation.hh"
+#include "simulation/particles/ptc_sim.hh"
+#include "simulation/physics/pysc_sim.hh"
 #include "tools.hh"
 #include <GLFW/glfw3.h>
-#include <string.h>
 
 void prettyPrintMat4(const glm::mat4 &matrix) {
 
@@ -62,8 +53,11 @@ int main() {
     glDebugMessageCallback(DebugCallback, 0);
     glEnable(GL_DEPTH_TEST);
 
-    PtcSimulation s = PtcSimulation();
-    s.cam.transform.position.z = -13.5;
+    /* PtcSimulation s = PtcSimulation(); */
+    /* s.cam.transform.position.z = -13.5; */
+    /* s.run(); */
+    PyscSimulation s = PyscSimulation();
+    /* s.cam.transform.position.z = -13.5; */
     s.run();
     clean_exit(0);
 }

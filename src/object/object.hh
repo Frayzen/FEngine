@@ -10,6 +10,7 @@ class Object {
   public:
     Object(Mesh &m);
     vec4* getColor();
+    void setColor(vec4 &c);
     Transform getTransform();
     void setTransform(Transform& t);
 

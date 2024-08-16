@@ -1,4 +1,4 @@
-#include "ptc_simulation.hh"
+#include "ptc_sim.hh"
 #include "mesh/mesh.hh"
 #include "simulation/particles/ptc_gui.hh"
 #include <cstring>

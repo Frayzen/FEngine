@@ -1,4 +1,4 @@
-#include "simulation/particles/ptc_simulation.hh"
+#include "simulation/particles/ptc_sim.hh"
 #include "ptc_gui.hh"
 #include "gui/imgui_impl_opengl3.h"
 #include "gui/imgui_impl_glfw.h"

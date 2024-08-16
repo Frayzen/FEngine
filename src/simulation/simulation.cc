@@ -30,7 +30,7 @@ void Simulation::run() {
     while (!glfwWindowShouldClose(win_)) {
 
         // BACKGROUND
-        glClearColor(0.6f, 0.6f, 0.6f, 1.0f);
+        glClearColor(bgColor[0], bgColor[1], bgColor[2], bgColor[3]);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // TIME UPDATE

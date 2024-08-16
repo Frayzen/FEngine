@@ -27,6 +27,7 @@ class Simulation {
   protected:
     Simulation();
     void attachGUI(GUI *gui);
+    vec4 bgColor = vec4(0.6f, 0.6f, 0.6f, 1.0f);
 
   private:
     void setupBuffers();

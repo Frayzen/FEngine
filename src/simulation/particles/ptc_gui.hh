@@ -1,6 +1,6 @@
 #pragma once
 
-#include "simulation/particles/ptc_simulation.hh"
+#include "simulation/particles/ptc_sim.hh"
 #include "gui/gui.hh"
 
 class PtcGUI : public GUI {
