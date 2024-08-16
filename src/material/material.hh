@@ -12,11 +12,11 @@ class Material {
   public:
     static Material createFrom(std::string folderRoot, aiMaterial *mat);
     void enable(Render &r);
-
+    void setColor(vec3 c);
     bool twosided = false;
     float shininess, opacity = 1.0f;
     float shininessStrength = 1.0f;
-    vec3 diffuseCol = vec3(0.5f), specularCol = vec3(0.0f), ambientCol = vec3(0.2f);
+    vec3 diffuseCol = vec3(0.5f), specularCol = vec3(0.0f), ambientCol = vec3(0.5f);
     vec3 emissiveCol = vec3(0.0f);
 
 

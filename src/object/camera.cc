@@ -1,6 +1,5 @@
 #include "camera.hh"
 #include "constants.hh"
-#include "tools.hh"
 #include <GLFW/glfw3.h>
 #include <cassert>
 #include <glm/common.hpp>

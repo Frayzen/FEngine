@@ -1,9 +1,12 @@
 #pragma once
 
-#include "object/transform.hh"
 #include <GLFW/glfw3.h>
+#include <cmath>
 #include <glm/fwd.hpp>
 #include <glm/gtc/constants.hpp>
+#include <glm/glm.hpp>
+
+using namespace glm;
 
 #define RCLICK 1
 #define LCLICK -1
@@ -14,8 +17,7 @@ class Camera {
     mat4 getViewMat();
     mat4 getProjMat();
 
-    Camera(float fov = 90.0f, float near = 0.1f,
-           float far = 10000.0f);
+    Camera(float fov = 90.0f, float near = 0.0001f, float far = MAXFLOAT);
     void mouseInput(vec2 bounds);
     void inputs();
 
@@ -24,15 +26,15 @@ class Camera {
 
     vec3 position = vec3(0.0f);
 
+    float sensitivity = 4.0f;
+    float speed = 0.3f;
+
   private:
     vec3 getFront();
     vec3 getRight();
     // fov in degrees
     GLFWwindow *win_;
     float fov_, near_, far_;
-
-    float sensitivity = 4.0f;
-    float speed = 0.3f;
 
     float lockAxisX_ = 89.9;
 

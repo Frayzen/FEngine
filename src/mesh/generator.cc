@@ -9,7 +9,8 @@ Mesh Mesh::generateSphere(int n_slices, int n_stacks) {
     SubMesh& sm = mesh.createSubMesh();
 
     // add top vertex
-    auto v0 = sm.addVertex(vec3(0, 1, 0));
+    auto pos = vec3(0, 1, 0);
+    auto v0 = sm.addVertex(pos, pos, pos);
 
     // generate vertices per stack / slice
     for (int i = 0; i < n_stacks - 1; i++) {
@@ -19,12 +20,14 @@ Mesh Mesh::generateSphere(int n_slices, int n_stacks) {
             auto x = std::sin(phi) * std::cos(theta);
             auto y = std::cos(phi);
             auto z = std::sin(phi) * std::sin(theta);
-            sm.addVertex(vec3(x, y, z));
+            vec3 pos = vec3(x, y, z);
+            sm.addVertex(pos, pos, pos);
         }
     }
 
     // add bottom vertex
-    auto v1 = sm.addVertex(vec3(0, -1, 0));
+    pos = vec3(0, -1, 0);
+    auto v1 = sm.addVertex(pos, pos, pos);
 
     // add top / bottom triangles
     for (int i = 0; i < n_slices; ++i) {

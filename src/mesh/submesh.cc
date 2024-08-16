@@ -9,7 +9,7 @@
 #define LOC_NORMAL 1
 #define LOC_UV 2
 #define LOC_TRANSFORM 3
-#define LOC_COLOR 8
+/* #define LOC_NEXT 8 */
 
 SubMesh::SubMesh(Mesh &m) : mesh_(m) {}
 
@@ -90,7 +90,7 @@ unsigned int SubMesh::triangleNumber() { return indices_.size(); }
 
 void SubMesh::updateObjects() {
     glBindVertexArray(VAO);
-    if (!TBO || !CBO) {
+    if (!TBO) {
         glGenBuffers(1, &TBO);
         glBindBuffer(GL_ARRAY_BUFFER, TBO);
         glBufferData(GL_ARRAY_BUFFER, sizeof(mat4) * mesh_.getObjects().size(),
@@ -102,45 +102,37 @@ void SubMesh::updateObjects() {
             glEnableVertexAttribArray(LOC_TRANSFORM + i);
             glVertexAttribDivisor(LOC_TRANSFORM + i, 1);
         }
-        // CBO
-        glGenBuffers(1, &CBO);
-        glBindBuffer(GL_ARRAY_BUFFER, CBO);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(vec4) * mesh_.getObjects().size(),
-                     Object::getColors(mesh_), GL_STATIC_DRAW);
-        glVertexAttribPointer(LOC_COLOR, 4, GL_FLOAT, GL_FALSE, sizeof(vec4),
-                              nullptr);
-        glEnableVertexAttribArray(LOC_COLOR);
-        glVertexAttribDivisor(LOC_COLOR, 1);
     } else {
         glBindBuffer(GL_ARRAY_BUFFER, TBO);
         glBufferData(GL_ARRAY_BUFFER, sizeof(mat4) * mesh_.getObjects().size(),
                      Object::getTransforms(mesh_), GL_STATIC_DRAW);
-        glBindBuffer(GL_ARRAY_BUFFER, CBO);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(vec4) * mesh_.getObjects().size(),
-                     Object::getColors(mesh_), GL_STATIC_DRAW);
     }
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 void SubMesh::render(Render &r) {
+    static Material defaultMaterial = Material();
     updateBuffers();
     updateObjects();
     if (mesh_.getMaterials().size() > materialId_)
         mesh_.getMaterials()[materialId_].enable(r);
+    else
+        defaultMaterial.enable(r);
+
     enable();
     glDrawElementsInstanced(GL_TRIANGLES, triangleNumber() * 3, GL_UNSIGNED_INT,
                             nullptr, mesh_.getObjects().size());
 }
 
-int SubMesh::addVertex(const vec3 &v)
-{
-    vertices_.push_back(v);
-    return vertices_.size() - 1;
+int SubMesh::addVertex(const vec3 &v, const vec3 &n, const vec3 &uv) {
+    vertices_.emplace_back(v);
+    vertices_.emplace_back(n);
+    vertices_.emplace_back(uv);
+    return ((vertices_.size()) / 3) - 1;
 }
 
-int SubMesh::addTriangle(const uvec3 &v)
-{
+int SubMesh::addTriangle(const uvec3 &v) {
     indices_.push_back(v);
     return indices_.size() - 1;
 }

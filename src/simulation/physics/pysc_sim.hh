@@ -8,5 +8,6 @@ class PyscSimulation : public Simulation {
     PyscSimulation();
 
   private:
-    Mesh sphere_;
+    Mesh sun_;
+    Mesh earth_;
 };

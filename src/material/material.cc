@@ -146,3 +146,8 @@ void Material::enable(Render &r) {
     r.setVec3("emissiveCol", emissiveCol);
     r.setVec3("ambientCol", ambientCol);
 }
+
+void Material::setColor(vec3 c) {
+    ambientCol = c * 0.5f;
+    diffuseCol = c;
+}

@@ -9,8 +9,7 @@ class Mesh;
 class Object {
   public:
     Object(Mesh &m);
-    vec4* getColor();
-    void setColor(vec4 &c);
+
     Transform getTransform();
     void setTransform(Transform& t);
 
@@ -20,7 +19,6 @@ class Object {
 
     static mat4* getTransforms(Mesh& m);
     static vec4* getVelocities(Mesh& m);
-    static vec4* getColors(Mesh& m);
 
     unsigned int id;
 

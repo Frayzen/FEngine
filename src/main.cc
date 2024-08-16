@@ -59,7 +59,6 @@ int main() {
     /* s.cam.transform.position.z = -13.5; */
     /* s.run(); */
     PyscSimulation s = PyscSimulation();
-    /* s.cam.transform.position.z = -13.5; */
     s.run();
     clean_exit(0);
 }

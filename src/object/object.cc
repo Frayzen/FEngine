@@ -9,7 +9,6 @@
 std::map<unsigned int, unsigned int> Object::objIds_;
 std::map<unsigned int, std::vector<mat4>> Object::objTransforms_;
 std::map<unsigned int, std::vector<vec4>> Object::objVelocity_;
-std::map<unsigned int, std::vector<vec4>> Object::objColors_;
 
 
 void Object::clearObjects(Mesh& m)
@@ -17,7 +16,6 @@ void Object::clearObjects(Mesh& m)
     objIds_[m.id] = 0;
     objVelocity_[m.id] = std::vector<vec4>();
     objTransforms_[m.id] = std::vector<mat4>();
-    objColors_[m.id] = std::vector<vec4>();
 }
 
 unsigned int Object::getId(Mesh &m) {
@@ -29,7 +27,6 @@ Object::Object(Mesh &m) : id(getId(m)), m_(m) {
     static const mat4 mat = Transform::identity().getMatrix();
     objTransforms_[m.id].push_back(mat);
     objVelocity_[m.id].push_back(vec4(0.0f));
-    objColors_[m.id].push_back(vec4(1.0f));
 }
 
 Transform Object::getTransform() {
@@ -50,24 +47,9 @@ mat4 *Object::getTransforms(Mesh &m) {
     return objTransforms_[m.id].data();
 }
 
-void Object::setColor(vec4 &c)
-{
-    objColors_[m_.id][id] = c;
-}
-
-vec4* Object::getColor()
-{
-    return &objColors_[m_.id][id];
-}
-
 vec4 *Object::getVelocities(Mesh &m) {
     if (objVelocity_.size() <= m.id)
         return nullptr;
     return objVelocity_[m.id].data();
 }
 
-vec4 *Object::getColors(Mesh &m) {
-    if (objColors_.size() <= m.id)
-        return nullptr;
-    return objColors_[m.id].data();
-}

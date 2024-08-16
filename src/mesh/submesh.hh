@@ -13,7 +13,7 @@ class SubMesh {
 
   public:
     SubMesh(Mesh &m);
-    static SubMesh createFrom(Mesh& m, aiMesh* mesh);
+    static SubMesh createFrom(Mesh &m, aiMesh *mesh);
     void enable();
     unsigned int triangleNumber();
     void render(Render &r);
@@ -23,16 +23,18 @@ class SubMesh {
     void updateBuffers();
     void updateObjects();
 
-    int addVertex(const vec3 &v);
+    int addVertex(const vec3 &v, const vec3 &n, const vec3 &uv);
     int addTriangle(const uvec3 &v);
 
     Mesh &mesh_;
 
     unsigned int materialId_ = 0;
 
+    // Linked to the VBO and contiaining the vertex data
+    // For each vertex we have 3 vec3 (position, normal, uv) in this array
     std::vector<vec3> vertices_;
     std::vector<uvec3> indices_;
     // TBO = Transform Buffer Object
     // CBO = Color Buffer Object
-    GLuint VAO, VBO, EBO, TBO, CBO = 0;
+    GLuint VAO, VBO, EBO, TBO = 0;
 };
