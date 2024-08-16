@@ -35,13 +35,14 @@ void Simulation::run() {
 
         // TIME UPDATE
         double curTime = glfwGetTime();
+        double deltaTime = curTime - lastTime_;
         lastTime_ = curTime;
 
         // EVENTS
         glfwPollEvents();
 
         cam.inputs();
-        update(curTime - lastTime_);
+        update(deltaTime);
 
         // RENDER
         for (unsigned long i = 0; i < meshes_.size(); i++)

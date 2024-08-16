@@ -32,7 +32,7 @@ class PtcSimulation : public Simulation {
     void setupBuffers();
     void updateBuffers();
     void updateBbox();
-    void compute();
+    void compute(double deltaTime);
 
     Mesh particleMesh_;
     Mesh boundingMesh_;

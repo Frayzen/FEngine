@@ -1,34 +1,41 @@
-#include "ptc_simulation.hh"
+#include "simulation.hh"
+#include "gui/imgui.h"
+#include "gui/imgui_impl_opengl3.h"
 #include "mesh/mesh.hh"
-#include "simulation/particles/ptc_gui.hh"
+#include "shader/render.hh"
 #include <cstring>
+#include <iostream>
 
 #define OBJNB (particleMesh_.getObjects().size())
 #define UBOUNDS (bounds)
 #define LBOUNDS (-bounds)
 
-void PtcSimulation::update(double deltaTime) {
-    cam.mouseInput(vec2(bounds.x, bounds.y));
-    if (isRunning)
-        compute(deltaTime);
-    updateBbox();
-}
-void PtcSimulation::init() {
+void Simulation::restartSimulation() {
+    isRunning = false;
     createObjects();
     setupBuffers();
 }
 
-PtcSimulation::PtcSimulation()
-    : particleMesh_(Mesh::createFrom("assets/sphere.obj")),
+Simulation::Simulation()
+    : gui_(GUI(*this)), particleMesh_(Mesh::createFrom("assets/sphere.obj")),
       boundingMesh_(Mesh::createFrom("assets/square.obj")),
       densityCmpt_(Compute("assets/shaders/density.comp")),
-      velocityCpt_(Compute("assets/shaders/velocity.comp")) {
-    registerMesh(particleMesh_);
-    registerMesh(boundingMesh_);
-    attachGUI(new PtcGUI(*this));
+      velocityCpt_(Compute("assets/shaders/velocity.comp")),
+      renderer_(
+          Render("assets/shaders/default.vert", "assets/shaders/default.frag")),
+      win_(glfwGetCurrentContext()) {
+    gui_.setup();
+
+    createObjects();
+    setupBuffers();
+    boundingMesh_.createObject();
+    updateBbox();
+
+    glfwSetTime(0);
+    last_ = glfwGetTime();
 }
 
-void PtcSimulation::setupBuffers() {
+void Simulation::setupBuffers() {
     // SETUP DENS
     densityCmpt_.setupData(Object::getTransforms(particleMesh_),
                            OBJNB * sizeof(mat4), 0, GL_DYNAMIC_DRAW);
@@ -43,8 +50,18 @@ void PtcSimulation::setupBuffers() {
                            OBJNB * sizeof(vec4), 2, GL_DYNAMIC_DRAW);
 }
 
-void PtcSimulation::createObjects() {
-    boundingMesh_.createObject();
+void Simulation::updateBuffers() {
+    // DENSITY UPDATE
+    velocityCpt_.updateData(Object::getTransforms(particleMesh_), 0);
+    velocityCpt_.updateData(Object::getVelocities(particleMesh_), 1);
+    velocityCpt_.updateData(Object::getColors(particleMesh_), 2);
+    // DENSITY UPDATE
+    densityCmpt_.updateData(Object::getTransforms(particleMesh_), 0);
+    densityCmpt_.updateData(Object::getVelocities(particleMesh_), 1);
+}
+
+void Simulation::createObjects() {
+    particleMesh_.clearObjects();
     for (int i = 0; i < size.x; i++) {
         for (int j = 0; j < size.y; j++) {
             Object &o = particleMesh_.createObject();
@@ -60,17 +77,7 @@ void PtcSimulation::createObjects() {
     }
 }
 
-void PtcSimulation::updateBuffers() {
-    // DENSITY UPDATE
-    velocityCpt_.updateData(Object::getTransforms(particleMesh_), 0);
-    velocityCpt_.updateData(Object::getVelocities(particleMesh_), 1);
-    velocityCpt_.updateData(Object::getColors(particleMesh_), 2);
-    // DENSITY UPDATE
-    densityCmpt_.updateData(Object::getTransforms(particleMesh_), 0);
-    densityCmpt_.updateData(Object::getVelocities(particleMesh_), 1);
-}
-
-void PtcSimulation::updateBbox() {
+void Simulation::updateBbox() {
     auto bbox = boundingMesh_.getObjects()[0];
     auto bbox_t = bbox.getTransform();
     bbox_t.scale = bounds + vec3(radius);
@@ -79,9 +86,9 @@ void PtcSimulation::updateBbox() {
     *bbox.getColor() = vec4(0.1f, 0.1f, 0.1f, 1.0f);
 }
 
-void PtcSimulation::compute(double deltaTime) {
+void Simulation::compute() {
+
     // COMPUTE DENSITY
-    glUniform1f(densityCmpt_.getUniformLoc("deltaTime"), deltaTime);
     densityCmpt_.updateData(Object::getTransforms(particleMesh_), 0);
 
     densityCmpt_.updateData(Object::getVelocities(particleMesh_), 1);
@@ -94,7 +101,6 @@ void PtcSimulation::compute(double deltaTime) {
     glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
 
     // COMPUTE VELOCITY
-    glUniform1f(velocityCpt_.getUniformLoc("deltaTime"), deltaTime);
     velocityCpt_.updateData(Object::getTransforms(particleMesh_), 0);
     velocityCpt_.updateData(Object::getVelocities(particleMesh_), 1);
     velocityCpt_.updateData(Object::getColors(particleMesh_), 2);
@@ -124,6 +130,38 @@ void PtcSimulation::compute(double deltaTime) {
     glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
 }
 
-std::vector<Object> PtcSimulation::getParticles() {
+// Main loop
+void Simulation::mainLoop() {
+    while (!glfwWindowShouldClose(win_)) {
+
+        // BACKGROUND
+        glClearColor(0.6f, 0.6f, 0.6f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        // INPUTS
+        double cur = glfwGetTime();
+        glUniform1f(velocityCpt_.getUniformLoc("deltaTime"), cur - last_);
+        glUniform1f(densityCmpt_.getUniformLoc("deltaTime"), cur - last_);
+        last_ = cur;
+        glfwPollEvents();
+        gui_.update();
+        cam.inputs(vec2(bounds.x, bounds.y));
+
+        if (isRunning)
+            compute();
+
+        // RENDER
+        particleMesh_.render(renderer_, cam);
+        updateBbox();
+        boundingMesh_.render(renderer_, cam);
+
+        ImGui::Render();
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+        glfwSwapBuffers(win_);
+    }
+}
+
+std::vector<Object> &Simulation::getParticles() {
     return particleMesh_.getObjects();
 }
