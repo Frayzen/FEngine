@@ -63,11 +63,11 @@ int main() {
     Render render =
         Render("assets/shaders/default.vert", "assets/shaders/default.frag");
 
-    Mesh mesh = Mesh::createFrom("assets/camera/camera.obj");
-    auto obj = mesh.createObject();
-    auto t = obj.getTransform();
-    t.scale = vec3(100.0f);
-    obj.setTransform(t);
+    /* Mesh mesh = Mesh::createFrom("assets/camera/camera.obj"); */
+    /* auto obj = mesh.createObject(); */
+    /* auto t = obj.getTransform(); */
+    /* t.scale = vec3(100.0f); */
+    /* obj.setTransform(t); */
 
     /* Mesh iron = Mesh::createFrom("assets/ironman/IronMan.obj"); */
     /* Object irono = iron.createObject(); */
@@ -78,11 +78,11 @@ int main() {
     /* t.scale = vec3(0.1f); */
     /* irono.setTransform(t); */
 
-    Mesh sph = Mesh::createFrom("assets/sphere.obj");
-    Object spho = sph.createObject();
-    Transform st = spho.getTransform();
-    st.position = lightPos;
-    spho.setTransform(st);
+    /* Mesh sph = Mesh::createFrom("assets/sphere.obj"); */
+    /* Object spho = sph.createObject(); */
+    /* Transform st = spho.getTransform(); */
+    /* st.position = lightPos; */
+    /* spho.setTransform(st); */
 
     glfwSetTime(0);
     double lastSec = glfwGetTime();
@@ -106,9 +106,9 @@ int main() {
         fps++;
 
         Camera::mainCamera().inputs();
-        mesh.render(render, Camera::mainCamera());
+        /* mesh.render(render, Camera::mainCamera()); */
         /* iron.render(render, Camera::mainCamera()); */
-        sph.render(render, Camera::mainCamera());
+        /* sph.render(render, Camera::mainCamera()); */
 
         glfwSwapBuffers(win);
     }
