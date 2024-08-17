@@ -26,7 +26,7 @@ PyscSimulation::PyscSimulation()
     : Simulation(), sun_(Mesh::generateSphere(100, 100)),
       earth_(Mesh::generateSphere(100, 100)) {
     cam.position.x = -distFactor * EARTH_DIST_SUN / UNIT_TO_KM;
-    cam.speed = 1;
+    cam.speed = 0.1f;
     sun_.getMaterials()[0].setColor(vec3(1.0f, 0.0f, 0.0f));
     earth_.getMaterials()[0].setColor(vec3(0.0f, 0.0f, 1.0f));
     registerMesh(sun_);

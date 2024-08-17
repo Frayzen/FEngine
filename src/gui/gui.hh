@@ -9,6 +9,7 @@ class GUI {
     GUI(Simulation &sim);
     virtual void update() = 0;
     void setup();
+    virtual ~GUI() = default;
 
   protected:
     GLFWwindow *win_;

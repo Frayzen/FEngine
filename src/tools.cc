@@ -5,7 +5,21 @@
 #include <cstdlib>
 #include <iostream>
 
-void clean_exit(int code) {
+void GLAPIENTRY DebugCallback(GLenum source, GLenum type, GLuint id,
+                              GLenum severity, GLsizei length,
+                              const GLchar *msg, const void *userParam) {
+    (void)source;
+    (void)type;
+    (void)id;
+    (void)severity;
+    (void)length;
+    (void)userParam;
+    std::cout << msg << '\n';
+    std::flush(std::cout);
+}
+
+
+void cleanExit(int code) {
     glfwTerminate();
     if (glfwGetCurrentContext() != nullptr)
         glfwDestroyWindow(glfwGetCurrentContext());

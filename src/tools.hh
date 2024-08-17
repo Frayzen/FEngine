@@ -1,14 +1,20 @@
 #pragma once
 
+#include <cstdlib>
+#include <glm/fwd.hpp>
+#include <GL/glew.h>
 #include <iostream>
-#include <ostream>
 
 // Macros
 #define FAIL_ON(Condition, Message)                                            \
     if (Condition) {                                                           \
         std::cerr << Message << std::endl;                                     \
-        clean_exit(-1);                                                        \
+        cleanExit(-1);                                                        \
     }
 
-void clean_exit(int code);
+
+void GLAPIENTRY DebugCallback(GLenum source, GLenum type, GLuint id,
+                              GLenum severity, GLsizei length,
+                              const GLchar *msg, const void *userParam);
+void cleanExit(int code);
 void checkGLError(const char *message);

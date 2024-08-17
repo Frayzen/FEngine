@@ -24,8 +24,13 @@ class Simulation {
     void registerMesh(Mesh &m);
     void run();
 
+    static void setup();
+
+    std::vector<std::reference_wrapper<Object>> getObjects();
+
   protected:
     Simulation();
+    ~Simulation();
     void attachGUI(GUI *gui);
     vec4 bgColor = vec4(0.6f, 0.6f, 0.6f, 1.0f);
 
