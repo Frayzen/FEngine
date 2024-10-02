@@ -10,18 +10,6 @@
 #define EARTH_DIST_SUN 150000000
 #define EARTH_RADIUS 6350
 
-void PyscSimulation::init() {
-    sun_.createObject();
-    Object &earth = earth_.createObject();
-    auto t = earth.getTransform();
-    t.position =
-        vec3(-distFactor * EARTH_DIST_SUN / UNIT_TO_KM, 0.0f, 0.0f);
-    earth.setTransform(t);
-    updateOverscaleFactor();
-}
-
-void PyscSimulation::update(double deltaTime) { (void)deltaTime; }
-
 PyscSimulation::PyscSimulation()
     : Simulation(), sun_(Mesh::generateSphere(100, 100)),
       earth_(Mesh::generateSphere(100, 100)) {
@@ -34,6 +22,19 @@ PyscSimulation::PyscSimulation()
     bgColor = vec4(0.0f, 0.0f, 0.0f, 1.0f);
     attachGUI(new PyscGUI(*this));
 }
+
+void PyscSimulation::init() {
+    sun_.createObject();
+    Object &earth = earth_.createObject();
+    auto t = earth.getTransform();
+    t.position =
+        vec3(-distFactor * EARTH_DIST_SUN / UNIT_TO_KM, 0.0f, 0.0f);
+    earth.setTransform(t);
+    updateOverscaleFactor();
+}
+
+void PyscSimulation::update(double deltaTime) { (void)deltaTime; }
+
 #define CONVERGE_VALUE (EARTH_RADIUS / UNIT_TO_KM)
 #define INTERPOLATE(a, b, t) ((a) * (1 - t) + (b) * (t))
 void PyscSimulation::updateOverscaleFactor() {
