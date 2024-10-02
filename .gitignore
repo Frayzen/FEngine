@@ -5,6 +5,7 @@
 !*.h
 !*.hh
 !*.hxx
+!*.sh
 !*.obj
 !*.glsl
 !assets/**
