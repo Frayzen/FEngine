@@ -1,8 +1,6 @@
-#include "gui/imgui.h"
+#include <imgui.h>
 #include "simulation/physics/pysc_sim.hh"
 #include "pysc_gui.hh"
-#include "gui/imgui_impl_glfw.h"
-#include "gui/imgui_impl_opengl3.h"
 
 static bool created = false;
 void PyscGUI::update()

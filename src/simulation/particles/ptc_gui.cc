@@ -1,8 +1,5 @@
 #include "simulation/particles/ptc_sim.hh"
 #include "ptc_gui.hh"
-#include "gui/imgui_impl_opengl3.h"
-#include "gui/imgui_impl_glfw.h"
-#include <GLFW/glfw3.h>
 
 static bool created = false;
 void PtcGUI::update() {

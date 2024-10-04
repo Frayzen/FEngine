@@ -7,7 +7,7 @@
 #include <map>
 #include <string>
 #define STB_IMAGE_IMPLEMENTATION
-#include <stb/stb_image.h>
+#include "tools/stb_image.h"
 
 static std::map<std::string, GLuint> textureCache;
 static GLuint load(aiMaterial *mat, aiTextureType type,

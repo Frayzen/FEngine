@@ -11,7 +11,9 @@
 #define LOC_TRANSFORM 3
 /* #define LOC_NEXT 8 */
 
-SubMesh::SubMesh(Mesh &m) : mesh_(m) {}
+SubMesh::SubMesh(Mesh &m) : mesh_(m) {
+    VAO = VBO = EBO = TBO = materialId_ = 0;
+}
 
 SubMesh SubMesh::createFrom(Mesh &m, aiMesh *mesh) {
     SubMesh sm = SubMesh(m);

@@ -8,20 +8,37 @@ It is **heavily** recommended to take a look at the [Official Notion](https://pe
 
 It initially was planned to remain the graphic engine it was aimed to be but after realising how powerfull a tool like this is, we decided to explore more about the physic and math that hides behind our 3 dimensional world.
 
-## Rquirements
+## Requirements
 
+### Conda
+The only dependcy of the project is conda. If your system has conda available, please refer to the following section.
+
+The executable can then be compiled and executed using:
+
+```bash
+cd <path/of/the/project>
+chmod +x run.sh setup.sh
+./setup.sh
+./run.sh
+```
+
+These scripts will create a "fengine" conda environment based on the environment.yml file present at the root of the project.
+
+### Dependencies
 FEngine has currently only be tested under linux-based OS but we aim to expand its reach to Windows as well.
-The dependecies of the project:
+The libs dependecies of the project:
 * GLEW
 * GLFW
 * OpenGL
 * GLM
 * Assimp
 
-Since the project is using GNU Make, the executable can be compiled using:
+The executable can be compiled and executed using:
 
 ```bash
-make engine
+cd <path/of/the/project>
+chmod +x run.sh
+./run.sh
 ```
 
 ## Usage

@@ -1,7 +1,7 @@
+#include <imgui_impl_opengl3.h>
 #include "simulation.hh"
 #include "constants.hh"
-#include "gui/imgui.h"
-#include "gui/imgui_impl_opengl3.h"
+#include "gui/gui.hh"
 #include "tools.hh"
 #include <GLFW/glfw3.h>
 #include <cstdlib>
@@ -38,6 +38,8 @@ void Simulation::setup() {
     glEnable(GL_DEBUG_OUTPUT);
     glDebugMessageCallback(DebugCallback, 0);
     glEnable(GL_DEPTH_TEST);
+
+    std::cout << "OPENGL VERSION: " << glGetString(GL_VERSION) << std::endl;
 }
 
 Simulation::Simulation()

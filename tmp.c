@@ -1,6 +1,5 @@
+#include "gui/gui.hh"
 #include "simulation.hh"
-#include "gui/imgui.h"
-#include "gui/imgui_impl_opengl3.h"
 #include "mesh/mesh.hh"
 #include "shader/render.hh"
 #include <cstring>

@@ -28,7 +28,7 @@ class SubMesh {
 
     Mesh &mesh_;
 
-    unsigned int materialId_ = 0;
+    unsigned int materialId_;
 
     // Linked to the VBO and contiaining the vertex data
     // For each vertex we have 3 vec3 (position, normal, uv) in this array
@@ -36,5 +36,5 @@ class SubMesh {
     std::vector<uvec3> indices_;
     // TBO = Transform Buffer Object
     // CBO = Color Buffer Object
-    GLuint VAO, VBO, EBO, TBO = 0;
+    GLuint VAO, VBO, EBO, TBO;
 };

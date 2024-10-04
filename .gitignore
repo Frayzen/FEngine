@@ -13,9 +13,12 @@
 !*.vert
 !*.frag
 !*.comp
-!*/
-!**/Makefile
 !.clang-format
 !README.md
+!env.yml
+!CMakeLists.txt
 .git
+deps
+.cache
 assets/dragon.obj
+build

@@ -1,8 +1,6 @@
-#include "gui/imgui.h"
+
 #include "simulation/simulation.hh"
 #include "gui.hh"
-#include "gui/imgui_impl_glfw.h"
-#include "gui/imgui_impl_opengl3.h"
 #include <GLFW/glfw3.h>
 
 GUI::GUI(Simulation &sim) : win_(glfwGetCurrentContext()), sim_(sim) {}
