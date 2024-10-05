@@ -1,0 +1,152 @@
+#version 430 core
+#define PI 3.1415926538
+
+layout(local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
+
+layout(binding = 0) buffer Transforms{
+    mat4 trs[];
+};
+layout(binding = 1) buffer Velocities{
+    vec4 vels[];
+};
+//layout(binding = 2) buffer Colors{
+//    vec4 colors[];
+//};
+
+
+uniform vec3 ubound;
+uniform vec3 lbound;
+uniform float deltaTime;
+uniform float radius;
+uniform vec3 interaction;
+uniform int inputState;
+uniform float gravity;
+uniform float targetedDensity;
+
+const float mass = 2;
+const float pressureMultiplier = 500.0f;
+
+float densityToPressure(float density)
+{
+   return (density - targetedDensity) * pressureMultiplier;
+}
+
+float smoothing(float radius, float dst)
+{
+    if (dst >= radius) return 0;
+    float volume = PI * pow(radius, 4) / 6;
+    float val = (radius - dst) * (radius - dst);
+    return val / volume;
+}
+
+float smoothingDerivative(float radius, float dst)
+{
+    if (dst >= radius)
+        return 0.0f;
+    float scale = 12 /(pow(radius, 4) * PI);
+    return (dst - radius) * scale;
+
+}
+float calculateDensity(vec3 point, float radius)
+{
+    float density = 0;
+
+    for(int i =0 ; i < gl_NumWorkGroups.x; i++)
+    {
+        vec3 pos = trs[i][3].xyz;
+        float dst = length(pos - point);
+        float influence = smoothing(radius, dst);
+        density += mass * influence;
+    }
+    return density;
+}
+float calculateSharedPressure(float a, float b)
+{
+    return (densityToPressure(a) + densityToPressure(b)) / 2.0f;
+}
+
+
+vec4 mapVelocityToColor(float velocityMagnitude) {
+    const float minVelocity = 0.0;
+    const float maxVelocity = 30.0;
+    const vec4 hotColor = vec4(168.0f, 10.0f, 23.0f, 255.0f) /225.0; 
+    const vec4 coldColor = vec4(63.0f, 114.0f, 217.0f, 255.0f) / 255.0; 
+    if (velocityMagnitude <= minVelocity) {
+        return coldColor;
+    } else if (velocityMagnitude >= maxVelocity) {
+        return hotColor;
+    } else {
+        float t = (velocityMagnitude - minVelocity) / (maxVelocity - minVelocity);
+        return mix(coldColor, hotColor, t);
+    }
+}
+
+void main()
+{
+    // CONSTANTS
+    const float restitutionCoeff = 0.9;
+    const float inputForce = 2.0f;
+    
+    //ID
+    const uint id = gl_WorkGroupID.x;
+    vec4 t = trs[id][3];
+    vec4 vel = vels[id];
+    float particuleDensity = vel.w;
+
+    vec3 pressure = vec3(0);
+    vec3 viscosity = vec3(0);
+    for (int i = 0; i < gl_NumWorkGroups.x; i++)
+    {
+        if (i == id)
+            continue;
+        vec3 other = trs[i][3].xyz;
+        float dst = length(other.xyz - t.xyz);
+        vec3 dir = dst == 0 ? normalize(vec3(1.0f)) : ((other.xyz - t.xyz) / dst);
+        float slope = smoothingDerivative(radius, dst);
+        float density = vels[i].w;
+        float sharedPressure = calculateSharedPressure(density, particuleDensity);
+        pressure += sharedPressure * dir * slope * mass / density;
+
+        vec3 dv = vel.xyz - vels[i].xyz;
+        viscosity += dv * mass;
+    }
+
+    //colors[id] = vec4(densityToPressure(particuleDensity) / pressureMultiplier * normalize(vec3(1.0f)), 1.0f);
+    //colors[id] = vec4(vec3(length(t.xyz - interaction)), 1.0f);
+    //colors[id] = mapVelocityToColor(length(vel));
+
+    vel += vec4(0.0f, -1.0f, 0.0f, 1.0f) * particuleDensity * gravity * deltaTime;
+    vel += vec4(pressure.xyz, 1.0f) * deltaTime / particuleDensity;
+    vec3 interactVec = interaction - t.xyz;
+    if (inputState != 0 && length(interactVec) <= radius * 2.0f)
+        vel += vec4(normalize(interactVec) * inputState * length(interactVec), 0.0f);
+    t += vel * deltaTime;
+
+    if( t.x < lbound.x)
+    {
+       t.x = lbound.x;
+       vel.x *= -restitutionCoeff;
+    }
+    else if( t.x > ubound.x)
+    {
+       t.x = ubound.x;
+       vel.x *= -restitutionCoeff;
+    }
+    if( t.y < lbound.y)
+    {
+       t.y = lbound.y;
+       vel.y *= -restitutionCoeff;
+    }
+    else if( t.y > ubound.y)
+    {
+       t.y = ubound.y;
+       vel.y *= -restitutionCoeff;
+    }
+    t.z = ubound.z;
+    t.w = 1.0;
+
+
+    vels[id] = vel * 0.97;
+    trs[id][3] = t;
+}
+
