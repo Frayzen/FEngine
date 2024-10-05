@@ -36,6 +36,26 @@ Camera::Camera(float fov, float near, float far)
     win_ = glfwGetCurrentContext();
 }
 
+void Camera::inputs2d() {
+
+    float dist = dot(getFront(), -position);
+    bool canZoom = dist > 1;
+    bool canUnzoom = dist < 8;
+
+    if (glfwGetKey(win_, GLFW_KEY_D) == GLFW_PRESS)
+        position += speed * getRight();
+    if (glfwGetKey(win_, GLFW_KEY_A) == GLFW_PRESS)
+        position += speed * -getRight();
+    if (glfwGetKey(win_, GLFW_KEY_W) == GLFW_PRESS)
+        position += speed * up_;
+    if (glfwGetKey(win_, GLFW_KEY_S) == GLFW_PRESS)
+        position += speed * -up_;
+    if (glfwGetKey(win_, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS && canUnzoom)
+        position += speed * -getFront();
+    if (glfwGetKey(win_, GLFW_KEY_SPACE) == GLFW_PRESS && canZoom)
+        position += speed * getFront();
+}
+
 void Camera::inputs() {
     if (glfwGetKey(win_, GLFW_KEY_D) == GLFW_PRESS)
         position += speed * getRight();

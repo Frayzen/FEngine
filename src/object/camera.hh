@@ -20,6 +20,7 @@ class Camera {
     Camera(float fov = 90.0f, float near = 0.1f, float far = 1000000000.0f);
     void mouseInput(vec2 bounds);
     void inputs();
+    void inputs2d();
 
     vec3 interactionPoint;
     int clickState = NOCLICK;
