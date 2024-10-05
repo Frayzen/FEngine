@@ -1,6 +1,6 @@
-#include "simulation/physics/pysc_sim.hh"
+#include "simulation/particles/ptc_sim.hh"
 int main() {
     Simulation::setup();
-    PyscSimulation s = PyscSimulation();
+    PtcSimulation s = PtcSimulation();
     s.run();
 }

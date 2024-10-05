@@ -19,8 +19,8 @@ void PtcSimulation::init() {
 }
 
 PtcSimulation::PtcSimulation()
-    : particleMesh_(Mesh::createFrom("assets/sphere.obj")),
-      boundingMesh_(Mesh::createFrom("assets/square.obj")),
+    : particleMesh_(Mesh::generateSphere(10, 10)),
+      boundingMesh_(Mesh::generate2DRect(2, 2)),
       densityCmpt_(Compute("assets/shaders/density.comp")),
       velocityCpt_(Compute("assets/shaders/velocity.comp")) {
     registerMesh(particleMesh_);
@@ -74,6 +74,7 @@ void PtcSimulation::updateBbox() {
     auto bbox = boundingMesh_.getObjects()[0];
     auto bbox_t = bbox.getTransform();
     bbox_t.scale = bounds + vec3(radius);
+    bbox_t.position = -bounds - radius;
     bbox_t.position.z = -1.0f;
     bbox.setTransform(bbox_t);
     /* *bbox.getColor() = vec4(0.1f, 0.1f, 0.1f, 1.0f); */
