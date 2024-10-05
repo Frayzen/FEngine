@@ -98,8 +98,9 @@ void PtcSimulation::compute(double deltaTime) {
     velocityCpt_.updateData(Object::getTransforms(particleMesh_), 0);
     velocityCpt_.updateData(Object::getVelocities(particleMesh_), 1);
     /* velocityCpt_.updateData(Object::getColors(particleMesh_), 2); */
+    auto interactPt = vec3(cam.lastInteractionPoint, 0);
     glUniform3fv(velocityCpt_.getUniformLoc("interaction"), 1,
-                 (float *)&cam.interactionPoint);
+                 (float *)&interactPt);
     glUniform1i(velocityCpt_.getUniformLoc("inputState"), cam.clickState);
     glUniform1f(velocityCpt_.getUniformLoc("radius"), radius);
     glUniform1f(velocityCpt_.getUniformLoc("mass"), mass);

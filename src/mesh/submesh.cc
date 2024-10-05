@@ -3,6 +3,7 @@
 #include "shader/render.hh"
 #include "mesh.hh"
 #include <assimp/mesh.h>
+#include <glm/ext/vector_uint3.hpp>
 #include <iostream>
 
 #define LOC_VERTEX 0
@@ -11,7 +12,7 @@
 #define LOC_TRANSFORM 3
 /* #define LOC_NEXT 8 */
 
-SubMesh::SubMesh(Mesh &m) : mesh_(m) {
+SubMesh::SubMesh(Mesh &m) : mesh_(m), box_(AABBox::noBounds()) {
     VAO = VBO = EBO = TBO = materialId_ = 0;
 }
 
@@ -128,6 +129,7 @@ void SubMesh::render(Render &r) {
 }
 
 int SubMesh::addVertex(const vec3 &v, const vec3 &n, const vec3 &uv) {
+    box_.update(v);
     vertices_.emplace_back(v);
     vertices_.emplace_back(n);
     vertices_.emplace_back(uv);
@@ -137,4 +139,15 @@ int SubMesh::addVertex(const vec3 &v, const vec3 &n, const vec3 &uv) {
 int SubMesh::addTriangle(const uvec3 &v) {
     indices_.push_back(v);
     return indices_.size() - 1;
+}
+
+AABBox &SubMesh::getAABbox() { return box_; }
+
+mat3 SubMesh::getTriangle(unsigned int id) {
+    uvec3 vid = indices_[id];
+    mat3 r;
+    r[0] = vertices_[vid[0] * 3];
+    r[1] = vertices_[vid[1] * 3];
+    r[2] = vertices_[vid[2] * 3];
+    return r;
 }

@@ -12,7 +12,7 @@ class Material {
   public:
     static Material createFrom(std::string folderRoot, aiMaterial *mat);
     void enable(Render &r);
-    void setColor(vec3 c);
+    void setColor(vec3 c, bool noDiffuse = false);
     bool twosided = false;
     float shininess, opacity = 1.0f;
     float shininessStrength = 1.0f;

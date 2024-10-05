@@ -147,7 +147,10 @@ void Material::enable(Render &r) {
     r.setVec3("ambientCol", ambientCol);
 }
 
-void Material::setColor(vec3 c) {
+void Material::setColor(vec3 c, bool noDiffuse) {
     ambientCol = c * 0.5f;
-    diffuseCol = c;
+    if (noDiffuse)
+        diffuseCol = vec3(0);
+    else
+        diffuseCol = c;
 }

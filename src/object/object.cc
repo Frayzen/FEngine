@@ -23,6 +23,11 @@ unsigned int Object::getId(Mesh &m) {
     return objIds_[m.id]++;
 }
 
+Mesh& Object::getMesh()
+{
+  return m_;
+}
+
 Object::Object(Mesh &m) : id(getId(m)), m_(m) {
     static const mat4 mat = Transform::identity().getMatrix();
     objTransforms_[m.id].push_back(mat);

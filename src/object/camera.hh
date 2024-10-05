@@ -19,24 +19,27 @@ class Camera {
 
     Camera(bool is2d, float fov = 90.0f, float near = 0.1f,
            float far = 1000000000.0f);
-    void mouseInput(vec2 bounds);
+    vec2 mouseInput(vec2 bounds);
     void inputs();
     void inputs2d();
 
-    vec3 interactionPoint;
+    vec2 lastInteractionPoint;
     int clickState = NOCLICK;
 
     vec3 position = vec3(0.0f);
 
     float sensitivity = 4.0f;
     float speed = 0.3f;
+    float near_;
 
-  private:
     vec3 getFront();
     vec3 getRight();
+
+  private:
+
     // fov in degrees
     GLFWwindow *win_;
-    float fov_, near_, far_;
+    float fov_, far_;
 
     float lockAxisX_ = 89.9;
 
@@ -45,4 +48,6 @@ class Camera {
     float pitch_ = 0;
     float yaw_ = 0;
     bool is2d_;
+
+    friend class Ray;
 };
