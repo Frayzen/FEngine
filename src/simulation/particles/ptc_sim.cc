@@ -2,6 +2,7 @@
 #include "mesh/mesh.hh"
 #include "simulation/particles/ptc_gui.hh"
 #include <cstring>
+#include <glm/fwd.hpp>
 
 #define OBJNB (particleMesh_.getObjects().size())
 #define UBOUNDS (bounds)
@@ -26,6 +27,7 @@ PtcSimulation::PtcSimulation()
     registerMesh(particleMesh_);
     registerMesh(boundingMesh_);
     attachGUI(new PtcGUI(*this));
+    bgColor = vec4(0);
 }
 
 void PtcSimulation::setupBuffers() {
@@ -54,7 +56,8 @@ void PtcSimulation::createObjects() {
             t.position -=
                 vec3(offset.x * size.x / 2, offset.y * size.y / 2, 0.0f);
             t.scale = vec3(radius * appearanceRadiusCoeff,
-                           radius * appearanceRadiusCoeff, 0.0f);
+                           radius * appearanceRadiusCoeff,
+                           radius * appearanceRadiusCoeff);
             o.setTransform(t);
         }
     }
