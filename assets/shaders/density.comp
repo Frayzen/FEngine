@@ -1,0 +1,46 @@
+#version 430 core
+#define PI 3.1415926538
+
+layout(local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
+
+layout(binding = 0) buffer Transforms{
+    mat4 trs[];
+};
+
+layout(binding = 1) buffer Velocities{
+    vec4 vels[];
+};
+
+uniform float mass;
+uniform float radius;
+uniform float deltaTime;
+
+float smoothing(float radius, float dst)
+{
+    if (dst >= radius) return 0;
+    float volume = PI * pow(radius, 4) / 6.0f;
+    float val = (radius - dst) * (radius - dst);
+    return val / volume;
+}
+
+
+float calculateDensity(vec3 point, float radius)
+{
+    float density = 0;
+
+    for(int i =0 ; i < gl_NumWorkGroups.x; i++)
+    {
+        vec3 pos = trs[i][3].xyz; //+ vels[i].xyz * deltaTime;
+        float dst = length(point - pos);
+        float influence = smoothing(radius, dst);
+        density += mass * influence;
+    }
+    return density;
+}
+
+
+void main()
+{
+    uint id =  gl_WorkGroupID.x;
+    vels[id].w = calculateDensity(trs[id][3].xyz + vels[id].xyz * deltaTime, radius);
+}

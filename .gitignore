@@ -1,4 +1,5 @@
 *
+!*/
 !*.cc
 !*.cpp
 !*.c
@@ -8,7 +9,6 @@
 !*.sh
 !*.obj
 !*.glsl
-!assets/**
 !.gitignore
 !*.vert
 !*.frag
@@ -20,5 +20,5 @@
 .git
 deps
 .cache
-assets/dragon.obj
 build
+CMakeFiles
