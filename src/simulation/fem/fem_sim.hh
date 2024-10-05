@@ -1,5 +1,6 @@
 #pragma once
 
+#include "object/object.hh"
 #include "simulation/simulation.hh"
 class FemSimulation : public Simulation {
   public:
@@ -10,4 +11,5 @@ class FemSimulation : public Simulation {
   private:
     Mesh tile_;
     Mesh beam_;
+    Mesh selector_;
 };

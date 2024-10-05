@@ -39,6 +39,7 @@ void Simulation::setup() {
     glEnable(GL_DEBUG_OUTPUT);
     glDebugMessageCallback(DebugCallback, 0);
     glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LESS);
 
     std::cout << "OPENGL VERSION: " << glGetString(GL_VERSION) << std::endl;
 }
@@ -57,7 +58,7 @@ Simulation::Simulation(bool is2d)
 
 void Simulation::registerMesh(Mesh &m) { meshes_.push_back(m); }
 
-// Main loop
+// Main loopsimu
 void Simulation::run() {
     init();
     while (!glfwWindowShouldClose(win_)) {
