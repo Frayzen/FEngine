@@ -3,7 +3,7 @@ project(engine)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(OpenGL_GL_PREFERENCE GLVND)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Werror -pedantic -std=c++20 -Wold-style-cast -Wno-error=old-style-cast")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Werror -pedantic -std=c++20 -Wno-old-style-cast")
 
 find_package(GLEW REQUIRED)
 find_package(glfw3 REQUIRED)
