@@ -17,7 +17,8 @@ class Camera {
     mat4 getViewMat();
     mat4 getProjMat();
 
-    Camera(float fov = 90.0f, float near = 0.1f, float far = 1000000000.0f);
+    Camera(bool is2d, float fov = 90.0f, float near = 0.1f,
+           float far = 1000000000.0f);
     void mouseInput(vec2 bounds);
     void inputs();
     void inputs2d();
@@ -43,4 +44,5 @@ class Camera {
     // in degrees
     float pitch_ = 0;
     float yaw_ = 0;
+    bool is2d_;
 };

@@ -12,7 +12,7 @@
 using namespace glm;
 class Simulation {
   public:
-    Camera cam = Camera();
+    Camera cam;
 
     bool isRunning = true;
 

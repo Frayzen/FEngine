@@ -44,8 +44,9 @@ void Simulation::setup() {
 }
 
 Simulation::Simulation(bool is2d)
-    : is2d_(is2d), renderer_(Render("assets/shaders/default.vert",
-                                    "assets/shaders/default.frag")),
+    : cam(Camera(is2d)), is2d_(is2d),
+      renderer_(
+          Render("assets/shaders/default.vert", "assets/shaders/default.frag")),
       win_(glfwGetCurrentContext()) {
     assert(glfwGetCurrentContext() != nullptr);
     glfwSetTime(0);
