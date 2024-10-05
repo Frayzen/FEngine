@@ -17,6 +17,8 @@ using namespace glm;
 class Mesh : public Renderable {
   public:
     static Mesh generateSphere(int slices, int stacks);
+    static Mesh generate2DRect(float h, float w);
+
     static Mesh createFrom(std::string path);
     void render(Render &shader, Camera &camera) override;
     const unsigned int id;

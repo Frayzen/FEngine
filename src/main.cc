@@ -1,6 +1,6 @@
-#include "simulation/physics/pysc_sim.hh"
+#include "simulation/fem/fem_sim.hh"
 int main() {
     Simulation::setup();
-    PyscSimulation s = PyscSimulation();
+    FemSimulation s = FemSimulation();
     s.run();
 }

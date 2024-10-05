@@ -3,10 +3,32 @@
 
 #define M_PI 3.14159265358979323846
 
+Mesh Mesh::generate2DRect(float h, float w) {
+    Mesh mesh = Mesh();
+    mesh.materials_.emplace_back(Material());
+    SubMesh &sm = mesh.createSubMesh();
+
+    // add vertices
+    for (int i = 0; i < 2; i++) {
+        for (int j = 0; j < 2; j++) {
+            auto pos = vec3(0, i * h, j * w);
+            auto norm = vec3(1, 0, 0);
+            auto uv = vec3(i, j, 0);
+            sm.addVertex(pos, norm, uv);
+        }
+    }
+
+    // add triangles
+    sm.addTriangle(uvec3(0, 1, 2));
+    sm.addTriangle(uvec3(1, 2, 3));
+
+    return mesh;
+}
+
 Mesh Mesh::generateSphere(int n_slices, int n_stacks) {
     Mesh mesh = Mesh();
     mesh.materials_.emplace_back(Material());
-    SubMesh& sm = mesh.createSubMesh();
+    SubMesh &sm = mesh.createSubMesh();
 
     // add top vertex
     auto pos = vec3(0, 1, 0);
