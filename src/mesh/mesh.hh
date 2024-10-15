@@ -1,5 +1,6 @@
 #pragma once
 
+#include "fwd.hh"
 #include "object/renderable.hh"
 #include "object/object.hh"
 #include <GL/gl.h>
@@ -16,6 +17,8 @@
 using namespace glm;
 
 class Mesh : public Renderable {
+  friend class FEMMesh;
+
   public:
     static Mesh generateSphere(int slices, int stacks);
     static Mesh generate2DRect(float h, float w);
@@ -30,9 +33,9 @@ class Mesh : public Renderable {
     void clearObjects();
 
     std::vector<SubMesh>& getSubMeshes(void);
+    SubMesh &createSubMesh();
 
   private:
-    SubMesh &createSubMesh();
     std::vector<SubMesh> subMeshes_;
     std::vector<Object> objects_;
     std::vector<Material> materials_;

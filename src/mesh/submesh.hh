@@ -23,12 +23,12 @@ class SubMesh {
 
     AABBox &getAABbox();
 
+    int addVertex(const vec3 &v, const vec3 &n, const vec3 &uv);
+    int addTriangle(const uvec3 &v);
+
   private:
     void updateBuffers();
     void updateObjects();
-
-    int addVertex(const vec3 &v, const vec3 &n, const vec3 &uv);
-    int addTriangle(const uvec3 &v);
 
     Mesh &mesh_;
 

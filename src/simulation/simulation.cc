@@ -10,6 +10,16 @@
 
 #define OBJNB(Mesh) (Mesh.getObjects().size())
 
+void Simulation::keyCallback(int key, int action) {
+    (void)key;
+    (void)action;
+}
+
+void Simulation::mouseButtonCallback(int button, int action) {
+    (void)button;
+    (void)action;
+}
+
 void Simulation::restartSimulation() {
     isRunning = false;
     for (auto &m : meshes_)
@@ -44,6 +54,10 @@ void Simulation::setup() {
     std::cout << "OPENGL VERSION: " << glGetString(GL_VERSION) << std::endl;
 }
 
+void Simulation::toggle2d() {
+    is2d_ = !is2d_;
+    cam.is2d_ = is2d_;
+}
 Simulation::Simulation(bool is2d)
     : cam(Camera(is2d)), is2d_(is2d),
       renderer_(
@@ -54,6 +68,24 @@ Simulation::Simulation(bool is2d)
     lastTime_ = glfwGetTime();
     if (is2d)
         cam.position = vec3(-5, 0, 0);
+
+    glfwSetWindowUserPointer(win_, this);
+    auto keyCallback = [](GLFWwindow *window, int key, int scancode, int action,
+                          int mods) {
+        (void)mods;
+        (void)scancode;
+        static_cast<Simulation *>(glfwGetWindowUserPointer(window))
+            ->keyCallback(key, action);
+    };
+    auto mouseBtnCallback = [](GLFWwindow *window, int button, int action,
+                               int mods) {
+        (void)mods;
+        glfwGetMouseButton(window, button);
+        static_cast<Simulation *>(glfwGetWindowUserPointer(window))
+            ->mouseButtonCallback(button, action);
+    };
+    glfwSetKeyCallback(win_, keyCallback);
+    glfwSetMouseButtonCallback(win_, mouseBtnCallback);
 }
 
 void Simulation::registerMesh(Mesh &m) { meshes_.push_back(m); }

@@ -4,7 +4,6 @@
 #include <glm/fwd.hpp>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include <iostream>
 
 Transform::Transform(vec3 pos, quat rot, vec3 scale)
     : position(pos), rotation(rot), scale(scale) {}
@@ -13,7 +12,7 @@ mat4 Transform::getMatrix() {
     glm::mat4 pos = glm::translate(glm::mat4(1.0f), position);
     glm::mat4 rot = getRotationMatrix();
     glm::mat4 scl = glm::scale(glm::mat4(1.0f), scale);
-    return rot * pos * scl;
+    return pos * rot * scl;
 }
 
 mat4 Transform::getRotationMatrix() {
