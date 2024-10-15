@@ -16,7 +16,7 @@
 
 static int curId = 0;
 
-Mesh::Mesh() : id(curId++) {}
+Mesh::Mesh() : id(curId++), bbox_(AABBox::noBounds()) {}
 
 Mesh Mesh::createFrom(std::string path) {
     std::cout << "Importing " << path << "..." << '\n';
@@ -65,8 +65,9 @@ void Mesh::clearObjects() {
     objects_ = std::vector<Object>();
 }
 
-SubMesh& Mesh::createSubMesh()
-{
+SubMesh &Mesh::createSubMesh() {
     subMeshes_.emplace_back(SubMesh(*this));
     return subMeshes_.back();
 }
+
+std::vector<SubMesh>& Mesh::getSubMeshes(void) { return subMeshes_; }
