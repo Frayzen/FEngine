@@ -4,6 +4,7 @@
 #include "shader/render.hh"
 #include <assimp/mesh.h>
 #include <glm/fwd.hpp>
+#include "object/aabbox.hh"
 #include <GL/gl.h>
 #include <vector>
 using namespace glm;
@@ -15,9 +16,12 @@ class SubMesh {
     SubMesh(Mesh &m);
     static SubMesh createFrom(Mesh &m, aiMesh *mesh);
     void enable();
+    mat3 getTriangle(unsigned int id);
     unsigned int triangleNumber();
     void render(Render &r);
     ~SubMesh();
+
+    AABBox &getAABbox();
 
   private:
     void updateBuffers();
@@ -37,4 +41,5 @@ class SubMesh {
     // TBO = Transform Buffer Object
     // CBO = Color Buffer Object
     GLuint VAO, VBO, EBO, TBO;
+    AABBox box_;
 };

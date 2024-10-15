@@ -10,8 +10,14 @@
 #include <glm/geometric.hpp>
 
 mat4 Camera::getProjMat() {
-
     const float ratio = screenSize.x / screenSize.y;
+    if (is2d_) {
+        auto zoom = -position.x;
+        float left = -zoom * 0.5f, right = zoom * 0.5f,
+              down = -zoom * 0.5f / ratio, up = zoom * 0.5f / ratio;
+
+        return glm::ortho(left, right, down, up, near_, far_);
+    }
     return glm::perspective(glm::radians(fov_), ratio, near_, far_);
 }
 
@@ -30,10 +36,32 @@ vec3 Camera::getFront() {
 
 vec3 Camera::getRight() { return glm::cross(getFront(), up_); }
 
-Camera::Camera(float fov, float near, float far)
-    : fov_(fov), near_(near), far_(far) {
+Camera::Camera(bool is2d, float fov, float near, float far)
+    : near_(near), fov_(fov), far_(far), is2d_(is2d) {
     assert(glfwGetCurrentContext() != nullptr);
     win_ = glfwGetCurrentContext();
+}
+
+void Camera::inputs2d() {
+
+    float zoom = -position.x;
+    bool canZoom = zoom > minZoom;
+    bool canUnzoom = zoom < maxZoom;
+
+    auto adaptSpeed =
+        speed * (0.2f + 2 * (zoom - minZoom) / (maxZoom - minZoom));
+    if (glfwGetKey(win_, GLFW_KEY_D) == GLFW_PRESS)
+        position += adaptSpeed * getRight();
+    if (glfwGetKey(win_, GLFW_KEY_A) == GLFW_PRESS)
+        position += adaptSpeed * -getRight();
+    if (glfwGetKey(win_, GLFW_KEY_W) == GLFW_PRESS)
+        position += adaptSpeed * up_;
+    if (glfwGetKey(win_, GLFW_KEY_S) == GLFW_PRESS)
+        position += adaptSpeed * -up_;
+    if (glfwGetKey(win_, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS && canUnzoom)
+        position += speed * 3 * -getFront();
+    if (glfwGetKey(win_, GLFW_KEY_SPACE) == GLFW_PRESS && canZoom)
+        position += speed * 3 * getFront();
 }
 
 void Camera::inputs() {
@@ -61,17 +89,19 @@ void Camera::inputs() {
     pitch_ = max(min(pitch_, lockAxisX_), -lockAxisX_);
 }
 
-void Camera::mouseInput(vec2 bounds) {
+// return value between -bounds and bounds and set lastInteractionPoint
+vec2 Camera::mouseInput(vec2 bounds) {
     double xpos, ypos;
     int height, width;
     glfwGetCursorPos(win_, &xpos, &ypos);
     glfwGetWindowSize(win_, &width, &height);
     float x = 2 * bounds.x * (-0.5 + xpos / width);
     float y = 2 * bounds.y * (0.5 - ypos / height);
-    interactionPoint = vec3(x, y, 0.0f);
+    lastInteractionPoint = clamp(vec2(x, y), -bounds, bounds);
     clickState = NOCLICK;
     if (glfwGetMouseButton(win_, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
         clickState += LCLICK;
     if (glfwGetMouseButton(win_, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS)
         clickState += RCLICK;
+    return lastInteractionPoint;
 }

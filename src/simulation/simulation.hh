@@ -12,7 +12,7 @@
 using namespace glm;
 class Simulation {
   public:
-    Camera cam = Camera();
+    Camera cam;
 
     bool isRunning = true;
 
@@ -29,7 +29,7 @@ class Simulation {
     std::vector<std::reference_wrapper<Object>> getObjects();
 
   protected:
-    Simulation();
+    Simulation(bool is2d = false);
     ~Simulation();
     void attachGUI(GUI *gui);
     vec4 bgColor = vec4(0.6f, 0.6f, 0.6f, 1.0f);
@@ -44,6 +44,7 @@ class Simulation {
     void compute(Mesh &m);
 
     double lastTime_;
+    bool is2d_;
 
     std::vector<std::reference_wrapper<Mesh>> meshes_ =
         std::vector<std::reference_wrapper<Mesh>>();

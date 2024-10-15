@@ -1,3 +1,4 @@
+#include <glm/fwd.hpp>
 #include <imgui_impl_opengl3.h>
 #include "simulation.hh"
 #include "constants.hh"
@@ -38,22 +39,26 @@ void Simulation::setup() {
     glEnable(GL_DEBUG_OUTPUT);
     glDebugMessageCallback(DebugCallback, 0);
     glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LESS);
 
     std::cout << "OPENGL VERSION: " << glGetString(GL_VERSION) << std::endl;
 }
 
-Simulation::Simulation()
-    : renderer_(
+Simulation::Simulation(bool is2d)
+    : cam(Camera(is2d)), is2d_(is2d),
+      renderer_(
           Render("assets/shaders/default.vert", "assets/shaders/default.frag")),
       win_(glfwGetCurrentContext()) {
     assert(glfwGetCurrentContext() != nullptr);
     glfwSetTime(0);
     lastTime_ = glfwGetTime();
+    if (is2d)
+        cam.position = vec3(-5, 0, 0);
 }
 
 void Simulation::registerMesh(Mesh &m) { meshes_.push_back(m); }
 
-// Main loop
+// Main loopsimu
 void Simulation::run() {
     init();
     while (!glfwWindowShouldClose(win_)) {
@@ -70,7 +75,10 @@ void Simulation::run() {
         // EVENTS
         glfwPollEvents();
 
-        cam.inputs();
+        if (is2d_)
+            cam.inputs2d();
+        else
+            cam.inputs();
         update(deltaTime);
 
         // RENDER
@@ -106,7 +114,4 @@ std::vector<std::reference_wrapper<Object>> Simulation::getObjects() {
     return objects;
 }
 
-Simulation::~Simulation()
-{
-    delete(gui_);	
-}
+Simulation::~Simulation() { delete (gui_); }
