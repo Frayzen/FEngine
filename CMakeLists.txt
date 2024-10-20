@@ -17,16 +17,28 @@ include_directories(${GLEW_INCLUDE_DIR})
 include_directories(${OPENGL_GLU_INCLUDE_DIR})
 include_directories(${imgui_DIR})
 
-link_libraries(GLEW)
-link_libraries(glfw)
-link_libraries(OpenGL::GL)
-link_libraries(imgui)
-link_libraries(glm::glm)
-link_libraries(assimp)
+include(FetchContent)
+FetchContent_Declare(
+    googletest
+    GIT_REPOSITORY https://github.com/google/googletest.git
+    GIT_TAG release-1.12.1
+)
+FetchContent_MakeAvailable(googletest)
+
+# Ensure to link against both gtest and gtest_main
+link_libraries(GLEW glfw OpenGL::GL imgui glm::glm assimp gtest gtest_main)
+
+enable_testing()
 
 file(GLOB_RECURSE sources src/*.cc)
 
 add_executable(engine ${sources})
 
 target_include_directories(engine PUBLIC ${PROJECT_SOURCE_DIR}/src)
+
+add_executable(fem_2d_mesh_test src/fem/fem_2d_mesh_test.cc)
+
+target_link_libraries(fem_2d_mesh_test gtest gtest_main)
+
+add_test(NAME FEM2DMeshTest COMMAND fem_2d_mesh_test)
 

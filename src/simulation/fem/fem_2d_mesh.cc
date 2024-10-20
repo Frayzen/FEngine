@@ -8,6 +8,9 @@
 #include <glm/trigonometric.hpp>
 #include <vector>
 
+void FEM2DMesh::setNodeType(int id, NodeType type) {
+    nodeTypes_[id] = type;
+}
 FEM2DMesh::FEM2DMesh() : beam_(Mesh::generate2DRect(SQR_SIZE, GAP_RECT)) {
     beam_.getMaterials()[0].setColor(vec3(0.0, 0.0, 1.0), true);
 }
