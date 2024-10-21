@@ -69,5 +69,4 @@ SubMesh &Mesh::createSubMesh() {
     subMeshes_.emplace_back(SubMesh(*this));
     return subMeshes_.back();
 }
-
 std::vector<SubMesh>& Mesh::getSubMeshes(void) { return subMeshes_; }

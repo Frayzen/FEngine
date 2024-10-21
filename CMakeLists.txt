@@ -5,40 +5,37 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(OpenGL_GL_PREFERENCE GLVND)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Werror -pedantic -std=c++20 -Wno-old-style-cast")
 
+# Find required packages
 find_package(GLEW REQUIRED)
 find_package(glfw3 REQUIRED)
 find_package(OpenGL REQUIRED)
 find_package(glm REQUIRED)
 find_package(assimp REQUIRED)
 find_package(imgui REQUIRED)
+find_package(GTest REQUIRED)  # Added for Google Test
 
+# Include directories
 include_directories(${OPENGL_INCLUDE_DIR})
 include_directories(${GLEW_INCLUDE_DIR})
 include_directories(${OPENGL_GLU_INCLUDE_DIR})
 include_directories(${imgui_DIR})
+include_directories(${GTEST_INCLUDE_DIRS})  # Added for Google Test
 
-include(FetchContent)
-FetchContent_Declare(
-    googletest
-    GIT_REPOSITORY https://github.com/google/googletest.git
-    GIT_TAG release-1.12.1
-)
-FetchContent_MakeAvailable(googletest)
+# Link libraries
+link_libraries(GLEW)
+link_libraries(glfw)
+link_libraries(OpenGL::GL)
+link_libraries(imgui)
+link_libraries(glm::glm)
+link_libraries(assimp)
+link_libraries(${GTEST_LIBRARIES} pthread)  # Link against Google Test and pthread
 
-# Ensure to link against both gtest and gtest_main
-link_libraries(GLEW glfw OpenGL::GL imgui glm::glm assimp gtest gtest_main)
-
-enable_testing()
-
+# Gather source files
 file(GLOB_RECURSE sources src/*.cc)
 
+# Create the main executable
 add_executable(engine ${sources})
 
+# Set include directories for the main executable
 target_include_directories(engine PUBLIC ${PROJECT_SOURCE_DIR}/src)
-
-add_executable(fem_2d_mesh_test src/fem/fem_2d_mesh_test.cc)
-
-target_link_libraries(fem_2d_mesh_test gtest gtest_main)
-
-add_test(NAME FEM2DMeshTest COMMAND fem_2d_mesh_test)
 

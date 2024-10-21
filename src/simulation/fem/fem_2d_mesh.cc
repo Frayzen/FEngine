@@ -8,11 +8,10 @@
 #include <glm/trigonometric.hpp>
 #include <vector>
 
-void FEM2DMesh::setNodeType(int id, NodeType type) {
-    nodeTypes_[id] = type;
-}
+void FEM2DMesh::setNodeType(int id, NodeType type) { nodeTypes_[id] = type; }
 FEM2DMesh::FEM2DMesh() : beam_(Mesh::generate2DRect(SQR_SIZE, GAP_RECT)) {
-    beam_.getMaterials()[0].setColor(vec3(0.0, 0.0, 1.0), true);
+    /* beam_.getMaterials()[0].setColor(vec3(0.0, 0.0, 1.0), true); */
+    //FLORIAN
 }
 
 int find_or_append(vec3 e, std::vector<vec3> &v) {
@@ -42,9 +41,10 @@ void FEM2DMesh::updatePos(int id) {
 
     auto dir = v1 - v2;
     auto len = length(dir);
-    auto rot = glm::quat_cast(glm::rotate(identity<mat4>(), std::atan2(dir.z, dir.y), vec3(1, 0, 0)));
+    auto rot = glm::quat_cast(
+        glm::rotate(identity<mat4>(), std::atan2(dir.z, dir.y), vec3(1, 0, 0)));
     Transform t = o.getTransform();
-    t.scale = vec3(len,len, 1);
+    t.scale = vec3(len, len, 1);
     t.position = (v1 + v2) / 2.0f;
     t.rotation = rot;
     o.setTransform(t);
