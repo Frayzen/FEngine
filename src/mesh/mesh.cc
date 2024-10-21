@@ -16,7 +16,7 @@
 
 static int curId = 0;
 
-Mesh::Mesh() : id(curId++), bbox_(AABBox::noBounds()) {}
+Mesh::Mesh() : id(curId++), subMeshes_(), objects_(), materials_(), bbox_(AABBox::noBounds())   {}
 
 Mesh Mesh::createFrom(std::string path) {
     std::cout << "Importing " << path << "..." << '\n';

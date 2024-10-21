@@ -19,10 +19,12 @@ class FEM2DMesh {
     void updatePos(int id);
     void setNodeType(int id, NodeType type);
     Mesh &getMesh(void);
+    bool loadFromCSV(const std::string &filePath);
 
   private:
     Mesh beam_;
     std::vector<uvec2> elems1d_;
     std::vector<vec3> elems0d_;
     std::vector<NodeType> nodeTypes_;
+    NodeType parseNodeType(const std::string &str);
 };

@@ -7,26 +7,21 @@ Mesh Mesh::generate2DRect(float h, float w) {
     Mesh mesh = Mesh();
     mesh.materials_.emplace_back(Material());
 
-    std::ignore = h + w; 
-    //FLORIAN you little shit. not sure whats happneing here but there is a segfalt in createSubMesh()
+    SubMesh &sm = mesh.createSubMesh();
 
+    // add vertices
+    for (int i = 0; i < 2; i++) {
+        for (int j = 0; j < 2; j++) {
+            auto pos = vec3(0, (i - 0.5) * h, (j - 0.5) * w);
+            auto norm = vec3(1, 0, 0);
+            auto uv = vec3(i, j, 0);
+            sm.addVertex(pos, norm, uv);
+        }
+    }
 
-
-    /* SubMesh &sm = mesh.createSubMesh(); */
-
-    /* // add vertices */
-    /* for (int i = 0; i < 2; i++) { */
-    /*     for (int j = 0; j < 2; j++) { */
-    /*         auto pos = vec3(0, (i - 0.5) * h, (j - 0.5) * w); */
-    /*         auto norm = vec3(1, 0, 0); */
-    /*         auto uv = vec3(i, j, 0); */
-    /*         sm.addVertex(pos, norm, uv); */
-    /*     } */
-    /* } */
-
-    /* // add triangles */
-    /* sm.addTriangle(uvec3(0, 1, 2)); */
-    /* sm.addTriangle(uvec3(1, 2, 3)); */
+    // add triangles
+    sm.addTriangle(uvec3(0, 1, 2));
+    sm.addTriangle(uvec3(1, 2, 3));
 
     return mesh;
 }
