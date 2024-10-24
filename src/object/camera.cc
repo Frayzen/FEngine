@@ -9,10 +9,12 @@
 #include <glm/fwd.hpp>
 #include <glm/geometric.hpp>
 
+static const float ortho_zoom_factor = 4;
+
 mat4 Camera::getProjMat() {
     const float ratio = screenSize.x / screenSize.y;
     if (is2d_) {
-        auto zoom = -position.x;
+        auto zoom = -position.x * ortho_zoom_factor;
         float left = -zoom * 0.5f, right = zoom * 0.5f,
               down = -zoom * 0.5f / ratio, up = zoom * 0.5f / ratio;
 
@@ -26,6 +28,8 @@ mat4 Camera::getViewMat() {
 }
 
 vec3 Camera::getFront() {
+    if (is2d_)
+        return vec3(1, 0, 0);
     vec3 front;
     front.x = cos(glm::radians(yaw_)) * cos(glm::radians(pitch_));
     front.y = sin(glm::radians(pitch_));
@@ -48,8 +52,7 @@ void Camera::inputs2d() {
     bool canZoom = zoom > minZoom;
     bool canUnzoom = zoom < maxZoom;
 
-    auto adaptSpeed =
-        speed * (0.2f + 2 * (zoom - minZoom) / (maxZoom - minZoom));
+    auto adaptSpeed = speed * 2 * (0.2f + 2 * (zoom - minZoom) / (maxZoom - minZoom));
     if (glfwGetKey(win_, GLFW_KEY_D) == GLFW_PRESS)
         position += adaptSpeed * getRight();
     if (glfwGetKey(win_, GLFW_KEY_A) == GLFW_PRESS)
@@ -59,9 +62,9 @@ void Camera::inputs2d() {
     if (glfwGetKey(win_, GLFW_KEY_S) == GLFW_PRESS)
         position += adaptSpeed * -up_;
     if (glfwGetKey(win_, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS && canUnzoom)
-        position += speed * 3 * -getFront();
+        position += speed * -getFront();
     if (glfwGetKey(win_, GLFW_KEY_SPACE) == GLFW_PRESS && canZoom)
-        position += speed * 3 * getFront();
+        position += speed * getFront();
 }
 
 void Camera::inputs() {

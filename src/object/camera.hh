@@ -1,5 +1,6 @@
 #pragma once
 
+#include "fwd.hh"
 #include <GLFW/glfw3.h>
 #include <cmath>
 #include <glm/fwd.hpp>
@@ -29,7 +30,7 @@ class Camera {
     vec3 position = vec3(0.0f);
 
     float sensitivity = 4.0f;
-    float speed = 0.3f;
+    float speed = 1;
     float near_;
 
     vec3 getFront();
@@ -50,4 +51,5 @@ class Camera {
     bool is2d_;
 
     friend class Ray;
+    friend class Simulation;
 };

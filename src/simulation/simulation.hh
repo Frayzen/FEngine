@@ -16,6 +16,8 @@ class Simulation {
 
     bool isRunning = true;
 
+    virtual void keyCallback(int key, int action);
+    virtual void mouseButtonCallback(int button, int action);
     virtual void update(double deltaTime) = 0;
     virtual void init() = 0;
 
@@ -24,13 +26,15 @@ class Simulation {
     void registerMesh(Mesh &m);
     void run();
 
+    void toggle2d();
+
     static void setup();
 
     std::vector<std::reference_wrapper<Object>> getObjects();
 
   protected:
     Simulation(bool is2d = false);
-    ~Simulation();
+    virtual ~Simulation();
     void attachGUI(GUI *gui);
     vec4 bgColor = vec4(0.6f, 0.6f, 0.6f, 1.0f);
 
@@ -42,6 +46,9 @@ class Simulation {
     void updateBboxes();
     void updateBbox(Mesh &m);
     void compute(Mesh &m);
+
+    void keyCallbackHandler(GLFWwindow* window, int key, int scancode, int action, int mods);
+
 
     double lastTime_;
     bool is2d_;

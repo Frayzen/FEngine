@@ -151,3 +151,4 @@ mat3 SubMesh::getTriangle(unsigned int id) {
     r[2] = vertices_[vid[2] * 3];
     return r;
 }
+
