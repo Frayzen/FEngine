@@ -4,24 +4,26 @@
 #include <vector>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp> // For matrix transformations
-#include <glm/gtc/type_ptr.hpp>        // For value_ptr
+#include <glm/gtc/type_ptr.hpp>         // For value_ptr
 
 const float A = 0.1;   // Cross-sectional area
 const float L = 1.0;   // Length of the beams
 const float E = 200.0; // Young's Modulus
 
 const glm::mat4 local_k = glm::mat4(0.0f);
-const glm::mat4 local_k_init = glm::mat4(1.0f, 0.0f, -1.0f, 0.0f,
-                                         0.0f, 0.0f, 0.0f, 0.0f,
-                                         -1.0f, 0.0f, 1.0f, 0.0f,
-                                         0.0f, 0.0f, 0.0f, 0.0f);
+const glm::mat4 local_k_init =
+    glm::mat4(1.0f, 0.0f, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f, 0.0f,
+              1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
 
 // Print function for glm::mat4
 void print_matrix(const glm::mat4 &matrix) {
-    std::cout << std::fixed << std::setprecision(3); // Set fixed-point notation and 3 decimal places
+    std::cout << std::fixed
+              << std::setprecision(
+                     3); // Set fixed-point notation and 3 decimal places
     for (int i = 0; i < 4; ++i) {
         for (int j = 0; j < 4; ++j) {
-            std::cout << std::setw(8) << matrix[i][j] << " "; // Set width for alignment
+            std::cout << std::setw(8) << matrix[i][j]
+                      << " "; // Set width for alignment
         }
         std::cout << std::endl;
     }
@@ -69,21 +71,68 @@ void calculate_global_stiffness_beam(const glm::vec2 &node1,
     print_matrix(global_k);
 }
 
+void calculate_global_stiffness_truss(glm::vec2 nodes[], glm::uvec2 beams[], glm::mat4 beam_ks[], float K_global[6][6]){
+
+
+    for (int i = 0; i < 3; ++i) {
+        uint n1 = beams[i][0];
+        uint n2 = beams[i][1];
+        std::cout << "beam = " << n1 << "-" << n2 << std::endl;
+
+        uint n1_dof_x = n1 * 2;
+        uint n1_dof_y = n1 * 2 + 1;
+        uint n2_dof_x = n2 * 2;
+        uint n2_dof_y = n2 * 2 + 1;
+        std::cout << n1_dof_x << " " << n1_dof_y << " " << n2_dof_x << " "
+                  << n2_dof_y << std::endl;
+        uint dofs[] = {n1_dof_x, n1_dof_y, n2_dof_x, n2_dof_y};
+        for (int j = 0; j < 4; ++j) {
+            for (int k = 0; k < 4; ++k) {
+                K_global[dofs[j]][dofs[k]] += beam_ks[i][j][k];
+            }
+        }
+            
+    }
+
+}
+
 int main() {
     // Define the nodes of the truss
     glm::vec2 node1(0, 0);             // Node 1
     glm::vec2 node2(0.5, sqrt(3) / 2); // Node 2
     glm::vec2 node3(1, 0);             // Node 3
+    glm::vec2 nodes[] = {node1, node2, node3};
+
+    glm::uvec2 beams[] = {glm::uvec2(0, 1), glm::uvec2(1, 2), glm::uvec2(0, 2)};
 
     // Calculate global stiffness for each beam
     glm::mat4 global_k1, global_k2, global_k3;
 
+
+
     calculate_global_stiffness_beam(node1, node2, global_k1); // Beam 1-2
     calculate_global_stiffness_beam(node2, node3, global_k2); // Beam 2-3
     calculate_global_stiffness_beam(node1, node3, global_k3); // Beam 3-1
+    
+    glm::mat4 beam_ks[3] = {global_k1, global_k2, global_k3};
+    float K_global[6][6];
+    //
+    calculate_global_stiffness_truss(nodes, beams , beam_ks, K_global);
+
+    for (int i = 0; i < 6; ++i) {
+        for (int j = 0; j < 6; ++j) {
+            std::cout << K_global[i][j] << " ";
+        }
+        std::cout << std::endl;
+    }
+
+
+    
+
 
     // Now we need to assemble the global stiffness matrix for the truss
-    /* glm::mat4 K_global = glm::mat4(0.0f); // Adjust based on the number of nodes and DOFs */
+    /* glm::mat4 K_global = glm::mat4(0.0f); // Adjust based on the number of
+     * nodes and DOFs */
 
     /* // Assemble the global stiffness matrix (assuming a specific ordering) */
     /* for (int i = 0; i < 4; ++i) { */
@@ -96,4 +145,3 @@ int main() {
 
     return 0;
 }
-
