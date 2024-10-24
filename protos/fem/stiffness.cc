@@ -1,6 +1,7 @@
 #include <iostream>
 #include <iomanip>
 #include <cmath>
+#include "solver.hh"
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp> // For matrix transformations
 #include <glm/gtc/type_ptr.hpp>         // For value_ptr
@@ -78,6 +79,9 @@ void calculate_global_stiffness_truss(glm::uvec2 beams[], glm::mat4 beam_ks[],
 }
 
 int main() {
+#include <iomanip>
+    std::cout << std::fixed;
+    std::cout << std::setprecision(2);
     glm::vec2 node1(0, 0);             // Node 1
     glm::vec2 node2(0.5, sqrt(3) / 2); // Node 2
     glm::vec2 node3(1, 0);             // Node 3
@@ -91,14 +95,60 @@ int main() {
     calculate_global_stiffness_beam(node1, node3, global_k3); // Beam 3-1
 
     glm::mat4 beam_ks[3] = {global_k1, global_k2, global_k3};
-    float K_global[6][6];
+    float K_global[6][6] = {{0.0f}};
     calculate_global_stiffness_truss(beams, beam_ks, K_global);
 
+    std::cout << "K GLOBAL " << std::endl;
     for (int i = 0; i < 6; ++i) {
         for (int j = 0; j < 6; ++j) {
             std::cout << K_global[i][j] << " ";
         }
         std::cout << std::endl;
     }
+
+    float known_forces[6] = {0, -1, 0, -100, -1, -1};
+
+    int count_non_zeros = 0;
+    for (int i = 0; i < 6; i++)
+        if (known_forces[i] != -1) // zero displacement
+            count_non_zeros++;
+
+    float *A = new float[count_non_zeros * count_non_zeros];
+    float *B = new float[count_non_zeros];
+
+    // fill A and B accordingly
+    int curi = 0;
+    for (int i = 0; i < 6; i++) // loop on all rows
+    {
+        if (known_forces[i] == -1)
+            continue;
+        // if non zero displacement
+        for (int j = 0; j < count_non_zeros; j++)
+            A[curi * count_non_zeros + j] =
+                K_global[i][6 - count_non_zeros + j];
+        B[curi] = known_forces[i];
+        curi++;
+    }
+
+    std::cout << "A IS" << std::endl;
+    for (int i = 0; i < count_non_zeros; ++i) {
+        for (int j = 0; j < count_non_zeros; ++j) {
+            std::cout << A[i * count_non_zeros + j] << " ";
+        }
+        std::cout << std::endl;
+    }
+    std::cout << "B IS" << std::endl;
+    for (int i = 0; i < count_non_zeros; ++i)
+        std::cout << B[i] << " ";
+    std::cout << std::endl;
+
+    gaussianElimination(A, B, count_non_zeros);
+
+    // Output the solution
+    std::cout << "Solution x:" << std::endl;
+    for (int i = 0; i < count_non_zeros; ++i) {
+        std::cout << B[i] << std::endl;
+    }
+
     return 0;
 }
