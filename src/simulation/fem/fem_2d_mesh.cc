@@ -1,24 +1,26 @@
 #include "fem_2d_mesh.hh"
+#include "simulation/fem/fem_computation.hh"
 #include "simulation/fem/fem_consts.hh"
-#include <algorithm>
 #include <cmath>
 #include <glm/ext/matrix_transform.hpp>
 #include <glm/geometric.hpp>
 #include <glm/gtc/quaternion.hpp>
 #include <glm/trigonometric.hpp>
+#include <iostream>
 #include <vector>
 
 FEM2DMesh::FEM2DMesh() : beam_(Mesh::generate2DRect(SQR_SIZE, GAP_RECT)) {
     beam_.getMaterials()[0].setColor(vec3(0.0, 0.0, 1.0), true);
 }
 
-int find_or_append(vec3 e, std::vector<vec3> &v) {
-    auto found1 = std::find(v.begin(), v.end(), e);
-    if (found1 == v.end()) {
-        v.push_back(e);
-        return v.size() - 1;
+int find_or_append(vec3 e, std::vector<FEMPoint> &v) {
+    for (unsigned int i = 0; i < v.size(); i++) {
+        if (v[i].coord == e)
+            return i;
     }
-    return found1 - v.begin();
+    auto newpt = FEMPoint{e, NONE, vec3(0)};
+    v.push_back(newpt);
+    return v.size() - 1;
 }
 
 void FEM2DMesh::add_beam(vec3 v1, vec3 v2) {
@@ -34,8 +36,8 @@ void FEM2DMesh::add_beam(vec3 v1, vec3 v2) {
 
 void FEM2DMesh::updatePos(int id) {
     Object &o = beam_.getObjects()[id];
-    vec3 v1 = elems0d_[elems1d_[id].x];
-    vec3 v2 = elems0d_[elems1d_[id].y];
+    vec3 v1 = elems0d_[elems1d_[id].x].coord;
+    vec3 v2 = elems0d_[elems1d_[id].y].coord;
 
     auto dir = v1 - v2;
     auto len = length(dir);
@@ -45,6 +47,14 @@ void FEM2DMesh::updatePos(int id) {
     t.position = (v1 + v2) / 2.0f;
     t.rotation = rot;
     o.setTransform(t);
+}
+
+void FEM2DMesh::compute(void)
+{
+  auto d = compute_displacement(elems0d_, elems1d_);
+  std::cout << "DISPLACEMENT:" << std::endl;
+  for (unsigned int i = 0; i < d.size(); i++)
+    std::cout << d[i].x << " " << d[i].y << std::endl;
 }
 
 Mesh &FEM2DMesh::getMesh(void) { return beam_; }

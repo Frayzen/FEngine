@@ -107,27 +107,20 @@ int main() {
     }
 
     float known_forces[6] = {0, -1, 0, -100, -1, -1};
+    int ids_non_zeros[3] = {0, 2, 3};
 
-    int count_non_zeros = 0;
-    for (int i = 0; i < 6; i++)
-        if (known_forces[i] != -1) // zero displacement
-            count_non_zeros++;
+    int count_non_zeros = sizeof(ids_non_zeros) / sizeof(int);
 
     float *A = new float[count_non_zeros * count_non_zeros];
     float *B = new float[count_non_zeros];
 
     // fill A and B accordingly
-    int curi = 0;
-    for (int i = 0; i < 6; i++) // loop on all rows
+    for (int i = 0; i < count_non_zeros; i++) // loop on all rows
     {
-        if (known_forces[i] == -1)
-            continue;
-        // if non zero displacement
+        B[i] = known_forces[ids_non_zeros[i]];
         for (int j = 0; j < count_non_zeros; j++)
-            A[curi * count_non_zeros + j] =
-                K_global[i][6 - count_non_zeros + j];
-        B[curi] = known_forces[i];
-        curi++;
+            A[i * count_non_zeros + j] =
+                K_global[ids_non_zeros[i]][ids_non_zeros[j]];
     }
 
     std::cout << "A IS" << std::endl;
@@ -147,7 +140,7 @@ int main() {
     // Output the solution
     std::cout << "Solution x:" << std::endl;
     for (int i = 0; i < count_non_zeros; ++i) {
-        std::cout << B[i] << std::endl;
+        std::cout << B[i] / 2 << std::endl;
     }
 
     return 0;
