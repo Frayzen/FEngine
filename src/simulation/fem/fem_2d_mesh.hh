@@ -18,6 +18,8 @@ class FEM2DMesh {
 
     Mesh &getMesh(void);
 
+
+    void reset();
   private:
     Mesh beam_;
     std::vector<uvec2> elems1d_;
