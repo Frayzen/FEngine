@@ -3,6 +3,7 @@
 #include "object/object.hh"
 #include "object/ray.hh"
 #include "simulation/fem/fem_consts.hh"
+#include "simulation/fem/fem_gui.hh"
 #include "simulation/simulation.hh"
 #include <GLFW/glfw3.h>
 #include <cmath>
@@ -14,6 +15,7 @@ FemSimulation::FemSimulation()
       tile_(Mesh::generate2DRect(SQR_SIZE, SQR_SIZE)),
       selector_(Mesh::generateSphere(10, 10)),
       selectIndicator_(Mesh::generate2DRect(GAP_RECT * 5, GAP_RECT * 5)) {
+    attachGUI(new FemGUI(*this));
     tile_.getMaterials()[0].setColor(vec3(1.0f, 1.0f, 1.0f), true);
     selector_.getMaterials()[0].setColor(vec3(1.0f, 0.0f, 0.0f), true);
     selectIndicator_.getMaterials()[0].setColor(vec3(0.0f, 0.0f, 1.0f), true);
@@ -23,6 +25,7 @@ FemSimulation::FemSimulation()
     registerMesh(selectIndicator_);
     registerMesh(fem_mesh_.getMesh());
     registerMesh(tile_);
+    cam.position = vec3(-8, 0, 0);
 }
 
 void FemSimulation::keyCallback(int key, int action) {
@@ -79,7 +82,6 @@ void FemSimulation::update(double deltaTime) {
 
 #define TILE_WORLD_SIZE 10
 void FemSimulation::init() {
-    cam.position = vec3(-8, 0, 0);
     Object &cursor = selector_.createObject();
     cursor.setPosition(vec3(0, 0, 0));
     cursor.setScale(vec3(GAP_RECT * 2));
@@ -95,4 +97,6 @@ void FemSimulation::init() {
             o.setTransform(t);
         }
     }
+    fem_mesh_.reset();
+    mouseButtonCallback(GLFW_MOUSE_BUTTON_RIGHT, GLFW_PRESS);
 }
