@@ -4,6 +4,7 @@
 #include <glm/ext/vector_float2.hpp>
 #include <glm/ext/vector_uint2.hpp>
 #include <cmath>
+#include <iostream>
 
 void gaussianElimination(float *A, float *B, int n) { // return value is in B
     // Forward elimination
@@ -94,35 +95,46 @@ void contribute_global_stifness_truss(uvec2 beam, glm::mat4 beam_ks,
 
 std::vector<vec2> compute_displacement(std::vector<FEMPoint> points,
                                        std::vector<uvec2> elems) {
-    int n = points.size() * 2;
-    float *global_k = new float[n * n];
-    float *known_forces = new float[points.size()];
-    std::vector<int> ids_non_zeros;
+#define DOF 2
+    int n = points.size() * DOF;
+    float *global_k = new float[n * n]{0};
+    float *known_forces = new float[n]{-1};
+    std::vector<int> ids_knowns;
 
-    mat4 local_k;
     int i = 0;
     for (auto &p : points) {
+        /* std::cout << p.coord.z << " " << p.coord.y << " " << p.flags */
+        /*           << std::endl; */
         switch (p.flags) {
         case NONE:
+            known_forces[2 * i + 1] = p.forceApplied.y;
+            known_forces[2 * i] = p.forceApplied.z;
+            ids_knowns.push_back(2 * i);
+            ids_knowns.push_back(2 * i + 1);
             break;
         case FIXED:
-            known_forces[2 * i + 1] = 0;
-            known_forces[2 * i] = 0;
-            ids_non_zeros.push_back(2 * i);
-            ids_non_zeros.push_back(2 * i + 1);
             break;
         case ROLLING_X:
             known_forces[2 * i + 1] = 0;
-            ids_non_zeros.push_back(2 * i);
+            ids_knowns.push_back(2 * i + 1);
             break;
         case ROLLING_Y:
             known_forces[2 * i] = 0;
-            ids_non_zeros.push_back(2 * i + 1);
+            ids_knowns.push_back(2 * i);
             break;
         }
+        i++;
     }
 
+    std::cout << "KNOWN FORCES:" << std::endl;
+    for (int i = 0; i < n; i++)
+        std::cout << known_forces[i] << std::endl;
+    std::cout << "IDS KNOWNS:" << std::endl;
+    for (unsigned int i = 0; i < ids_knowns.size(); i++)
+        std::cout << ids_knowns[i] << std::endl;
+
     for (unsigned int i = 0; i < elems.size(); i++) {
+        mat4 local_k = {0};
         FEMPoint &pt1 = points[elems[i].x];
         FEMPoint &pt2 = points[elems[i].y];
         auto node1 = vec2(pt1.coord.z, pt1.coord.y);
@@ -131,30 +143,61 @@ std::vector<vec2> compute_displacement(std::vector<FEMPoint> points,
         contribute_global_stifness_truss(elems[i], local_k, global_k, n);
     }
 
-    int count_non_zeros = ids_non_zeros.size();
+    std::cout << "K GLOBAL " << std::endl;
+    for (int i = 0; i < n; ++i) {
+        for (int j = 0; j < n; ++j) {
+            std::cout << global_k[i * n + j] << " ";
+        }
+        std::cout << std::endl;
+    }
+
+    int count_non_zeros = ids_knowns.size();
     std::vector<float> A(count_non_zeros * count_non_zeros);
     std::vector<float> B(count_non_zeros);
 
     for (int i = 0; i < count_non_zeros; i++) // loop on all rows
     {
-        B[i] = known_forces[ids_non_zeros[i]];
+        B[i] = known_forces[ids_knowns[i]];
         for (int j = 0; j < count_non_zeros; j++)
             A[i * count_non_zeros + j] =
-                global_k[ids_non_zeros[i] * n + ids_non_zeros[j]];
+                global_k[ids_knowns[i] * n + ids_knowns[j]];
     }
+
+    std::cout << "A IS" << std::endl;
+    for (int i = 0; i < count_non_zeros; ++i) {
+        for (int j = 0; j < count_non_zeros; ++j) {
+            std::cout << A[i * count_non_zeros + j] << " ";
+        }
+        std::cout << std::endl;
+    }
+    std::cout << "B IS" << std::endl;
+    for (int i = 0; i < count_non_zeros; ++i)
+        std::cout << B[i] << " ";
+    std::cout << std::endl;
 
     gaussianElimination(A.data(), B.data(), count_non_zeros);
     delete[] global_k;
     delete[] known_forces;
 
+    std::cout << "B IS" << std::endl;
+    for (int i = 0; i < count_non_zeros; ++i)
+        std::cout << B[i] << " ";
+    std::cout << std::endl;
+
     std::vector<vec2> displacements(points.size(), vec2(0));
 
-    for (unsigned int i = 0; i < ids_non_zeros.size(); i++)
-    {
-      if (i % 2 == 0)
-        displacements[ids_non_zeros[i]].x = B[i];
-      else
-        displacements[ids_non_zeros[i]].y = B[i];
+    unsigned int cur_kown_id = 0;
+    unsigned int cur_unkown_id = 0;
+    for (int i = 0; i < (int)n; i++) {
+        float *cur;
+        if (i % 2 == 0)
+            cur = &displacements[ids_knowns[i / 2]].x;
+        else
+            cur = &displacements[ids_knowns[i / 2]].y;
+        if (cur_kown_id < ids_knowns.size() && ids_knowns[cur_kown_id] == i)
+            *cur = known_forces[cur_kown_id++];
+        else
+            *cur = B[cur_unkown_id++];
     }
 
     return displacements;

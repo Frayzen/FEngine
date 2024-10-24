@@ -10,7 +10,7 @@
 
 using namespace glm;
 
-enum FEMFlag { NONE, FIXED, ROLLING_X, ROLLING_Y };
+enum FEMFlag { NONE = 1, FIXED = 2, ROLLING_X = 3, ROLLING_Y = 4 };
 
 struct FEMPoint {
     vec3 coord;
@@ -26,11 +26,8 @@ class FEM2DMesh {
     void add_beam(vec3 v1, vec3 v2);
     void updatePos(int id);
     void reset();
-
     Mesh &getMesh(void);
 
-
-    void reset();
   private:
     Mesh beam_;
     std::vector<uvec2> elems1d_;

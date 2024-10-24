@@ -18,7 +18,17 @@ int find_or_append(vec3 e, std::vector<FEMPoint> &v) {
         if (v[i].coord == e)
             return i;
     }
-    auto newpt = FEMPoint{e, NONE, vec3(0)};
+    auto flag = NONE;
+    if (v.size() == 0)
+      flag = FIXED;
+    if (v.size() == 1)
+      flag = ROLLING_X;
+
+    auto newpt = FEMPoint{e, flag, vec3(0)};
+
+    if (v.size() == 2)
+      newpt.forceApplied.y = -100;
+
     v.push_back(newpt);
     return v.size() - 1;
 }

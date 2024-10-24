@@ -100,3 +100,8 @@ void FemSimulation::init() {
     fem_mesh_.reset();
     mouseButtonCallback(GLFW_MOUSE_BUTTON_RIGHT, GLFW_PRESS);
 }
+
+void FemSimulation::computeMesh(void)
+{
+  fem_mesh_.compute();
+}

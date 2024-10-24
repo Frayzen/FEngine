@@ -17,6 +17,8 @@ void FemGUI::update() {
     }
     if (ImGui::Button("Clear"))
         sim.restartSimulation();
+    if (ImGui::Button("Compute"))
+        sim.computeMesh();
     ImGuiIO &io = ImGui::GetIO();
     ImGui::Text("Application average %.3f ms/frame (%.1f FPS)",
                 1000.0f / io.Framerate, io.Framerate);

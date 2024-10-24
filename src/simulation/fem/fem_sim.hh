@@ -1,7 +1,7 @@
 #pragma once
 
-#include "object/object.hh"
 #include "simulation/fem/fem_2d_mesh.hh"
+#include "object/object.hh"
 #include "simulation/simulation.hh"
 class FemSimulation : public Simulation {
   public:
@@ -10,6 +10,7 @@ class FemSimulation : public Simulation {
     void init() override;
     void keyCallback(int key, int action) override;
     void mouseButtonCallback(int button, int action) override;
+    void computeMesh(void);
 
   private:
     FEM2DMesh fem_mesh_;
