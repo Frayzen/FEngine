@@ -46,6 +46,9 @@ void build_rotation_matrix(float theta, glm::mat4 &rotation_matrix) {
 void calculate_global_stiffness_beam(const glm::vec2 &node1,
                                      const glm::vec2 &node2,
                                      glm::mat4 &global_k) {
+
+    std::cout << "NODE 1 : " << node1.x << " " << node1.y << std::endl;
+  std::cout << "NODE 2 : " << node2.x << " " << node2.y << std::endl;
     float theta = calculate_theta(node1, node2);
     std::cout << "theta = " << theta << std::endl;
     glm::mat4 rotation_matrix;
@@ -82,9 +85,9 @@ int main() {
 #include <iomanip>
     std::cout << std::fixed;
     std::cout << std::setprecision(2);
-    glm::vec2 node1(0, 0);             // Node 1
-    glm::vec2 node2(0.5, sqrt(3) / 2); // Node 2
-    glm::vec2 node3(1, 0);             // Node 3
+    glm::vec2 node1(0, 0); // Node 1
+    glm::vec2 node2(2, 2); // Node 2
+    glm::vec2 node3(4, 0); // Node 3
 
     glm::uvec2 beams[] = {glm::uvec2(0, 1), glm::uvec2(1, 2), glm::uvec2(0, 2)};
 
@@ -113,6 +116,13 @@ int main() {
 
     float *A = new float[count_non_zeros * count_non_zeros];
     float *B = new float[count_non_zeros];
+
+    std::cout << "KNOWN FORCES:" << std::endl;
+    for (int i = 0; i < 6; i++)
+        std::cout << known_forces[i] << std::endl;
+    std::cout << "IDS KNOWNS:" << std::endl;
+    for (unsigned int i = 0; i < 3; i++)
+        std::cout << ids_non_zeros[i] << std::endl;
 
     // fill A and B accordingly
     for (int i = 0; i < count_non_zeros; i++) // loop on all rows

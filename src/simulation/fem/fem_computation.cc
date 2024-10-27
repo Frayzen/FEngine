@@ -1,10 +1,26 @@
 #include "fem_computation.hh"
 #include "simulation/fem/fem_2d_mesh.hh"
+#include <cstring>
 #include <glm/ext/matrix_float4x4.hpp>
 #include <glm/ext/vector_float2.hpp>
 #include <glm/ext/vector_uint2.hpp>
 #include <cmath>
+#include <iomanip>
 #include <iostream>
+
+void print_matrix(const glm::mat4 &matrix) {
+    std::cout << std::fixed
+              << std::setprecision(
+                     3); // Set fixed-point notation and 3 decimal places
+    for (int i = 0; i < 4; ++i) {
+        for (int j = 0; j < 4; ++j) {
+            std::cout << std::setw(8) << matrix[i][j]
+                      << " "; // Set width for alignment
+        }
+        std::cout << std::endl;
+    }
+    std::cout << std::endl;
+}
 
 void gaussianElimination(float *A, float *B, int n) { // return value is in B
     // Forward elimination
@@ -65,15 +81,19 @@ void build_rotation_matrix(float theta, glm::mat4 &rotation_matrix) {
 void calculate_global_stiffness_beam(const glm::vec2 &node1,
                                      const glm::vec2 &node2,
                                      glm::mat4 &global_k) {
+    std::cout << "NODE 1 : " << node1.x << " " << node1.y << std::endl;
+    std::cout << "NODE 2 : " << node2.x << " " << node2.y << std::endl;
 
     static const glm::mat4 local_k_init =
         glm::mat4(1.0f, 0.0f, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f, 0.0f,
                   1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
     float theta = calculate_theta(node1, node2);
+    std::cout << "theta = " << theta << std::endl;
     glm::mat4 rotation_matrix;
     build_rotation_matrix(theta, rotation_matrix);
     glm::mat4 temp_k = local_k_init * rotation_matrix;
     global_k = glm::transpose(rotation_matrix) * temp_k;
+    print_matrix(global_k);
 }
 
 void contribute_global_stifness_truss(uvec2 beam, glm::mat4 beam_ks,
@@ -81,10 +101,15 @@ void contribute_global_stifness_truss(uvec2 beam, glm::mat4 beam_ks,
     uint n1 = beam.x;
     uint n2 = beam.y;
 
+    std::cout << "beam = " << n1 << "-" << n2 << std::endl;
+
     uint n1_dof_x = n1 * 2;
     uint n1_dof_y = n1 * 2 + 1;
     uint n2_dof_x = n2 * 2;
     uint n2_dof_y = n2 * 2 + 1;
+
+    std::cout << n1_dof_x << " " << n1_dof_y << " " << n2_dof_x << " "
+              << n2_dof_y << std::endl;
     uint dofs[] = {n1_dof_x, n1_dof_y, n2_dof_x, n2_dof_y};
     for (int j = 0; j < 4; ++j) {
         for (int k = 0; k < 4; ++k) {
@@ -98,7 +123,8 @@ std::vector<vec2> compute_displacement(std::vector<FEMPoint> points,
 #define DOF 2
     int n = points.size() * DOF;
     float *global_k = new float[n * n]{0};
-    float *known_forces = new float[n]{-1};
+    float *known_forces = new float[n];
+    std::fill_n(known_forces, n, -1);
     std::vector<int> ids_knowns;
 
     int i = 0;
@@ -107,6 +133,8 @@ std::vector<vec2> compute_displacement(std::vector<FEMPoint> points,
         /*           << std::endl; */
         switch (p.flags) {
         case NONE:
+            std::cout << "set " << (2 * i + 1) << " and " << (2 * i)
+                      << std::endl;
             known_forces[2 * i + 1] = p.forceApplied.y;
             known_forces[2 * i] = p.forceApplied.z;
             ids_knowns.push_back(2 * i);
@@ -115,12 +143,14 @@ std::vector<vec2> compute_displacement(std::vector<FEMPoint> points,
         case FIXED:
             break;
         case ROLLING_X:
-            known_forces[2 * i + 1] = 0;
-            ids_knowns.push_back(2 * i + 1);
-            break;
-        case ROLLING_Y:
+            /* std::cout << "set " << (2 * i) << std::endl; */
             known_forces[2 * i] = 0;
             ids_knowns.push_back(2 * i);
+            break;
+        case ROLLING_Y:
+            /* std::cout << "set " << (2 * i + 1) << std::endl; */
+            known_forces[2 * i + 1] = 0;
+            ids_knowns.push_back(2 * i + 1);
             break;
         }
         i++;
@@ -152,53 +182,49 @@ std::vector<vec2> compute_displacement(std::vector<FEMPoint> points,
     }
 
     int count_non_zeros = ids_knowns.size();
-    std::vector<float> A(count_non_zeros * count_non_zeros);
-    std::vector<float> B(count_non_zeros);
+    std::vector<float> constrained_mat(count_non_zeros * count_non_zeros);
+    std::vector<float> constraints(count_non_zeros);
 
     for (int i = 0; i < count_non_zeros; i++) // loop on all rows
     {
-        B[i] = known_forces[ids_knowns[i]];
+        constraints[i] = known_forces[ids_knowns[i]];
         for (int j = 0; j < count_non_zeros; j++)
-            A[i * count_non_zeros + j] =
+            constrained_mat[i * count_non_zeros + j] =
                 global_k[ids_knowns[i] * n + ids_knowns[j]];
     }
 
     std::cout << "A IS" << std::endl;
     for (int i = 0; i < count_non_zeros; ++i) {
         for (int j = 0; j < count_non_zeros; ++j) {
-            std::cout << A[i * count_non_zeros + j] << " ";
+            std::cout << constrained_mat[i * count_non_zeros + j] << " ";
         }
         std::cout << std::endl;
     }
     std::cout << "B IS" << std::endl;
     for (int i = 0; i < count_non_zeros; ++i)
-        std::cout << B[i] << " ";
+        std::cout << constraints[i] << " ";
     std::cout << std::endl;
 
-    gaussianElimination(A.data(), B.data(), count_non_zeros);
+    gaussianElimination(constrained_mat.data(), constraints.data(),
+                        count_non_zeros);
     delete[] global_k;
     delete[] known_forces;
 
-    std::cout << "B IS" << std::endl;
+    std::cout << "Solution x:" << std::endl;
     for (int i = 0; i < count_non_zeros; ++i)
-        std::cout << B[i] << " ";
-    std::cout << std::endl;
+        std::cout << constraints[i] / 2 << std::endl;
 
     std::vector<vec2> displacements(points.size(), vec2(0));
 
-    unsigned int cur_kown_id = 0;
-    unsigned int cur_unkown_id = 0;
-    for (int i = 0; i < (int)n; i++) {
-        float *cur;
-        if (i % 2 == 0)
-            cur = &displacements[ids_knowns[i / 2]].x;
+    const float E = 100; // Elasticity (0.01 for rubber, 200 for metal)
+    const float A = 1;   // Cross section
+    const float L = 1;   // Length of an element
+    for (unsigned int i = 0; i < ids_knowns.size(); i++) {
+        int id = ids_knowns[i];
+        if (id % 2)
+            displacements[id / 2].y = constraints[i] * L / (E * A);
         else
-            cur = &displacements[ids_knowns[i / 2]].y;
-        if (cur_kown_id < ids_knowns.size() && ids_knowns[cur_kown_id] == i)
-            *cur = known_forces[cur_kown_id++];
-        else
-            *cur = B[cur_unkown_id++];
+            displacements[id / 2].x = constraints[i] * L / (E * A);
     }
-
     return displacements;
 }

@@ -99,9 +99,10 @@ void FemSimulation::init() {
     }
     fem_mesh_.reset();
     mouseButtonCallback(GLFW_MOUSE_BUTTON_RIGHT, GLFW_PRESS);
+    fem_mesh_.add_beam(vec3(0, 0, 0), vec3(0, 2.0, 2.0));
+    fem_mesh_.add_beam(vec3(0, 2.0, 2.0), vec3(0, 0, 4.0));
+    fem_mesh_.add_beam(vec3(0, 0, 0), vec3(0, 0, 4.0));
+    fem_mesh_.compute();
 }
 
-void FemSimulation::computeMesh(void)
-{
-  fem_mesh_.compute();
-}
+void FemSimulation::computeMesh(void) { fem_mesh_.compute(); }

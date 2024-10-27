@@ -19,14 +19,12 @@ int find_or_append(vec3 e, std::vector<FEMPoint> &v) {
             return i;
     }
     auto flag = NONE;
-    if (v.size() == 0)
-      flag = FIXED;
-    if (v.size() == 1)
-      flag = ROLLING_X;
-
-    auto newpt = FEMPoint{e, flag, vec3(0)};
-
     if (v.size() == 2)
+      flag = FIXED;
+    if (v.size() == 0)
+      flag = ROLLING_X;
+    auto newpt = FEMPoint{e, flag, vec3(0)};
+    if (v.size() == 1)
       newpt.forceApplied.y = -100;
 
     v.push_back(newpt);
