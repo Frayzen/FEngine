@@ -6,4 +6,5 @@
 
 using namespace glm;
 
-std::vector<vec2> compute_displacement(std::vector<FEMPoint> points, std::vector<uvec2> elems);
+void compute_displacement(std::vector<FEMPoint> &points,
+                          std::vector<uvec2> &elems);

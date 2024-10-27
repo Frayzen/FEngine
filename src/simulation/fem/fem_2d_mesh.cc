@@ -20,12 +20,12 @@ int find_or_append(vec3 e, std::vector<FEMPoint> &v) {
     }
     auto flag = NONE;
     if (v.size() == 2)
-      flag = FIXED;
+        flag = FIXED;
     if (v.size() == 0)
-      flag = ROLLING_X;
-    auto newpt = FEMPoint{e, flag, vec3(0)};
+        flag = ROLLING_X;
+    auto newpt = FEMPoint{e, vec3(0), flag, vec3(0)};
     if (v.size() == 1)
-      newpt.forceApplied.y = -100;
+        newpt.forceApplied.y = -100;
 
     v.push_back(newpt);
     return v.size() - 1;
@@ -44,8 +44,8 @@ void FEM2DMesh::add_beam(vec3 v1, vec3 v2) {
 
 void FEM2DMesh::updatePos(int id) {
     Object &o = beam_.getObjects()[id];
-    vec3 v1 = elems0d_[elems1d_[id].x].coord;
-    vec3 v2 = elems0d_[elems1d_[id].y].coord;
+    vec3 v1 = elems0d_[elems1d_[id].x].coord + elems0d_[elems1d_[id].x].displacement;
+    vec3 v2 = elems0d_[elems1d_[id].y].coord + elems0d_[elems1d_[id].y].displacement;
 
     auto dir = v1 - v2;
     auto len = length(dir);
@@ -58,17 +58,15 @@ void FEM2DMesh::updatePos(int id) {
     o.setTransform(t);
 }
 
-void FEM2DMesh::compute(void)
-{
-  auto d = compute_displacement(elems0d_, elems1d_);
-  std::cout << "DISPLACEMENT:" << std::endl;
-  for (unsigned int i = 0; i < d.size(); i++)
-    std::cout << d[i].x << " " << d[i].y << std::endl;
+void FEM2DMesh::compute(void) {
+    compute_displacement(elems0d_, elems1d_);
+    for (unsigned int i = 0; i < elems1d_.size(); i++)
+        updatePos(i);
 }
 
 Mesh &FEM2DMesh::getMesh(void) { return beam_; }
 
 void FEM2DMesh::reset() {
-  elems0d_.clear();
-  elems1d_.clear();
+    elems0d_.clear();
+    elems1d_.clear();
 }

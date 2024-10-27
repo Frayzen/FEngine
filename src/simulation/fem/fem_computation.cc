@@ -118,8 +118,8 @@ void contribute_global_stifness_truss(uvec2 beam, glm::mat4 beam_ks,
     }
 }
 
-std::vector<vec2> compute_displacement(std::vector<FEMPoint> points,
-                                       std::vector<uvec2> elems) {
+void compute_displacement(std::vector<FEMPoint> &points,
+                          std::vector<uvec2> &elems) {
 #define DOF 2
     int n = points.size() * DOF;
     float *global_k = new float[n * n]{0};
@@ -214,17 +214,14 @@ std::vector<vec2> compute_displacement(std::vector<FEMPoint> points,
     for (int i = 0; i < count_non_zeros; ++i)
         std::cout << constraints[i] / 2 << std::endl;
 
-    std::vector<vec2> displacements(points.size(), vec2(0));
-
     const float E = 100; // Elasticity (0.01 for rubber, 200 for metal)
     const float A = 1;   // Cross section
     const float L = 1;   // Length of an element
     for (unsigned int i = 0; i < ids_knowns.size(); i++) {
         int id = ids_knowns[i];
         if (id % 2)
-            displacements[id / 2].y = constraints[i] * L / (E * A);
+            points[id / 2].displacement.y = constraints[i] * L / (E * A);
         else
-            displacements[id / 2].x = constraints[i] * L / (E * A);
+            points[id / 2].displacement.z = constraints[i] * L / (E * A);
     }
-    return displacements;
 }

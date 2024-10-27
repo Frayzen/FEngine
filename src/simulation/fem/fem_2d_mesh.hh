@@ -14,6 +14,7 @@ enum FEMFlag { NONE = 1, FIXED = 2, ROLLING_X = 3, ROLLING_Y = 4 };
 
 struct FEMPoint {
     vec3 coord;
+    vec3 displacement;
     FEMFlag flags;
     vec3 forceApplied;
 };
