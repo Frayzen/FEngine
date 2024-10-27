@@ -145,5 +145,3 @@ std::vector<std::reference_wrapper<Object>> Simulation::getObjects() {
                        m.get().getObjects().end());
     return objects;
 }
-
-Simulation::~Simulation() { delete (gui_); }

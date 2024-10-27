@@ -5,7 +5,6 @@
 
 GUI::GUI(Simulation &sim) : win_(glfwGetCurrentContext()), sim_(sim) {}
 
-
 static bool isSetup = false;
 void GUI::setup() {
     if (isSetup)
@@ -27,3 +26,5 @@ void GUI::setup() {
 #endif
     ImGui_ImplOpenGL3_Init(glsl_version);
 }
+
+bool GUI::isHovered() { return ImGui::IsAnyItemHovered(); }

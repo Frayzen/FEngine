@@ -34,7 +34,6 @@ class Simulation {
 
   protected:
     Simulation(bool is2d = false);
-    virtual ~Simulation();
     void attachGUI(GUI *gui);
     vec4 bgColor = vec4(0.6f, 0.6f, 0.6f, 1.0f);
 

@@ -27,10 +27,19 @@ class FEM2DMesh {
     void add_beam(vec3 v1, vec3 v2);
     void updatePos(int id);
     void reset();
-    Mesh &getMesh(void);
+    void registerMeshes(Simulation &sim);
+    bool setMode(vec3 pt, FEMFlag flag);
+    FEMPoint *getPoint(vec3 pt);
+    void resetForces();
 
   private:
+    void updateFlags();
     Mesh beam_;
+
+    Mesh rollerXIndicator_;
+    Mesh rollerYIndicator_;
+    Mesh fixedIndicator_;
+
     std::vector<uvec2> elems1d_;
     std::vector<FEMPoint> elems0d_;
 };

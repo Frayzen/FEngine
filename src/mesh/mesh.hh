@@ -20,7 +20,7 @@ class Mesh : public Renderable {
   friend class FEMMesh;
 
   public:
-    static Mesh generateSphere(int slices, int stacks);
+    static Mesh generateSphere(int slices, int stacks, float radius = 1.0f);
     static Mesh generate2DRect(float h, float w);
 
     static Mesh createFrom(std::string path);
