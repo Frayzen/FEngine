@@ -13,6 +13,7 @@ class GUI {
     virtual void update() = 0;
     void setup();
     virtual ~GUI() = default;
+    bool isHovered();
 
   protected:
     GLFWwindow *win_;

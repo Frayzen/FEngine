@@ -2,6 +2,7 @@
 #include "constants.hh"
 #include "object/object.hh"
 #include "object/ray.hh"
+#include "simulation/fem/fem_2d_mesh.hh"
 #include "simulation/fem/fem_consts.hh"
 #include "simulation/fem/fem_gui.hh"
 #include "simulation/simulation.hh"
@@ -9,33 +10,49 @@
 #include <cmath>
 #include <glm/fwd.hpp>
 #include <glm/matrix.hpp>
+#include <iostream>
 
 FemSimulation::FemSimulation()
-    : Simulation(true), fem_mesh_(),
+    : Simulation(true), gui_(*this), fem_mesh_(),
       tile_(Mesh::generate2DRect(SQR_SIZE, SQR_SIZE)),
       selector_(Mesh::generateSphere(10, 10)),
       selectIndicator_(Mesh::generate2DRect(GAP_RECT * 5, GAP_RECT * 5)) {
-    attachGUI(new FemGUI(*this));
+    attachGUI(&gui_);
     tile_.getMaterials()[0].setColor(vec3(1.0f, 1.0f, 1.0f), true);
-    selector_.getMaterials()[0].setColor(vec3(1.0f, 0.0f, 0.0f), true);
-    selectIndicator_.getMaterials()[0].setColor(vec3(0.0f, 0.0f, 1.0f), true);
+    selector_.getMaterials()[0].setColor(vec3(1.0f, 0.4f, 0.4f), true);
+    selectIndicator_.getMaterials()[0].setColor(vec3(1.0f, 0.4f, 0.4f), true);
     bgColor = vec4(0, 0, 0, 0);
     cam.speed = 0.2;
     registerMesh(selector_);
     registerMesh(selectIndicator_);
-    registerMesh(fem_mesh_.getMesh());
+    fem_mesh_.registerMeshes(*this);
     registerMesh(tile_);
     cam.position = vec3(-8, 0, 0);
+}
+
+static int clicked = 0;
+static vec3 previous = vec3(MAXF);
+
+FEMPoint *FemSimulation::getCurrentPoint() {
+    if (!clicked)
+        return NULL;
+    return fem_mesh_.getPoint(previous);
 }
 
 void FemSimulation::keyCallback(int key, int action) {
     if (key == GLFW_KEY_F && action == GLFW_PRESS)
         toggle2d();
+    if (key == GLFW_KEY_Z && action == GLFW_PRESS && clicked)
+        fem_mesh_.setMode(previous, FIXED);
+    if (key == GLFW_KEY_X && action == GLFW_PRESS && clicked)
+        fem_mesh_.setMode(previous, ROLLING_X);
+    if (key == GLFW_KEY_C && action == GLFW_PRESS && clicked)
+        fem_mesh_.setMode(previous, ROLLING_Y);
 }
 
 void FemSimulation::mouseButtonCallback(int button, int action) {
-    static int clicked = 0;
-    static vec3 previous = vec3(MAXF);
+    if (gui_.isHovered())
+        return;
     if (action == GLFW_PRESS && button == GLFW_MOUSE_BUTTON_RIGHT) {
         clicked = 0;
         previous = vec3(MAXF);
@@ -100,3 +117,5 @@ void FemSimulation::init() {
     fem_mesh_.reset();
     mouseButtonCallback(GLFW_MOUSE_BUTTON_RIGHT, GLFW_PRESS);
 }
+
+void FemSimulation::computeMesh(void) { fem_mesh_.compute(); }

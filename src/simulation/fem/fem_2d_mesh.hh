@@ -1,5 +1,6 @@
 #pragma once
 
+#include <glm/ext/vector_float2.hpp>
 #include <glm/ext/vector_float3.hpp>
 #include <glm/ext/vector_uint2.hpp>
 #include <glm/ext/vector_uint3.hpp>
@@ -9,19 +10,36 @@
 
 using namespace glm;
 
+enum FEMFlag { NONE = 1, FIXED = 2, ROLLING_X = 3, ROLLING_Y = 4 };
+
+struct FEMPoint {
+    vec3 coord;
+    vec3 displacement;
+    FEMFlag flags;
+    vec3 forceApplied;
+};
+
 class FEM2DMesh {
 
   public:
     FEM2DMesh();
+    void compute(void);
     void add_beam(vec3 v1, vec3 v2);
     void updatePos(int id);
-
-    Mesh &getMesh(void);
-
-
     void reset();
+    void registerMeshes(Simulation &sim);
+    bool setMode(vec3 pt, FEMFlag flag);
+    FEMPoint *getPoint(vec3 pt);
+    void resetForces();
+
   private:
+    void updateFlags();
     Mesh beam_;
+
+    Mesh rollerXIndicator_;
+    Mesh rollerYIndicator_;
+    Mesh fixedIndicator_;
+
     std::vector<uvec2> elems1d_;
-    std::vector<vec3> elems0d_;
+    std::vector<FEMPoint> elems0d_;
 };

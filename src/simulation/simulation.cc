@@ -46,8 +46,8 @@ void Simulation::setup() {
     FAIL_ON(!GLEW_ARB_framebuffer_object,
             "Error: GL_ARB_framebuffer_object extension is not supported");
     glViewport(0, 0, screenSize.x, screenSize.y);
-    glEnable(GL_DEBUG_OUTPUT);
-    glDebugMessageCallback(DebugCallback, 0);
+    /* glEnable(GL_DEBUG_OUTPUT); */
+    /* glDebugMessageCallback(DebugCallback, 0); */
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
 
@@ -145,5 +145,3 @@ std::vector<std::reference_wrapper<Object>> Simulation::getObjects() {
                        m.get().getObjects().end());
     return objects;
 }
-
-Simulation::~Simulation() { delete (gui_); }

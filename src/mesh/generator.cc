@@ -25,13 +25,13 @@ Mesh Mesh::generate2DRect(float h, float w) {
     return mesh;
 }
 
-Mesh Mesh::generateSphere(int n_slices, int n_stacks) {
+Mesh Mesh::generateSphere(int n_slices, int n_stacks, float radius) {
     Mesh mesh = Mesh();
     mesh.materials_.emplace_back(Material());
     SubMesh &sm = mesh.createSubMesh();
 
     // add top vertex
-    auto pos = vec3(0, 1, 0);
+    auto pos = radius * vec3(0, 1, 0);
     auto v0 = sm.addVertex(pos, pos, pos);
 
     // generate vertices per stack / slice
@@ -42,13 +42,13 @@ Mesh Mesh::generateSphere(int n_slices, int n_stacks) {
             auto x = std::sin(phi) * std::cos(theta);
             auto y = std::cos(phi);
             auto z = std::sin(phi) * std::sin(theta);
-            vec3 pos = vec3(x, y, z);
+            vec3 pos = radius * vec3(x, y, z);
             sm.addVertex(pos, pos, pos);
         }
     }
 
     // add bottom vertex
-    pos = vec3(0, -1, 0);
+    pos = radius * vec3(0, -1, 0);
     auto v1 = sm.addVertex(pos, pos, pos);
 
     // add top / bottom triangles
