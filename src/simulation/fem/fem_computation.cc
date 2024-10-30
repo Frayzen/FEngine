@@ -60,7 +60,7 @@ void gaussianElimination(float *A, float *B, int n) { // return value is in B
 }
 
 float calculate_theta(const glm::vec2 &node1, const glm::vec2 &node2) {
-    glm::vec2 diff = node2 - node1;
+    glm::vec2 diff = node1 - node2;
     return atan2(diff.y, diff.x); // Calculate angle in radians
 }
 
@@ -72,10 +72,10 @@ void build_rotation_matrix(float theta, glm::mat4 &rotation_matrix) {
     float C = cos(theta);
     float S = sin(theta);
 
-    rotation_matrix[0] = glm::vec4(C * C, C * S, -C * C, -C * S);
-    rotation_matrix[1] = glm::vec4(C * S, S * S, -C * S, -S * S);
-    rotation_matrix[2] = glm::vec4(-C * C, -C * S, C * C, C * S);
-    rotation_matrix[3] = glm::vec4(-C * S, -S * S, C * S, S * S);
+    rotation_matrix[0] = glm::vec4(C, S, 0, 0);
+    rotation_matrix[1] = glm::vec4(-S, C, 0, 0);
+    rotation_matrix[2] = glm::vec4(0, 0, C, S);
+    rotation_matrix[3] = glm::vec4(0, 0, -S, C);
 }
 
 void calculate_global_stiffness_beam(const glm::vec2 &node1,
@@ -91,7 +91,9 @@ void calculate_global_stiffness_beam(const glm::vec2 &node1,
     std::cout << "theta = " << theta << std::endl;
     glm::mat4 rotation_matrix;
     build_rotation_matrix(theta, rotation_matrix);
+    print_matrix(rotation_matrix);
     glm::mat4 temp_k = local_k_init * rotation_matrix;
+    print_matrix(temp_k);
     global_k = glm::transpose(rotation_matrix) * temp_k;
     print_matrix(global_k);
 }
@@ -131,25 +133,19 @@ void compute_displacement(std::vector<FEMPoint> &points,
     for (auto &p : points) {
         /* std::cout << p.coord.z << " " << p.coord.y << " " << p.flags */
         /*           << std::endl; */
+        known_forces[2 * i] = p.forceApplied.x;
+        known_forces[2 * i + 1] = p.forceApplied.y;
         switch (p.flags) {
         case NONE:
-            std::cout << "set " << (2 * i + 1) << " and " << (2 * i)
-                      << std::endl;
-            known_forces[2 * i + 1] = p.forceApplied.y;
-            known_forces[2 * i] = p.forceApplied.z;
             ids_knowns.push_back(2 * i);
             ids_knowns.push_back(2 * i + 1);
             break;
         case FIXED:
             break;
         case ROLLING_X:
-            /* std::cout << "set " << (2 * i) << std::endl; */
-            known_forces[2 * i] = 0;
             ids_knowns.push_back(2 * i);
             break;
         case ROLLING_Y:
-            /* std::cout << "set " << (2 * i + 1) << std::endl; */
-            known_forces[2 * i + 1] = 0;
             ids_knowns.push_back(2 * i + 1);
             break;
         }
