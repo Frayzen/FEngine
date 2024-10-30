@@ -31,6 +31,7 @@ class FEM2DMesh {
     bool setMode(vec3 pt, FEMFlag flag);
     FEMPoint *getPoint(vec3 pt);
     void resetForces();
+    bool is_well_defined();
 
   private:
     void updateFlags();

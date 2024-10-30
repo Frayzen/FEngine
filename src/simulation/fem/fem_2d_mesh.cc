@@ -22,6 +22,33 @@ FEM2DMesh::FEM2DMesh()
     fixedIndicator_.getMaterials()[0].setColor(vec3(1.0f, 0.0f, 0.0f), true);
 }
 
+bool FEM2DMesh::is_well_defined()
+{
+  bool oneFixed = false;
+  vec3 fixedpos;
+  for (auto& p : elems0d_)
+    if (p.flags == FIXED)
+    {
+      oneFixed = true;
+      fixedpos = p.coord;
+      break;
+    }
+  if (!oneFixed)
+    return false;
+  vec3 dir = vec3(0);
+  for (auto& p : elems0d_)
+  {
+    if (p.flags == NONE)
+      continue;
+    if (dir.x == 0 && dir.y == 0)
+      dir = fixedpos - p.coord;
+    else if(glm::length(cross(dir, fixedpos - p.coord)) <= 0.01f)
+      continue;
+    return true;
+  }
+  return false;
+}
+
 int find_or_append(vec3 e, std::vector<FEMPoint> &v) {
     for (unsigned int i = 0; i < v.size(); i++) {
         if (v[i].coord == e)
